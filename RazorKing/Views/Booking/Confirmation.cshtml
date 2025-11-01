@@ -1,0 +1,101 @@
+@model RazorKing.Models.Appointment
+@{
+    ViewData["Title"] = "تایید نوبت";
+}
+
+<div class="container mt-4" dir="rtl">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white text-center">
+                    <h3>نوبت شما با موفقیت ثبت شد</h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>شماره نوبت:</strong></div>
+                        <div class="col-8">@Model.Id</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>نام مشتری:</strong></div>
+                        <div class="col-8">@Model.CustomerName</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>شماره تماس:</strong></div>
+                        <div class="col-8">@Model.CustomerPhone</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>آرایشگاه:</strong></div>
+                        <div class="col-8">@Model.Barbershop.Name</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>شهر:</strong></div>
+                        <div class="col-8">@Model.Barbershop.City.Name</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>تاریخ:</strong></div>
+                        <div class="col-8">@Model.AppointmentDate.ToString("yyyy/MM/dd")</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>ساعت:</strong></div>
+                        <div class="col-8">@Model.AppointmentTime.ToString(@"hh\:mm")</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>خدمات:</strong></div>
+                        <div class="col-8">
+                            @foreach (var service in Model.AppointmentServices)
+                            {
+                                <div>@service.Service.Name - @service.Price.ToString("N0") تومان</div>
+                            }
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>مجموع هزینه:</strong></div>
+                        <div class="col-8 text-primary"><strong>@Model.TotalPrice.ToString("N0") تومان</strong></div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>بیعانه پرداختی:</strong></div>
+                        <div class="col-8 text-success"><strong>@Model.PaidAmount.ToString("N0") تومان</strong></div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>باقیمانده:</strong></div>
+                        <div class="col-8 text-warning"><strong>@((Model.TotalPrice - Model.PaidAmount).ToString("N0")) تومان</strong></div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <strong>توجه:</strong> مبلغ باقیمانده در آرایشگاه پرداخت می‌شود.
+                        <br>
+                        لطفا ۱۵ دقیقه قبل از ساعت نوبت در آرایشگاه حضور یابید.
+                    </div>
+                    
+                    <div class="text-center">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary">بازگشت به صفحه اصلی</a>
+                        <button onclick="window.print()" class="btn btn-secondary">چاپ رسید</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        .btn { display: none; }
+        .card { border: none; box-shadow: none; }
+    }
+</style>

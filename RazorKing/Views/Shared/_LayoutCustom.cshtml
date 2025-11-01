@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa-IR">
+<head>
+    <meta charset="utf-8">
+    <title>@ViewData["Title"]</title>
+    <meta name="description" content="آرایشگاه مردانه ریزر کینگ - خدمات حرفه‌ای کوتاهی، اصلاح، رنگ مو، ماساژ صورت و نوبت‌دهی آنلاین 24 ساعته">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="~/lib/slick-carousel/slick/slick.css" type="text/css">
+    <link rel="stylesheet" href="~/lib/slick-carousel/slick/slick-theme.css" type="text/css">
+    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" type="text/css">
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body class="layout-column bg-dark">
+    <header id="header" class="page-header fixed">
+        <div class="navbar navbar-expand-lg">
+            <a href="@Url.Action("Index", "Home")" class="navbar-brand text-white">
+                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="#000"></circle>
+                    <circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="1"></circle>
+                    <g class="loading-spin" stroke="currentColor" stroke-width="1" style="transform-origin: 12px 12px">
+                        <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path>
+                    </g>
+                </svg>
+                <span class="hidden-folded d-inline l-s-n-1x">RazorKing</span>
+            </a>
+            
+            <div class="collapse navbar-collapse order-2 order-lg-1" id="navbarCollapse">
+                <ul class="navbar-nav" data-nav>
+                    <li class="nav-item">
+                        <a href="#services" class="nav-link"><span class="nav-text">خدمات ما</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#barbers" class="nav-link"><span class="nav-text">آرایشگران</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#pricing" class="nav-link"><span class="nav-text">تعرفه‌ها</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#gallery" class="nav-link"><span class="nav-text">گالری</span></a>
+                    </li>
+                </ul>
+            </div>
+            
+            <ul class="nav navbar-menu order-1 order-lg-2">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            @User.Identity.Name
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="@Url.Action("Dashboard", "Profile")">پروفایل</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="dropdown-item">خروج</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link no-ajax" href="@Url.Action("Login", "Account")">ورود</a>
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <a class="btn btn-rounded btn-outline-light btn-sm btn-black no-ajax" href="@Url.Action("Register", "Account")">ثبت نام</a>
+                    </li>
+                }
+                <li class="nav-item d-lg-none">
+                    <a href="#" class="nav-link px-2" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                        <i data-feather="menu"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </header>
+
+    <div id="main" class="layout-row flex">
+        <div id="content" class="flex">
+            <div class="page-content page-container" id="page-content">
+                <div class="padding sr">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- فوتر -->
+    <footer id="footer" class="page-footer">
+        <div class="padding bg-dark b-t">
+            <div class="page-container">
+                <div class="py-5 text-inherit text-hover-primary">
+                    <div class="row mb-5">
+                        <div class="col-6 col-md-4">
+                            <div class="mb-3">
+                                <a href="@Url.Action("Index", "Home")" class="navbar-brand text-white">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="#000"></circle>
+                                        <circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="1"></circle>
+                                        <g class="loading-spin" stroke="currentColor" stroke-width="1" style="transform-origin: 12px 12px">
+                                            <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path>
+                                        </g>
+                                    </svg>
+                                    <span class="hidden-folded d-inline l-s-n-1x">ریزر کینگ</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <h5 class="mb-3 text-muted">خدمات</h5>
+                            <ul class="list-unstyled l-h-2x text-highlight">
+                                <li><a href="#">کوتاهی مو</a></li>
+                                <li><a href="#">اصلاح صورت</a></li>
+                                <li><a href="#">رنگ و مش</a></li>
+                                <li><a href="#">فید و لاین</a></li>
+                                <li><a href="#">ماساژ صورت</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <h5 class="mb-3 text-muted">نوبت‌دهی</h5>
+                            <ul class="list-unstyled l-h-2x text-highlight">
+                                <li><a href="@Url.Action("Index", "Booking")">رزرو آنلاین</a></li>
+                                <li><a href="#">نوبت‌های من</a></li>
+                                <li><a href="#">انتخاب آرایشگر</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <h5 class="mb-3 text-muted">درباره ما</h5>
+                            <ul class="list-unstyled l-h-2x text-highlight">
+                                <li><a href="#">معرفی آرایشگاه</a></li>
+                                <li><a href="#">گالری تصاویر</a></li>
+                                <li><a href="#">تماس با ما</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-6 col-md-2 text-md-right">
+                            <h5 class="mb-3 text-muted">شبکه‌های اجتماعی</h5>
+                            <a href="#" class="d-block">اینستاگرام</a>
+                            <a href="#" class="d-block">تلگرام</a>
+                            <a href="#" class="d-block">واتس‌اپ</a>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <span class="text-muted text-sm">© ۱۴۰۴ ریزر کینگ - آرایشگاه مردانه حرفه‌ای | تمامی حقوق محفوظ است.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/ajax.js"></script>
+    <script src="~/js/lazyload.config.js"></script>
+    <script src="~/js/lazyload.js"></script>
+    <script src="~/js/plugin.js"></script>
+    <script src="~/lib/scrollreveal/dist/scrollreveal.min.js"></script>
+    <script src="~/lib/slick-carousel/slick/slick.min.js"></script>
+    <script src="~/js/feather.min.js"></script>
+    <script src="~/js/theme.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

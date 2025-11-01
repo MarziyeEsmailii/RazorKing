@@ -1,0 +1,426 @@
+@model RazorKing.Models.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "ورود به ریزر کینگ";
+    Layout = "_LayoutModern";
+}
+
+<section class="auth-section">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-lg-5 col-md-7">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <div class="auth-logo">
+                            <i class="fas fa-cut"></i>
+                            <span>ریزر کینگ</span>
+                        </div>
+                        <h2>ورود به حساب کاربری</h2>
+                        <p>به بهترین پلتفرم رزرو آرایشگاه خوش آمدید</p>
+                    </div>
+                    
+                    <form asp-action="Login" method="post" class="auth-form">
+                        <div asp-validation-summary="All" class="alert alert-danger" style="display: none;"></div>
+                        
+                        <div class="form-group">
+                            <label asp-for="Email" class="form-label">
+                                <i class="fas fa-envelope"></i>
+                                ایمیل
+                            </label>
+                            <input asp-for="Email" class="form-control" placeholder="example@email.com" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Password" class="form-label">
+                                <i class="fas fa-lock"></i>
+                                رمز عبور
+                            </label>
+                            <div class="password-input">
+                                <input asp-for="Password" class="form-control" placeholder="رمز عبور خود را وارد کنید" />
+                                <button type="button" class="password-toggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input asp-for="RememberMe" class="form-check-input" />
+                                <label asp-for="RememberMe" class="form-check-label">
+                                    مرا به خاطر بسپار
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-gold btn-lg w-100 btn-animated">
+                            <i class="fas fa-sign-in-alt"></i>
+                            ورود
+                        </button>
+                    </form>
+                    
+                    <div class="auth-footer">
+                        <div class="auth-divider">
+                            <span>یا</span>
+                        </div>
+                        
+                        <div class="auth-links">
+                            <p>حساب کاربری ندارید؟</p>
+                            <a href="@Url.Action("Register", "Account")" class="auth-link">
+                                ثبت نام کنید
+                            </a>
+                        </div>
+                        
+                        <div class="forgot-password">
+                            <a href="#" class="forgot-link">
+                                رمز عبور خود را فراموش کرده‌اید؟
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-7 d-none d-lg-block">
+                <div class="auth-image">
+                    <img src="/images/auth-bg.jpg" alt="آرایشگاه مردانه" class="img-fluid">
+                    <div class="auth-overlay">
+                        <div class="auth-content">
+                            <h3>تجربه‌ای متفاوت از آرایشگری</h3>
+                            <p>با ریزر کینگ، بهترین آرایشگاه‌های استان گلستان را پیدا کنید و نوبت خود را آنلاین رزرو کنید</p>
+                            <div class="auth-features">
+                                <div class="feature-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>رزرو 24 ساعته</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>آرایشگران حرفه‌ای</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>تضمین کیفیت</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.auth-section {
+    background: var(--gradient-primary);
+    min-height: 100vh;
+    padding: 80px 0 40px;
+}
+
+.auth-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: var(--shadow-heavy);
+    border: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.auth-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--primary-gold);
+    margin-bottom: 20px;
+}
+
+.auth-logo i {
+    font-size: var(--font-size-2xl);
+}
+
+.auth-header h2 {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-white);
+}
+
+.auth-header p {
+    color: var(--text-gray);
+    font-size: var(--font-size-sm);
+}
+
+.auth-form {
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-white);
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: var(--font-size-sm);
+}
+
+.form-label i {
+    color: var(--primary-gold);
+    width: 16px;
+}
+
+.form-control {
+    background: rgba(42, 42, 42, 0.8);
+    border: 2px solid rgba(212, 175, 55, 0.2);
+    color: var(--text-white);
+    border-radius: 12px;
+    padding: 15px 20px;
+    font-size: var(--font-size-sm);
+    transition: all var(--transition-normal);
+}
+
+.form-control:focus {
+    background: rgba(42, 42, 42, 1);
+    border-color: var(--primary-gold);
+    box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25);
+    color: var(--text-white);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.password-input {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-gray);
+    cursor: pointer;
+    transition: color var(--transition-normal);
+}
+
+.password-toggle:hover {
+    color: var(--primary-gold);
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-check-input {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 4px;
+    background: transparent;
+}
+
+.form-check-input:checked {
+    background: var(--primary-gold);
+    border-color: var(--primary-gold);
+}
+
+.form-check-label {
+    color: var(--text-gray);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+}
+
+.auth-footer {
+    text-align: center;
+}
+
+.auth-divider {
+    position: relative;
+    margin: 30px 0;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(212, 175, 55, 0.2);
+}
+
+.auth-divider span {
+    background: var(--bg-card);
+    color: var(--text-gray);
+    padding: 0 20px;
+    font-size: var(--font-size-sm);
+}
+
+.auth-links {
+    margin-bottom: 20px;
+}
+
+.auth-links p {
+    color: var(--text-gray);
+    margin-bottom: 10px;
+    font-size: var(--font-size-sm);
+}
+
+.auth-link {
+    color: var(--primary-gold);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color var(--transition-normal);
+}
+
+.auth-link:hover {
+    color: var(--secondary-gold);
+}
+
+.forgot-link {
+    color: var(--text-gray);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    transition: color var(--transition-normal);
+}
+
+.forgot-link:hover {
+    color: var(--primary-gold);
+}
+
+.auth-image {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    height: 600px;
+}
+
+.auth-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.auth-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 10, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.auth-content {
+    text-align: center;
+    color: var(--text-white);
+}
+
+.auth-content h3 {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.auth-content p {
+    font-size: var(--font-size-base);
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.auth-features {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: var(--font-size-sm);
+}
+
+.feature-item i {
+    color: var(--primary-gold);
+    width: 20px;
+}
+
+media (max-width: 768px) {
+    .auth-card {
+        padding: 30px 20px;
+    }
+    
+    .auth-section {
+        padding: 60px 0 20px;
+    }
+}
+</style>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password toggle
+            const passwordToggle = document.querySelector('.password-toggle');
+            const passwordInput = document.querySelector('input[type="password"]');
+            
+            if (passwordToggle && passwordInput) {
+                passwordToggle.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    const icon = this.querySelector('i');
+                    icon.classList.toggle('fa-eye');
+                    icon.classList.toggle('fa-eye-slash');
+                });
+            }
+            
+            // Form validation
+            const form = document.querySelector('.auth-form');
+            const alertDiv = document.querySelector('.alert');
+            
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const email = document.querySelector('input[name="Email"]').value;
+                    const password = document.querySelector('input[name="Password"]').value;
+                    
+                    if (!email || !password) {
+                        e.preventDefault();
+                        showAlert('لطفا تمام فیلدها را پر کنید');
+                    }
+                });
+            }
+            
+            function showAlert(message) {
+                if (alertDiv) {
+                    alertDiv.textContent = message;
+                    alertDiv.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        alertDiv.style.display = 'none';
+                    }, 5000);
+                }
+            }
+        });
+    </script>
+}

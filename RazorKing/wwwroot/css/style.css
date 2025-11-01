@@ -1,0 +1,381 @@
+/* استایل‌های اضافی ریزر کینگ */
+
+/* Layout کلی */
+.layout-column {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.layout-row {
+    display: flex;
+    flex: 1;
+}
+
+.flex {
+    flex: 1;
+}
+
+/* Header */
+.page-header.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.page-header + #main {
+    margin-top: 70px;
+}
+
+/* Navigation */
+.navbar {
+    padding: 15px 0;
+}
+
+.navbar-brand svg {
+    margin-left: 10px;
+}
+
+.hidden-folded {
+    margin-right: 10px;
+}
+
+/* Content */
+.page-content {
+    flex: 1;
+}
+
+.page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.padding {
+    padding: 20px;
+}
+
+.sr {
+    position: relative;
+}
+
+/* Hero Section */
+.pos-rlt {
+    position: relative;
+}
+
+.media {
+    position: relative;
+    overflow: hidden;
+}
+
+.bg-media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* Slick Carousel */
+.slick-dots {
+    bottom: 30px;
+}
+
+.slick-dots li button:before {
+    color: var(--accent-gold);
+    font-size: 12px;
+}
+
+.slick-dots li.slick-active button:before {
+    color: var(--primary-cream);
+}
+
+/* Headings */
+.heading {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.heading .text-muted {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.heading h3 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+/* Services */
+.service-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.service-item::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(218, 165, 32, 0.1) 0%, transparent 70%);
+    transform: scale(0);
+    transition: transform 0.5s ease;
+}
+
+.service-item:hover::before {
+    transform: scale(1);
+}
+
+/* Buttons */
+.gd-black {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-brown) 100%);
+    border: none;
+}
+
+.gd-black:hover {
+    background: linear-gradient(135deg, var(--primary-brown) 0%, var(--accent-gold) 100%);
+}
+
+/* Text utilities */
+.l-s-n-1x {
+    letter-spacing: -1px;
+}
+
+.l-h-2x {
+    line-height: 2;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+.text-inherit {
+    color: inherit;
+}
+
+.text-hover-primary a:hover {
+    color: var(--accent-gold) !important;
+}
+
+/* Borders */
+.b-t {
+    border-top: 1px solid rgba(139, 69, 19, 0.3);
+}
+
+/* City Selection */
+#cityDropdown {
+    background: var(--gradient-secondary);
+    border: 2px solid var(--accent-gold);
+    color: var(--text-light);
+    font-weight: bold;
+    text-align: right;
+    position: relative;
+}
+
+#cityDropdown::after {
+    margin-right: 10px;
+}
+
+.city-link {
+    padding: 12px 20px;
+    font-weight: 500;
+    border-radius: 5px;
+    margin: 2px 0;
+    transition: all 0.3s ease;
+}
+
+.city-link:hover {
+    background: var(--primary-brown) !important;
+    color: var(--text-light) !important;
+    transform: translateX(5px);
+}
+
+/* Booking Form */
+.booking-step {
+    background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+    border: 2px solid var(--primary-brown);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.booking-step.active {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 20px rgba(218, 165, 32, 0.3);
+}
+
+.step-number {
+    background: var(--gradient-secondary);
+    color: var(--text-light);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-left: 15px;
+}
+
+.step-number.completed {
+    background: var(--accent-gold);
+    color: var(--primary-dark);
+}
+
+/* Time Slots */
+.time-slot {
+    background: rgba(42, 42, 42, 0.8);
+    border: 2px solid var(--primary-brown);
+    color: var(--text-light);
+    padding: 10px 20px;
+    border-radius: 25px;
+    margin: 5px;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.time-slot:hover {
+    background: var(--primary-brown);
+    border-color: var(--accent-gold);
+    transform: translateY(-2px);
+}
+
+.time-slot.selected {
+    background: var(--accent-gold);
+    border-color: var(--accent-gold);
+    color: var(--primary-dark);
+}
+
+/* Service Selection */
+.service-checkbox {
+    margin-left: 10px;
+}
+
+.form-check-label {
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-check-input:checked + .form-check-label {
+    color: var(--accent-gold);
+    font-weight: bold;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+.alert-info {
+    background: rgba(139, 69, 19, 0.2);
+    color: var(--primary-cream);
+    border: 1px solid var(--primary-brown);
+}
+
+.alert-warning {
+    background: rgba(218, 165, 32, 0.2);
+    color: var(--accent-gold);
+    border: 1px solid var(--accent-gold);
+}
+
+.alert-success {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 1px solid #28a745;
+}
+
+/* Confirmation Page */
+.confirmation-icon {
+    color: var(--accent-gold);
+    font-size: 4rem;
+    margin-bottom: 30px;
+}
+
+.receipt-row {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(139, 69, 19, 0.3);
+}
+
+.receipt-row:last-child {
+    border-bottom: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Print Styles */
+@media print {
+    .btn, .navbar, .page-footer {
+        display: none !important;
+    }
+    
+    .card {
+        border: 2px solid #000 !important;
+        box-shadow: none !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.spinner {
+    border: 3px solid rgba(139, 69, 19, 0.3);
+    border-top: 3px solid var(--accent-gold);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+/* Hover Effects */
+.hover-lift {
+    transition: transform 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+}
+
+/* Custom Scrollbar for specific elements */
+.custom-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-brown) var(--primary-dark);
+}
+
+.custom-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+    background: var(--primary-dark);
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: var(--primary-brown);
+    border-radius: 3px;
+}
+
+/* Feather Icons */
+[data-feather] {
+    stroke-width: 2;
+    vertical-align: middle;
+}

@@ -1,0 +1,884 @@
+@model RazorKing.Models.ViewModels.BookingViewModel
+@{
+    ViewData["Title"] = "رزرو نوبت آرایشگاه مردانه - استان گلستان";
+    Layout = "_LayoutModern";
+}
+
+<section class="booking-section">
+    <div class="container">
+        <!-- Header -->
+        <div class="booking-header text-center mb-5">
+            <span class="section-badge">رزرو آنلاین</span>
+            <h1 class="section-title">رزرو نوبت آرایشگاه مردانه</h1>
+            <p class="section-subtitle">در استان گلستان، بهترین آرایشگاه را انتخاب کنید</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="booking-wizard">
+                    <!-- Progress Steps -->
+                    <div class="wizard-steps">
+                        <div class="step active" data-step="1">
+                            <div class="step-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <span>انتخاب شهر</span>
+                        </div>
+                        <div class="step" data-step="2">
+                            <div class="step-icon">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <span>انتخاب آرایشگاه</span>
+                        </div>
+                        <div class="step" data-step="3">
+                            <div class="step-icon">
+                                <i class="fas fa-cut"></i>
+                            </div>
+                            <span>انتخاب خدمات</span>
+                        </div>
+                        <div class="step" data-step="4">
+                            <div class="step-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <span>انتخاب زمان</span>
+                        </div>
+                        <div class="step" data-step="5">
+                            <div class="step-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span>اطلاعات شخصی</span>
+                        </div>
+                    </div>
+
+                    <!-- Booking Form -->
+                    <div class="booking-form-container">
+                        <form id="bookingForm" class="booking-form">
+                            <!-- Step 1: انتخاب شهر -->
+                            <div class="form-step active" id="step1">
+                                <div class="step-content">
+                                    <h3 class="step-title">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        انتخاب شهر
+                                    </h3>
+                                    <p class="step-description">شهر خود را از شهرهای استان گلستان انتخاب کنید</p>
+                                    
+                                    <div class="cities-grid">
+                                        @foreach (var city in Model.Cities)
+                                        {
+                                            <div class="city-option" data-city-id="@city.Id">
+                                                <div class="city-icon">
+                                                    <i class="fas fa-building"></i>
+                                                </div>
+                                                <h5>@city.Name</h5>
+                                                <p>استان @city.Province</p>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: انتخاب آرایشگاه -->
+                            <div class="form-step" id="step2">
+                                <div class="step-content">
+                                    <h3 class="step-title">
+                                        <i class="fas fa-store"></i>
+                                        انتخاب آرایشگاه
+                                    </h3>
+                                    <p class="step-description">آرایشگاه مورد نظر خود را انتخاب کنید</p>
+                                    
+                                    <div id="barbershopsList" class="barbershops-grid">
+                                        <!-- Barbershops will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: انتخاب خدمات -->
+                            <div class="form-step" id="step3">
+                                <div class="step-content">
+                                    <h3 class="step-title">
+                                        <i class="fas fa-cut"></i>
+                                        انتخاب خدمات
+                                    </h3>
+                                    <p class="step-description">خدمات مورد نیاز خود را انتخاب کنید</p>
+                                    
+                                    <div id="servicesList" class="services-grid">
+                                        <!-- Services will be loaded here -->
+                                    </div>
+                                    
+                                    <div class="price-summary">
+                                        <div class="price-item">
+                                            <span>مجموع هزینه:</span>
+                                            <span id="totalPrice" class="price-value">0 تومان</span>
+                                        </div>
+                                        <div class="price-item deposit">
+                                            <span>بیعانه (30%):</span>
+                                            <span id="depositAmount" class="price-value">0 تومان</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 4: انتخاب زمان -->
+                            <div class="form-step" id="step4">
+                                <div class="step-content">
+                                    <h3 class="step-title">
+                                        <i class="fas fa-calendar"></i>
+                                        انتخاب زمان
+                                    </h3>
+                                    <p class="step-description">تاریخ و ساعت مناسب خود را انتخاب کنید</p>
+                                    
+                                    <div class="datetime-selection">
+                                        <div class="date-selection">
+                                            <div class="date-form-group">
+                                                <label class="form-label">انتخاب تاریخ:</label>
+                                                <input type="text" class="form-control persian-date-input" 
+                                                       id="appointmentDate" placeholder="روز/ماه/سال" 
+                                                       readonly required>
+                                                <i class="fas fa-calendar-alt date-icon"></i>
+                                            </div>
+                                            <div id="selectedDateDisplay" class="selected-date-display" style="display: none;">
+                                                <div class="date-label">تاریخ انتخاب شده:</div>
+                                                <div class="date-value" id="selectedDateText"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="time-selection">
+                                            <label class="form-label">ساعات خالی:</label>
+                                            <div id="timeSlots" class="time-slots-grid">
+                                                <!-- Time slots will be loaded here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 5: اطلاعات شخصی -->
+                            <div class="form-step" id="step5">
+                                <div class="step-content">
+                                    <h3 class="step-title">
+                                        <i class="fas fa-user"></i>
+                                        اطلاعات شخصی
+                                    </h3>
+                                    <p class="step-description">اطلاعات تماس خود را وارد کنید</p>
+                                    
+                                    <div class="customer-info">
+                                        <div class="form-group">
+                                            <label for="customerName" class="form-label">
+                                                <i class="fas fa-user"></i>
+                                                نام و نام خانوادگی
+                                            </label>
+                                            <input type="text" class="form-control" id="customerName" 
+                                                   placeholder="نام کامل خود را وارد کنید" required>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="customerPhone" class="form-label">
+                                                <i class="fas fa-phone"></i>
+                                                شماره تماس
+                                            </label>
+                                            <input type="tel" class="form-control" id="customerPhone" 
+                                                   placeholder="09xxxxxxxxx" required>
+                                        </div>
+                                        
+                                        <div class="booking-summary">
+                                            <h4>خلاصه رزرو</h4>
+                                            <div class="summary-item">
+                                                <span>شهر:</span>
+                                                <span id="summaryCity">-</span>
+                                            </div>
+                                            <div class="summary-item">
+                                                <span>آرایشگاه:</span>
+                                                <span id="summaryBarbershop">-</span>
+                                            </div>
+                                            <div class="summary-item">
+                                                <span>خدمات:</span>
+                                                <span id="summaryServices">-</span>
+                                            </div>
+                                            <div class="summary-item">
+                                                <span>تاریخ و ساعت:</span>
+                                                <span id="summaryDateTime">-</span>
+                                            </div>
+                                            <div class="summary-item total">
+                                                <span>مجموع هزینه:</span>
+                                                <span id="summaryTotal">0 تومان</span>
+                                            </div>
+                                            <div class="summary-item deposit">
+                                                <span>بیعانه قابل پرداخت:</span>
+                                                <span id="summaryDeposit">0 تومان</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="payment-notice">
+                                            <div class="notice-icon">
+                                                <i class="fas fa-info-circle"></i>
+                                            </div>
+                                            <div class="notice-content">
+                                                <h5>نکات مهم:</h5>
+                                                <ul>
+                                                    <li>30% از مبلغ کل به عنوان بیعانه پرداخت می‌شود</li>
+                                                    <li>مابقی مبلغ در آرایشگاه پرداخت خواهد شد</li>
+                                                    <li>15 دقیقه قبل از ساعت نوبت حضور یابید</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Navigation Buttons -->
+                            <div class="form-navigation">
+                                <button type="button" id="prevBtn" class="btn btn-outline-gold" style="display: none;">
+                                    <i class="fas fa-arrow-right"></i>
+                                    مرحله قبل
+                                </button>
+                                <button type="button" id="nextBtn" class="btn btn-gold" style="display: none;">
+                                    مرحله بعد
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                                <button type="submit" id="submitBtn" class="btn btn-gold btn-lg" style="display: none;">
+                                    <i class="fas fa-credit-card"></i>
+                                    تایید و پرداخت بیعانه
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Booking Styles -->
+<style>
+.booking-section {
+    background: var(--gradient-primary);
+    min-height: 100vh;
+    padding: 120px 0 60px;
+}
+
+.booking-header {
+    margin-bottom: 60px;
+}
+
+.booking-wizard {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: var(--shadow-heavy);
+    border: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.wizard-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+.wizard-steps::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 50px;
+    right: 50px;
+    height: 2px;
+    background: rgba(212, 175, 55, 0.2);
+    z-index: 1;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+}
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--medium-gray);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    transition: all var(--transition-normal);
+}
+
+.step.active .step-icon,
+.step.completed .step-icon {
+    background: var(--primary-gold);
+    border-color: var(--primary-gold);
+    color: var(--primary-black);
+}
+
+.step span {
+    font-size: var(--font-size-sm);
+    color: var(--text-gray);
+    font-weight: 500;
+}
+
+.step.active span,
+.step.completed span {
+    color: var(--primary-gold);
+}
+
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.step-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--text-white);
+    margin-bottom: 10px;
+}
+
+.step-title i {
+    color: var(--primary-gold);
+}
+
+.step-description {
+    color: var(--text-gray);
+    margin-bottom: 40px;
+    font-size: var(--font-size-base);
+}
+
+.cities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.city-option {
+    background: var(--medium-gray);
+    border: 2px solid rgba(212, 175, 55, 0.2);
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.city-option:hover,
+.city-option.selected {
+    border-color: var(--primary-gold);
+    background: rgba(212, 175, 55, 0.1);
+    transform: translateY(-5px);
+}
+
+.city-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(212, 175, 55, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+}
+
+.city-icon i {
+    font-size: var(--font-size-xl);
+    color: var(--primary-gold);
+}
+
+.city-option h5 {
+    color: var(--text-white);
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.city-option p {
+    color: var(--text-gray);
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.barbershops-grid,
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.barbershop-card,
+.service-card {
+    background: var(--medium-gray);
+    border: 2px solid rgba(212, 175, 55, 0.2);
+    border-radius: 15px;
+    padding: 25px;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.barbershop-card:hover,
+.barbershop-card.selected,
+.service-card:hover,
+.service-card.selected {
+    border-color: var(--primary-gold);
+    background: rgba(212, 175, 55, 0.1);
+    transform: translateY(-3px);
+}
+
+.service-card {
+    position: relative;
+}
+
+.service-checkbox {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 20px;
+    height: 20px;
+}
+
+.price-summary {
+    background: var(--dark-gray);
+    border-radius: 15px;
+    padding: 25px;
+    margin-top: 30px;
+}
+
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: var(--font-size-base);
+}
+
+.price-item:last-child {
+    margin-bottom: 0;
+}
+
+.price-item.deposit {
+    border-top: 1px solid rgba(212, 175, 55, 0.3);
+    padding-top: 15px;
+    font-weight: 600;
+}
+
+.price-value {
+    color: var(--primary-gold);
+    font-weight: 700;
+}
+
+.datetime-selection {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.time-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+}
+
+.time-slot {
+    background: var(--medium-gray);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    color: var(--text-white);
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+}
+
+.time-slot:hover,
+.time-slot.selected {
+    background: var(--primary-gold);
+    border-color: var(--primary-gold);
+    color: var(--primary-black);
+}
+
+.customer-info {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.booking-summary {
+    background: var(--dark-gray);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 30px 0;
+}
+
+.booking-summary h4 {
+    color: var(--primary-gold);
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.summary-item.total,
+.summary-item.deposit {
+    font-weight: 700;
+    font-size: var(--font-size-lg);
+}
+
+.summary-item.total {
+    color: var(--text-white);
+}
+
+.summary-item.deposit {
+    color: var(--primary-gold);
+}
+
+.payment-notice {
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    gap: 15px;
+}
+
+.notice-icon {
+    color: var(--primary-gold);
+    font-size: var(--font-size-xl);
+}
+
+.notice-content h5 {
+    color: var(--text-white);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.notice-content ul {
+    color: var(--text-gray);
+    margin: 0;
+    padding-right: 20px;
+}
+
+.notice-content li {
+    margin-bottom: 5px;
+    font-size: var(--font-size-sm);
+}
+
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+media (max-width: 768px) {
+    .wizard-steps {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .wizard-steps::before {
+        display: none;
+    }
+    
+    .datetime-selection {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .cities-grid,
+    .barbershops-grid,
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .time-slots-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
+}
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentStep = 1;
+            let selectedData = {
+                cityId: null,
+                cityName: '',
+                barbershopId: null,
+                barbershopName: '',
+                services: [],
+                date: '',
+                time: '',
+                totalPrice: 0
+            };
+
+            // Initialize
+            updateNavigation();
+            
+            // City selection
+            document.querySelectorAll('.city-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.city-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    selectedData.cityId = this.dataset.cityId;
+                    selectedData.cityName = this.querySelector('h5').textContent;
+                    
+                    nextStep();
+                    loadBarbershops(selectedData.cityId);
+                });
+            });
+
+            // Navigation buttons
+            document.getElementById('prevBtn').addEventListener('click', prevStep);
+            document.getElementById('nextBtn').addEventListener('click', nextStep);
+            document.getElementById('bookingForm').addEventListener('submit', handleSubmit);
+
+            function nextStep() {
+                if (currentStep < 5) {
+                    document.querySelector(`#step${currentStep}`).classList.remove('active');
+                    document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('completed');
+                    
+                    currentStep++;
+                    
+                    document.querySelector(`#step${currentStep}`).classList.add('active');
+                    document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+                    
+                    updateNavigation();
+                    
+                    if (currentStep === 5) {
+                        updateSummary();
+                    }
+                }
+            }
+
+            function prevStep() {
+                if (currentStep > 1) {
+                    document.querySelector(`#step${currentStep}`).classList.remove('active');
+                    document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+                    
+                    currentStep--;
+                    
+                    document.querySelector(`#step${currentStep}`).classList.add('active');
+                    document.querySelector(`.step[data-step="${currentStep + 1}"]`).classList.remove('completed');
+                    
+                    updateNavigation();
+                }
+            }
+
+            function updateNavigation() {
+                const prevBtn = document.getElementById('prevBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                const submitBtn = document.getElementById('submitBtn');
+
+                prevBtn.style.display = currentStep > 1 ? 'inline-flex' : 'none';
+                nextBtn.style.display = currentStep < 5 ? 'inline-flex' : 'none';
+                submitBtn.style.display = currentStep === 5 ? 'inline-flex' : 'none';
+            }
+
+            function loadBarbershops(cityId) {
+                fetch(`/Booking/GetBarbershops?cityId=${cityId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const container = document.getElementById('barbershopsList');
+                        container.innerHTML = '';
+                        
+                        data.forEach(barbershop => {
+                            const card = document.createElement('div');
+                            card.className = 'barbershop-card';
+                            card.dataset.barbershopId = barbershop.id;
+                            card.innerHTML = `
+                                <h5>${barbershop.name}</h5>
+                                <p>${barbershop.address}</p>
+                                <small class="text-muted">${barbershop.phone}</small>
+                            `;
+                            
+                            card.addEventListener('click', function() {
+                                document.querySelectorAll('.barbershop-card').forEach(c => c.classList.remove('selected'));
+                                this.classList.add('selected');
+                                
+                                selectedData.barbershopId = barbershop.id;
+                                selectedData.barbershopName = barbershop.name;
+                                
+                                setTimeout(() => {
+                                    nextStep();
+                                    loadServices(barbershop.id);
+                                }, 300);
+                            });
+                            
+                            container.appendChild(card);
+                        });
+                    });
+            }
+
+            function loadServices(barbershopId) {
+                fetch(`/Booking/GetServices?barbershopId=${barbershopId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const container = document.getElementById('servicesList');
+                        container.innerHTML = '';
+                        
+                        data.forEach(service => {
+                            const card = document.createElement('div');
+                            card.className = 'service-card';
+                            card.innerHTML = `
+                                <input type="checkbox" class="service-checkbox" value="${service.id}" 
+                                       data-price="${service.price}" data-name="${service.name}">
+                                <h5>${service.name}</h5>
+                                <p>${service.description}</p>
+                                <div class="service-price">${service.price.toLocaleString()} تومان</div>
+                            `;
+                            
+                            const checkbox = card.querySelector('.service-checkbox');
+                            checkbox.addEventListener('change', function() {
+                                if (this.checked) {
+                                    card.classList.add('selected');
+                                } else {
+                                    card.classList.remove('selected');
+                                }
+                                updateServiceSelection();
+                            });
+                            
+                            container.appendChild(card);
+                        });
+                    });
+            }
+
+            function updateServiceSelection() {
+                selectedData.services = [];
+                selectedData.totalPrice = 0;
+                
+                document.querySelectorAll('.service-checkbox:checked').forEach(checkbox => {
+                    selectedData.services.push({
+                        id: parseInt(checkbox.value),
+                        name: checkbox.dataset.name,
+                        price: parseFloat(checkbox.dataset.price)
+                    });
+                    selectedData.totalPrice += parseFloat(checkbox.dataset.price);
+                });
+                
+                document.getElementById('totalPrice').textContent = selectedData.totalPrice.toLocaleString() + ' تومان';
+                document.getElementById('depositAmount').textContent = (selectedData.totalPrice * 0.3).toLocaleString() + ' تومان';
+                
+                // Enable next button if services selected
+                const nextBtn = document.getElementById('nextBtn');
+                if (currentStep === 3) {
+                    nextBtn.disabled = selectedData.services.length === 0;
+                }
+            }
+
+            // Date selection
+            document.getElementById('appointmentDate').addEventListener('change', function() {
+                selectedData.date = this.value;
+                if (selectedData.date && selectedData.barbershopId && selectedData.services.length > 0) {
+                    loadAvailableTimes();
+                }
+            });
+
+            function loadAvailableTimes() {
+                const serviceIds = selectedData.services.map(s => s.id).join(',');
+                
+                fetch(`/Booking/GetAvailableTimes?barbershopId=${selectedData.barbershopId}&date=${selectedData.date}&serviceIds=${serviceIds}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const container = document.getElementById('timeSlots');
+                        container.innerHTML = '';
+                        
+                        if (data.length === 0) {
+                            container.innerHTML = '<div class="alert alert-warning">متاسفانه در این تاریخ ساعت خالی وجود ندارد.</div>';
+                        } else {
+                            data.forEach(time => {
+                                const button = document.createElement('button');
+                                button.type = 'button';
+                                button.className = 'time-slot';
+                                button.textContent = time;
+                                button.dataset.time = time;
+                                
+                                button.addEventListener('click', function() {
+                                    document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+                                    this.classList.add('selected');
+                                    selectedData.time = time;
+                                });
+                                
+                                container.appendChild(button);
+                            });
+                        }
+                    });
+            }
+
+            function updateSummary() {
+                document.getElementById('summaryCity').textContent = selectedData.cityName;
+                document.getElementById('summaryBarbershop').textContent = selectedData.barbershopName;
+                document.getElementById('summaryServices').textContent = selectedData.services.map(s => s.name).join(', ');
+                document.getElementById('summaryDateTime').textContent = `${selectedData.date} - ${selectedData.time}`;
+                document.getElementById('summaryTotal').textContent = selectedData.totalPrice.toLocaleString() + ' تومان';
+                document.getElementById('summaryDeposit').textContent = (selectedData.totalPrice * 0.3).toLocaleString() + ' تومان';
+            }
+
+            function handleSubmit(e) {
+                e.preventDefault();
+                
+                const appointmentData = {
+                    SelectedCityId: selectedData.cityId,
+                    SelectedBarbershopId: selectedData.barbershopId,
+                    SelectedServiceIds: selectedData.services.map(s => s.id),
+                    SelectedDate: selectedData.date,
+                    SelectedTime: selectedData.time,
+                    CustomerName: document.getElementById('customerName').value,
+                    CustomerPhone: document.getElementById('customerPhone').value,
+                    TotalPrice: selectedData.totalPrice,
+                    DepositAmount: selectedData.totalPrice * 0.3
+                };
+
+                fetch('/Booking/CreateAppointment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(appointmentData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        RazorKing.showToast('نوبت شما با موفقیت ثبت شد!', 'success');
+                        setTimeout(() => {
+                            window.location.href = `/Booking/Confirmation/${data.appointmentId}`;
+                        }, 1500);
+                    } else {
+                        RazorKing.showToast('خطا در ثبت نوبت. لطفا دوباره تلاش کنید.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    RazorKing.showToast('خطا در ارتباط با سرور', 'error');
+                });
+            }
+        });
+    </script>
+}

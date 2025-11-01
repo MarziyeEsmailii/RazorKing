@@ -1,0 +1,374 @@
+@model RazorKing.Models.Barbershop
+@{
+    ViewData["Title"] = "پنل مدیریت آرایشگاه";
+    Layout = "_LayoutModern";
+}
+
+<div class="owner-dashboard">
+    <div class="dashboard-header">
+        <div class="welcome-section">
+            <h1>سلام، @User.Identity.Name</h1>
+            <p>به پنل مدیریت آرایشگاه @Model.Name خوش آمدید</p>
+        </div>
+        <div class="quick-actions">
+            <a href="@Url.Action("EditBarbershop")" class="btn btn-primary">
+                <i class="fas fa-edit"></i> ویرایش اطلاعات
+            </a>
+            <a href="@Url.Action("CreateService")" class="btn btn-success">
+                <i class="fas fa-plus"></i> افزودن خدمت
+            </a>
+        </div>
+    </div>
+
+    <!-- آمار کلی -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-day"></i>
+            </div>
+            <div class="stat-content">
+                <h3>@ViewBag.Stats.TodayAppointments</h3>
+                <p>نوبت امروز</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="stat-content">
+                <h3>@ViewBag.Stats.MonthlyAppointments</h3>
+                <p>نوبت این ماه</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="stat-content">
+                <h3>@ViewBag.Stats.MonthlyRevenue.ToString("N0") تومان</h3>
+                <p>درآمد این ماه</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-cut"></i>
+            </div>
+            <div class="stat-content">
+                <h3>@ViewBag.Stats.TotalServices</h3>
+                <p>تعداد خدمات</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- اطلاعات آرایشگاه -->
+    <div class="barbershop-info">
+        <div class="info-card">
+            <div class="card-header">
+                <h2>اطلاعات آرایشگاه</h2>
+                <a href="@Url.Action("EditBarbershop")" class="edit-btn">
+                    <i class="fas fa-edit"></i>
+                </a>
+            </div>
+            <div class="card-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>نام آرایشگاه:</label>
+                        <span>@Model.Name</span>
+                    </div>
+                    <div class="info-item">
+                        <label>آدرس:</label>
+                        <span>@Model.Address</span>
+                    </div>
+                    <div class="info-item">
+                        <label>شهر:</label>
+                        <span>@Model.City.Name</span>
+                    </div>
+                    <div class="info-item">
+                        <label>تلفن:</label>
+                        <span>@Model.Phone</span>
+                    </div>
+                    <div class="info-item">
+                        <label>ساعات کاری:</label>
+                        <span>@Model.OpenTime.ToString(@"hh\:mm") - @Model.CloseTime.ToString(@"hh\:mm")</span>
+                    </div>
+                    <div class="info-item">
+                        <label>وضعیت:</label>
+                        <span class="status @(Model.IsActive ? "active" : "inactive")">
+                            @(Model.IsActive ? "فعال" : "غیرفعال")
+                        </span>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div class="description">
+                        <label>توضیحات:</label>
+                        <p>@Model.Description</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- منوی سریع -->
+    <div class="quick-menu">
+        <div class="menu-grid">
+            <a href="@Url.Action("Appointments")" class="menu-item">
+                <i class="fas fa-calendar-check"></i>
+                <h3>مدیریت نوبت‌ها</h3>
+                <p>مشاهده و مدیریت نوبت‌های رزرو شده</p>
+            </a>
+            <a href="@Url.Action("Services")" class="menu-item">
+                <i class="fas fa-cut"></i>
+                <h3>مدیریت خدمات</h3>
+                <p>افزودن، ویرایش و حذف خدمات</p>
+            </a>
+            <a href="@Url.Action("EditBarbershop")" class="menu-item">
+                <i class="fas fa-store"></i>
+                <h3>تنظیمات آرایشگاه</h3>
+                <p>ویرایش اطلاعات و تصاویر آرایشگاه</p>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <h3>گزارشات</h3>
+                <p>مشاهده آمار و گزارشات فروش</p>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.owner-dashboard {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+    border-radius: 15px;
+    color: white;
+}
+
+.welcome-section h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: #d4af37;
+}
+
+.welcome-section p {
+    margin: 5px 0 0 0;
+    opacity: 0.8;
+}
+
+.quick-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #d4af37, #b8941f);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.stat-content h3 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #333;
+}
+
+.stat-content p {
+    margin: 5px 0 0 0;
+    color: #666;
+}
+
+.barbershop-info {
+    margin-bottom: 30px;
+}
+
+.info-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h2 {
+    margin: 0;
+    color: #d4af37;
+}
+
+.edit-btn {
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.1);
+    transition: background 0.3s ease;
+}
+
+.edit-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.card-content {
+    padding: 25px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.info-item label {
+    font-weight: 600;
+    color: #333;
+}
+
+.info-item span {
+    color: #666;
+}
+
+.status.active {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.status.inactive {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.description {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.description label {
+    font-weight: 600;
+    color: #333;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.description p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.quick-menu {
+    margin-top: 30px;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.menu-item {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.menu-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.menu-item i {
+    font-size: 2.5rem;
+    color: #d4af37;
+    margin-bottom: 15px;
+}
+
+.menu-item h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.menu-item p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+@@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .menu-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>

@@ -1,0 +1,386 @@
+@model RazorKing.Models.Barbershop
+@{
+    ViewData["Title"] = "ویرایش اطلاعات آرایشگاه";
+    Layout = "_LayoutModern";
+}
+
+<div class="edit-barbershop">
+    <div class="page-header">
+        <h1>ویرایش اطلاعات آرایشگاه</h1>
+        <a href="@Url.Action("Dashboard")" class="btn btn-secondary">
+            <i class="fas fa-arrow-right"></i> بازگشت به پنل
+        </a>
+    </div>
+
+    <form asp-action="EditBarbershop" method="post" enctype="multipart/form-data" class="barbershop-form">
+        <div class="form-sections">
+            <!-- اطلاعات اصلی -->
+            <div class="form-section">
+                <h2>اطلاعات اصلی</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="Name">نام آرایشگاه</label>
+                        <input asp-for="Name" class="form-control" required>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Phone">شماره تلفن</label>
+                        <input asp-for="Phone" class="form-control" type="tel">
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+                    <div class="form-group full-width">
+                        <label asp-for="Address">آدرس</label>
+                        <input asp-for="Address" class="form-control" required>
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CityId">شهر</label>
+                        <select asp-for="CityId" class="form-control" required>
+                            <option value="">انتخاب شهر</option>
+                            @foreach (var city in (List<RazorKing.Models.City>)ViewBag.Cities)
+                            {
+                                <option value="@city.Id" selected="@(city.Id == Model.CityId)">@city.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="CityId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ساعات کاری -->
+            <div class="form-section">
+                <h2>ساعات کاری</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="OpenTime">ساعت شروع</label>
+                        <input asp-for="OpenTime" class="form-control" type="time" required>
+                        <span asp-validation-for="OpenTime" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CloseTime">ساعت پایان</label>
+                        <input asp-for="CloseTime" class="form-control" type="time" required>
+                        <span asp-validation-for="CloseTime" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تصویر آرایشگاه -->
+            <div class="form-section">
+                <h2>تصویر آرایشگاه</h2>
+                <div class="image-upload">
+                    @if (!string.IsNullOrEmpty(Model.ImagePath))
+                    {
+                        <div class="current-image">
+                            <img src="@Model.ImagePath" alt="تصویر فعلی" id="currentImage">
+                            <p>تصویر فعلی</p>
+                        </div>
+                    }
+                    <div class="upload-area">
+                        <input type="file" name="imageFile" id="imageFile" accept="image/*" class="file-input">
+                        <label for="imageFile" class="file-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>انتخاب تصویر جدید</span>
+                        </label>
+                        <div class="preview-area" id="previewArea" style="display: none;">
+                            <img id="previewImage" alt="پیش‌نمایش">
+                            <button type="button" id="removePreview" class="remove-btn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- توضیحات -->
+            <div class="form-section">
+                <h2>توضیحات</h2>
+                <div class="form-group">
+                    <label asp-for="Description">توضیحات آرایشگاه</label>
+                    <textarea asp-for="Description" class="form-control" rows="4" 
+                              placeholder="توضیحاتی درباره آرایشگاه، امکانات و خدمات ویژه..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> ذخیره تغییرات
+            </button>
+            <a href="@Url.Action("Dashboard")" class="btn btn-secondary">
+                <i class="fas fa-times"></i> انصراف
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+.edit-barbershop {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+    border-radius: 15px;
+    color: white;
+}
+
+.page-header h1 {
+    margin: 0;
+    color: #d4af37;
+}
+
+.barbershop-form {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.form-sections {
+    padding: 30px;
+}
+
+.form-section {
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.form-section h2 {
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 1.3rem;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #d4af37;
+    display: inline-block;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-control {
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.image-upload {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.current-image {
+    text-align: center;
+}
+
+.current-image img {
+    width: 200px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.current-image p {
+    margin: 10px 0 0 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.upload-area {
+    flex: 1;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    border: 2px dashed #ddd;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f9f9f9;
+}
+
+.file-label:hover {
+    border-color: #d4af37;
+    background: #fff;
+}
+
+.file-label i {
+    font-size: 2rem;
+    color: #d4af37;
+    margin-bottom: 10px;
+}
+
+.file-label span {
+    color: #666;
+    font-weight: 600;
+}
+
+.preview-area {
+    position: relative;
+    margin-top: 20px;
+}
+
+.preview-area img {
+    width: 100%;
+    max-width: 300px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-actions {
+    padding: 20px 30px;
+    background: #f8f9fa;
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #d4af37, #b8941f);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+@@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .image-upload {
+        flex-direction: column;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('imageFile');
+    const previewArea = document.getElementById('previewArea');
+    const previewImage = document.getElementById('previewImage');
+    const removeBtn = document.getElementById('removePreview');
+    const fileLabel = document.querySelector('.file-label');
+
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewArea.style.display = 'block';
+                fileLabel.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    removeBtn.addEventListener('click', function() {
+        fileInput.value = '';
+        previewArea.style.display = 'none';
+        fileLabel.style.display = 'flex';
+    });
+});
+</script>
