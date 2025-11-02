@@ -22,10 +22,64 @@ namespace RazorKing.Controllers
             _roleManager = roleManager;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> SeedCities()
+        {
+            try
+            {
+                Console.WriteLine("🌱 شروع Seed Cities...");
+                
+                // بررسی اینکه آیا شهرها وجود دارند
+                var existingCities = await _context.Cities.CountAsync();
+                Console.WriteLine($"📊 شهرهای موجود: {existingCities}");
+                
+                if (existingCities > 0)
+                {
+                    return Json(new { success = true, message = $"{existingCities} شهر از قبل وجود دارد" });
+                }
+
+                // اضافه کردن شهرهای استان گلستان
+                var cities = new[]
+                {
+                    new City { Name = "گرگان", Province = "گلستان" },
+                    new City { Name = "گنبد کاووس", Province = "گلستان" },
+                    new City { Name = "علی آباد کتول", Province = "گلستان" },
+                    new City { Name = "آق قلا", Province = "گلستان" },
+                    new City { Name = "کردکوی", Province = "گلستان" },
+                    new City { Name = "بندر گز", Province = "گلستان" },
+                    new City { Name = "آزادشهر", Province = "گلستان" },
+                    new City { Name = "رامیان", Province = "گلستان" },
+                    new City { Name = "کلاله", Province = "گلستان" },
+                    new City { Name = "مینودشت", Province = "گلستان" }
+                };
+
+                Console.WriteLine($"🌱 اضافه کردن {cities.Length} شهر...");
+                
+                _context.Cities.AddRange(cities);
+                await _context.SaveChangesAsync();
+                
+                Console.WriteLine("✅ شهرها با موفقیت اضافه شدند");
+
+                return Json(new { success = true, message = $"{cities.Length} شهر با موفقیت اضافه شد" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ خطا در Seed Cities: {ex.Message}");
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
         public async Task<IActionResult> SeedBarbershops()
         {
             try
             {
+                // اول شهرها رو چک کن
+                var citiesCount = await _context.Cities.CountAsync();
+                if (citiesCount == 0)
+                {
+                    await SeedCities();
+                }
+
                 // اول نقش‌ها رو ایجاد کن
                 await EnsureRolesExist();
 

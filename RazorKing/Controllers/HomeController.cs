@@ -23,18 +23,30 @@ namespace RazorKing.Controllers
         {
             try
             {
+                Console.WriteLine("🏠 Loading Home Index...");
+                
+                var cities = await _context.Cities
+                    .Include(c => c.Barbershops.Where(b => b.IsActive))
+                    .OrderBy(c => c.Name)
+                    .ToListAsync();
+                
+                Console.WriteLine($"📊 Cities loaded: {cities.Count}");
+                
+                var totalBarbershops = await _context.Barbershops.CountAsync(b => b.IsActive);
+                var totalAppointments = await _context.Appointments.CountAsync();
+                var totalCustomers = await _context.Appointments
+                    .Select(a => a.CustomerPhone)
+                    .Distinct()
+                    .CountAsync();
+                
+                Console.WriteLine($"📊 Stats - Barbershops: {totalBarbershops}, Appointments: {totalAppointments}, Customers: {totalCustomers}");
+                
                 var viewModel = new HomeViewModel
                 {
-                    Cities = await _context.Cities
-                        .Include(c => c.Barbershops.Where(b => b.IsActive))
-                        .OrderBy(c => c.Name)
-                        .ToListAsync(),
-                    TotalBarbershops = await _context.Barbershops.CountAsync(b => b.IsActive),
-                    TotalAppointments = await _context.Appointments.CountAsync(),
-                    TotalCustomers = await _context.Appointments
-                        .Select(a => a.CustomerPhone)
-                        .Distinct()
-                        .CountAsync(),
+                    Cities = cities,
+                    TotalBarbershops = totalBarbershops,
+                    TotalAppointments = totalAppointments,
+                    TotalCustomers = totalCustomers,
                     FeaturedBarbershops = await _context.Barbershops
                         .Include(b => b.City)
                         .Include(b => b.Services)
@@ -186,6 +198,39 @@ namespace RazorKing.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> TestData()
+        {
+            try
+            {
+                var citiesCount = await _context.Cities.CountAsync();
+                var barbershopsCount = await _context.Barbershops.CountAsync();
+                var appointmentsCount = await _context.Appointments.CountAsync();
+                
+                var cities = await _context.Cities.Take(5).ToListAsync();
+                
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        citiesCount,
+                        barbershopsCount,
+                        appointmentsCount,
+                        cities = cities.Select(c => new { c.Id, c.Name, c.Province })
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    error = ex.Message
+                });
+            }
         }
 
         [HttpGet]

@@ -56,6 +56,10 @@
                                 <i class="fas fa-cut"></i>
                                 مشاهده خدمات
                             </a>
+                            <button onclick="loadRealTimeStats()" class="btn btn-outline-gold btn-sm" style="margin-top: 10px;">
+                                <i class="fas fa-sync-alt"></i>
+                                به‌روزرسانی آمار
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -67,7 +71,7 @@
                                     <i class="fas fa-users"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <div class="stat-number" data-count="@Model.TotalCustomers">@Model.TotalCustomers</div>
+                                    <div class="stat-number" id="totalCustomers" data-count="@Model.TotalCustomers">@Model.TotalCustomers</div>
                                     <div class="stat-label">مشتری راضی</div>
                                 </div>
                             </div>
@@ -76,7 +80,7 @@
                                     <i class="fas fa-store"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <div class="stat-number" data-count="@Model.TotalBarbershops">@Model.TotalBarbershops</div>
+                                    <div class="stat-number" id="totalBarbershops" data-count="@Model.TotalBarbershops">@Model.TotalBarbershops</div>
                                     <div class="stat-label">آرایشگاه فعال</div>
                                 </div>
                             </div>
@@ -85,7 +89,7 @@
                                     <i class="fas fa-map-marker-alt"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <div class="stat-number" data-count="@Model.Cities.Count">@Model.Cities.Count</div>
+                                    <div class="stat-number" id="totalCities" data-count="@Model.Cities.Count">@Model.Cities.Count</div>
                                     <div class="stat-label">شهر فعال</div>
                                 </div>
                             </div>
@@ -150,47 +154,73 @@
                     
                     @for (int row = 0; row < totalRows; row++)
                     {
-                        <div class="cities-row">
-                            @for (int i = row * citiesPerRow; i < Math.Min((row + 1) * citiesPerRow, Model.Cities.Count); i++)
-                            {
-                                var city = Model.Cities[i];
-                                <div class="city-slide-item">
-                                    <div class="city-card" data-city-id="@city.Id" onclick="window.location.href='@Url.Action("City", "Home", new { id = city.Id })'">
-                                        <div class="city-image">
-                                            <img src="~/img/pic-@(new Random().Next(2, 5)).jpg" alt="@city.Name" onerror="this.src='~/img/background.webp'">
-                                            <div class="city-overlay">
-                                                <i class="fas fa-map-marker-alt"></i>
+                        var startIndex = row * citiesPerRow;
+                        var endIndex = Math.Min(startIndex + citiesPerRow, Model.Cities.Count);
+                        
+                        @* Only create row if there are cities to show *@
+                        @if (startIndex < Model.Cities.Count)
+                        {
+                            <div class="cities-row">
+                                @for (int i = startIndex; i < endIndex; i++)
+                                {
+                                    var city = Model.Cities[i];
+                                    <div class="city-slide-item">
+                                        <div class="city-card" data-city-id="@city.Id" onclick="window.location.href='@Url.Action("City", "Home", new { id = city.Id })'">
+                                            <div class="city-image">
+                                                <img src="~/img/pic-@(new Random().Next(2, 5)).jpg" alt="@city.Name" onerror="this.src='~/img/background.webp'">
+                                                <div class="city-overlay">
+                                                    <i class="fas fa-map-marker-alt"></i>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="city-info">
-                                            <h4>@city.Name</h4>
-                                            <p>@city.Barbershops.Count(b => b.IsActive) آرایشگاه فعال</p>
-                                            <div class="city-btn">
-                                                مشاهده آرایشگاه‌ها
-                                                <i class="fas fa-arrow-left"></i>
+                                            <div class="city-info">
+                                                <h4>@city.Name</h4>
+                                                <p>@city.Barbershops.Count(b => b.IsActive) آرایشگاه فعال</p>
+                                                <div class="city-btn">
+                                                    مشاهده آرایشگاه‌ها
+                                                    <i class="fas fa-arrow-left"></i>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            }
-                        </div>
+                                }
+                                
+                                @* Fill empty slots if needed to maintain grid structure *@
+                                @for (int j = endIndex; j < startIndex + citiesPerRow && j < startIndex + citiesPerRow; j++)
+                                {
+                                    @if (endIndex < startIndex + citiesPerRow)
+                                    {
+                                        <div class="city-slide-item" style="visibility: hidden;">
+                                            <div class="city-card"></div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        }
                     }
                 </div>
                 
                 <!-- Navigation Arrows -->
                 <button class="cities-nav-btn cities-nav-prev" id="citiesPrevBtn">
-                    <i class="fas fa-chevron-right"></i>
+                    <i class="fas fa-chevron-left"></i>
                 </button>
                 <button class="cities-nav-btn cities-nav-next" id="citiesNextBtn">
-                    <i class="fas fa-chevron-left"></i>
+                    <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
             
             <!-- Dots Indicator -->
             <div class="cities-dots-container" id="citiesDotsContainer">
-                @for (int i = 0; i < totalRows; i++)
-                {
-                    <div class="cities-dot @(i == 0 ? "active" : "")" onclick="goToCityRow(@i)"></div>
+                @{
+                    var actualRows = 0;
+                    for (int row = 0; row < totalRows; row++)
+                    {
+                        var startIndex = row * citiesPerRow;
+                        if (startIndex < Model.Cities.Count)
+                        {
+                            <div class="cities-dot @(actualRows == 0 ? "active" : "")" onclick="goToCityRow(@actualRows)"></div>
+                            actualRows++;
+                        }
+                    }
                 }
             </div>
         </div>

@@ -17,6 +17,8 @@ namespace RazorKing.Models
         [Required]
         public int Duration { get; set; } // Duration in minutes
         
+        public int DurationMinutes => Duration; // Alias for compatibility
+        
         public bool IsActive { get; set; } = true;
         
         public DateTime CreatedAt { get; set; } = DateTime.Now;

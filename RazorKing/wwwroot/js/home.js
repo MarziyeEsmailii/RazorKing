@@ -68,60 +68,121 @@ class CitiesSlider {
         this.nextBtn = document.getElementById('citiesNextBtn');
         this.dotsContainer = document.getElementById('citiesDotsContainer');
         
-        if (!this.sliderTrack) return;
+        if (!this.sliderTrack) {
+            console.log('Cities slider track not found');
+            return;
+        }
         
         this.calculateRows();
         this.bindEvents();
-        this.startAutoSlide();
+        this.updateSlider();
+        
+        // Auto slide disabled for better user control
+        // if (this.totalRows > 1) {
+        //     this.startAutoSlide();
+        // }
+        
+        console.log('Cities slider initialized with', this.totalRows, 'rows');
     }
     
     calculateRows() {
         const rows = this.sliderTrack.querySelectorAll('.cities-row');
-        this.totalRows = rows.length;
         
-        // Hide navigation if only one row
+        // Count only rows that have visible cities
+        this.totalRows = 0;
+        rows.forEach(row => {
+            const visibleCities = row.querySelectorAll('.city-slide-item:not([style*="visibility: hidden"])');
+            if (visibleCities.length > 0) {
+                this.totalRows++;
+            }
+        });
+        
+        console.log('Calculated rows with cities:', this.totalRows, 'Total DOM rows:', rows.length);
+        
+        // Hide navigation if only one row or no rows
         if (this.totalRows <= 1) {
             if (this.prevBtn) this.prevBtn.style.display = 'none';
             if (this.nextBtn) this.nextBtn.style.display = 'none';
             if (this.dotsContainer) this.dotsContainer.style.display = 'none';
+        } else {
+            if (this.prevBtn) this.prevBtn.style.display = 'block';
+            if (this.nextBtn) this.nextBtn.style.display = 'block';
+            if (this.dotsContainer) this.dotsContainer.style.display = 'flex';
         }
     }
     
     bindEvents() {
         if (this.prevBtn) {
-            this.prevBtn.addEventListener('click', () => this.prevRow());
+            this.prevBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.prevRow();
+            });
         }
         
         if (this.nextBtn) {
-            this.nextBtn.addEventListener('click', () => this.nextRow());
+            this.nextBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.nextRow();
+            });
         }
         
-        // Pause on hover
-        const container = document.getElementById('citiesSliderContainer');
-        if (container) {
-            container.addEventListener('mouseenter', () => this.stopAutoSlide());
-            container.addEventListener('mouseleave', () => this.startAutoSlide());
+        // Auto slide disabled - manual navigation only
+        // const container = document.getElementById('citiesSliderContainer');
+        // if (container) {
+        //     container.addEventListener('mouseenter', () => this.stopAutoSlide());
+        //     container.addEventListener('mouseleave', () => {
+        //         if (this.totalRows > 1) {
+        //             this.startAutoSlide();
+        //         }
+        //     });
+        // }
+        
+        // Bind dot clicks
+        if (this.dotsContainer) {
+            const dots = this.dotsContainer.querySelectorAll('.cities-dot');
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.goToRow(index);
+                });
+            });
         }
     }
     
     updateSlider() {
-        if (this.isTransitioning) return;
+        if (!this.sliderTrack) return;
         
+        // Use percentage-based translation for better responsiveness
         const translateX = -(this.currentRow * 100);
         this.sliderTrack.style.transform = `translateX(${translateX}%)`;
         
+        console.log(`Slider updated: currentRow=${this.currentRow}, totalRows=${this.totalRows}, translateX=${translateX}%`);
+        
         // Update dots
-        const dots = this.dotsContainer.querySelectorAll('.cities-dot');
-        dots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === this.currentRow);
-        });
+        if (this.dotsContainer) {
+            const dots = this.dotsContainer.querySelectorAll('.cities-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === this.currentRow);
+            });
+        }
+        
+        // Update button states
+        if (this.prevBtn) {
+            this.prevBtn.style.opacity = this.currentRow === 0 ? '0.5' : '1';
+            this.prevBtn.style.pointerEvents = this.currentRow === 0 ? 'none' : 'auto';
+        }
+        
+        if (this.nextBtn) {
+            this.nextBtn.style.opacity = this.currentRow === this.totalRows - 1 ? '0.5' : '1';
+            this.nextBtn.style.pointerEvents = this.currentRow === this.totalRows - 1 ? 'none' : 'auto';
+        }
     }
     
     nextRow() {
-        if (this.isTransitioning || this.totalRows <= 1) return;
+        if (this.isTransitioning || this.totalRows <= 1 || this.currentRow >= this.totalRows - 1) return;
         
         this.isTransitioning = true;
-        this.currentRow = (this.currentRow + 1) % this.totalRows;
+        this.currentRow++;
         this.updateSlider();
         
         setTimeout(() => {
@@ -130,10 +191,10 @@ class CitiesSlider {
     }
     
     prevRow() {
-        if (this.isTransitioning || this.totalRows <= 1) return;
+        if (this.isTransitioning || this.totalRows <= 1 || this.currentRow <= 0) return;
         
         this.isTransitioning = true;
-        this.currentRow = this.currentRow === 0 ? this.totalRows - 1 : this.currentRow - 1;
+        this.currentRow--;
         this.updateSlider();
         
         setTimeout(() => {
@@ -142,7 +203,7 @@ class CitiesSlider {
     }
     
     goToRow(rowIndex) {
-        if (this.isTransitioning || rowIndex === this.currentRow) return;
+        if (this.isTransitioning || rowIndex === this.currentRow || rowIndex < 0 || rowIndex >= this.totalRows) return;
         
         this.isTransitioning = true;
         this.currentRow = rowIndex;
@@ -159,7 +220,7 @@ class CitiesSlider {
         this.stopAutoSlide();
         this.autoSlideInterval = setInterval(() => {
             this.nextRow();
-        }, 6000);
+        }, 5000); // 5 seconds
     }
     
     stopAutoSlide() {
@@ -170,20 +231,18 @@ class CitiesSlider {
     }
 }
 
+// Global function for dot clicks
+function goToCityRow(rowIndex) {
+    if (window.citiesSlider) {
+        window.citiesSlider.goToRow(rowIndex);
+    }
+}
+
 // City Modal Functions
 function showCityModal(cityId, cityName) {
-    const modal = new bootstrap.Modal(document.getElementById('cityModal'));
-    document.getElementById('cityModalTitle').textContent = `آرایشگاه‌های ${cityName}`;
-    
-    // Show loading
-    document.getElementById('cityBarbershopsLoading').classList.remove('d-none');
-    document.getElementById('cityBarbershopsContent').classList.add('d-none');
-    document.getElementById('cityBarbershopsEmpty').classList.add('d-none');
-    
-    modal.show();
-    
-    // Load barbershops
-    loadCityBarbershops(cityId);
+    // Redirect to city page instead of showing modal
+    const baseUrl = document.querySelector('meta[name="base-url"]')?.getAttribute('content') || '';
+    window.location.href = `${baseUrl}/Home/City/${cityId}`;
 }
 
 async function loadCityBarbershops(cityId) {
@@ -247,26 +306,51 @@ function displayBarbershops(barbershops) {
     });
 }
 
-function goToCityRow(rowIndex) {
-    if (window.citiesSlider) {
-        window.citiesSlider.goToRow(rowIndex);
-    }
-}
-
 // Initialize Cities Slider
 function initializeCityCards() {
-    window.citiesSlider = new CitiesSlider();
+    console.log('Initializing city cards...');
+    
+    // Add entrance animations to city cards
+    const cityCards = document.querySelectorAll('.city-card');
+    console.log('Found', cityCards.length, 'city cards');
+    
+    cityCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+    
+    // Initialize slider after a short delay
+    setTimeout(() => {
+        console.log('Creating CitiesSlider instance...');
+        window.citiesSlider = new CitiesSlider();
+        
+        // Debug: Check if slider was created successfully
+        if (window.citiesSlider) {
+            console.log('CitiesSlider created successfully');
+        } else {
+            console.error('Failed to create CitiesSlider');
+        }
+    }, 1000);
 }
 
 // Initialize all functionality
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Home page loaded');
     
-    // Initialize statistics counter immediately
+    // Initialize statistics counter
     const statsContainer = document.querySelector('.hero-stats');
     if (statsContainer) {
         console.log('Stats container found');
         observer.observe(statsContainer);
+        
+        // Load real-time stats from API
+        loadRealTimeStats();
         
         // Also trigger animation immediately for testing
         setTimeout(() => {
@@ -279,8 +363,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }, 1000);
-    } else {
-        console.log('Stats container not found');
     }
     
     // Add pulse animation to stat items
@@ -294,61 +376,67 @@ document.addEventListener('DOMContentLoaded', () => {
         }, index * 200);
     });
     
-    // Initialize city cards animation
+    // Initialize city cards and slider
     initializeCityCards();
 });
+
+// Load real-time statistics
+async function loadRealTimeStats() {
+    try {
+        console.log('🔄 Loading real-time stats...');
+        
+        const response = await fetch('/Home/TestData');
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            console.log('📊 Real-time stats loaded:', data.data);
+            
+            // Update stat numbers
+            const totalCitiesEl = document.getElementById('totalCities');
+            const totalBarbershopsEl = document.getElementById('totalBarbershops');
+            const totalCustomersEl = document.getElementById('totalCustomers');
+            
+            if (totalCitiesEl) {
+                totalCitiesEl.setAttribute('data-count', data.data.citiesCount);
+                totalCitiesEl.textContent = data.data.citiesCount;
+                console.log('✅ Cities updated:', data.data.citiesCount);
+            }
+            
+            if (totalBarbershopsEl) {
+                totalBarbershopsEl.setAttribute('data-count', data.data.barbershopsCount);
+                totalBarbershopsEl.textContent = data.data.barbershopsCount;
+                console.log('✅ Barbershops updated:', data.data.barbershopsCount);
+            }
+            
+            if (totalCustomersEl) {
+                // Use appointments count as customers if no real customers
+                const customersCount = data.data.appointmentsCount || 0;
+                totalCustomersEl.setAttribute('data-count', customersCount);
+                totalCustomersEl.textContent = customersCount;
+                console.log('✅ Customers updated:', customersCount);
+            }
+            
+            // Trigger animations after updating data
+            setTimeout(() => {
+                const statNumbers = document.querySelectorAll('.stat-number');
+                statNumbers.forEach(statNumber => {
+                    const target = parseInt(statNumber.getAttribute('data-count'));
+                    if (target > 0) {
+                        animateCounter(statNumber, target);
+                    }
+                });
+            }, 500);
+            
+        } else {
+            console.log('⚠️ No stats data received');
+        }
+    } catch (error) {
+        console.error('❌ Error loading real-time stats:', error);
+    }
+}
 
 // Make functions globally available
 window.quickBooking = quickBooking;
 window.showCityModal = showCityModal;
-window.goToCityRow = goToCityRow;// Ci
-ty modal functionality
-function showCityModal(cityId, cityName) {
-    // Redirect to city page instead of showing modal
-    const baseUrl = document.querySelector('meta[name="base-url"]')?.getAttribute('content') || '';
-    window.location.href = `${baseUrl}/Home/City/${cityId}`;
-}
-
-// City navigation functions
-function goToCityRow(rowIndex) {
-    const track = document.getElementById('citiesSliderTrack');
-    if (track) {
-        const rowHeight = 300; // Approximate height of each row
-        track.style.transform = `translateY(-${rowIndex * rowHeight}px)`;
-        
-        // Update dots
-        const dots = document.querySelectorAll('.cities-dot');
-        dots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === rowIndex);
-        });
-    }
-}
-
-// Cities slider navigation
-function initializeCitiesSlider() {
-    const prevBtn = document.getElementById('citiesPrevBtn');
-    const nextBtn = document.getElementById('citiesNextBtn');
-    const track = document.getElementById('citiesSliderTrack');
-    const dots = document.querySelectorAll('.cities-dot');
-    
-    let currentRow = 0;
-    const totalRows = dots.length;
-    
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-            if (currentRow > 0) {
-                currentRow--;
-                goToCityRow(currentRow);
-            }
-        });
-    }
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-            if (currentRow < totalRows - 1) {
-                currentRow++;
-                goToCityRow(currentRow);
-            }
-        });
-    }
-}
+window.goToCityRow = goToCityRow;
+window.loadRealTimeStats = loadRealTimeStats;

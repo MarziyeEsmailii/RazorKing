@@ -1,101 +1,586 @@
-@model RazorKing.Models.Appointment
+@model RazorKing.Models.ViewModels.BookingConfirmationViewModel
 @{
-    ViewData["Title"] = "تایید نوبت";
+    ViewData["Title"] = "تایید رزرو نوبت";
+    Layout = "_LayoutModern";
 }
 
-<div class="container mt-4" dir="rtl">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header bg-success text-white text-center">
-                    <h3>نوبت شما با موفقیت ثبت شد</h3>
+<section class="confirmation-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Success Header -->
+                <div class="confirmation-header text-center mb-5">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h1 class="confirmation-title">نوبت شما با موفقیت رزرو شد!</h1>
+                    <p class="confirmation-subtitle">جزئیات نوبت شما در زیر آمده است</p>
                 </div>
-                <div class="card-body">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+
+                <!-- Appointment Details Card -->
+                <div class="appointment-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-check"></i> جزئیات نوبت</h3>
+                        <span class="appointment-id">شماره نوبت: #@Model.AppointmentId</span>
                     </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-4"><strong>شماره نوبت:</strong></div>
-                        <div class="col-8">@Model.Id</div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-4"><strong>نام مشتری:</strong></div>
-                        <div class="col-8">@Model.CustomerName</div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-4"><strong>شماره تماس:</strong></div>
-                        <div class="col-8">@Model.CustomerPhone</div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-4"><strong>آرایشگاه:</strong></div>
-                        <div class="col-8">@Model.Barbershop.Name</div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-4"><strong>شهر:</strong></div>
-                        <div class="col-8">@Model.Barbershop.City.Name</div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-4"><strong>تاریخ:</strong></div>
-                        <div class="col-8">@Model.AppointmentDate.ToString("yyyy/MM/dd")</div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-4"><strong>ساعت:</strong></div>
-                        <div class="col-8">@Model.AppointmentTime.ToString(@"hh\:mm")</div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-4"><strong>خدمات:</strong></div>
-                        <div class="col-8">
-                            @foreach (var service in Model.AppointmentServices)
-                            {
-                                <div>@service.Service.Name - @service.Price.ToString("N0") تومان</div>
-                            }
+
+                    <div class="card-body">
+                        <div class="appointment-info">
+                            <!-- Date & Time -->
+                            <div class="info-section">
+                                <h4><i class="fas fa-clock"></i> زمان نوبت</h4>
+                                <div class="datetime-display">
+                                    <div class="date-info">
+                                        <span class="date">@Model.AppointmentDate.ToString("yyyy/MM/dd")</span>
+                                        <span class="day">@GetPersianDayName(Model.AppointmentDate.DayOfWeek)</span>
+                                    </div>
+                                    <div class="time-info">
+                                        <span class="time">@Model.AppointmentTime.ToString(@"hh\:mm")</span>
+                                        <span class="period">@(Model.AppointmentTime.Hours < 12 ? "صبح" : "عصر")</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Barbershop Info -->
+                            <div class="info-section">
+                                <h4><i class="fas fa-store"></i> اطلاعات آرایشگاه</h4>
+                                <div class="barbershop-details">
+                                    <div class="barbershop-name">@Model.BarbershopName</div>
+                                    <div class="barbershop-location">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        @Model.BarbershopAddress، @Model.CityName
+                                    </div>
+                                    <div class="barbershop-contact">
+                                        <i class="fas fa-phone"></i>
+                                        <a href="tel:@Model.BarbershopPhone">@Model.BarbershopPhone</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Services -->
+                            <div class="info-section">
+                                <h4><i class="fas fa-cut"></i> خدمات انتخاب شده</h4>
+                                <div class="services-list">
+                                    @if (Model.Services != null && Model.Services.Any())
+                                    {
+                                        @foreach (var service in Model.Services)
+                                        {
+                                            <div class="service-item">
+                                                <span class="service-name">@service.Name</span>
+                                                <span class="service-price">@service.Price.ToString("N0") تومان</span>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="service-item">
+                                            <span class="service-name">@Model.ServiceName</span>
+                                            <span class="service-price">@Model.ServicePrice.ToString("N0") تومان</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Customer Info -->
+                            <div class="info-section">
+                                <h4><i class="fas fa-user"></i> اطلاعات مشتری</h4>
+                                <div class="customer-details">
+                                    <div class="customer-name">@Model.CustomerName</div>
+                                    <div class="customer-phone">
+                                        <i class="fas fa-phone"></i>
+                                        @Model.CustomerPhone
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Payment Info -->
+                            <div class="info-section payment-section">
+                                <h4><i class="fas fa-credit-card"></i> اطلاعات پرداخت</h4>
+                                <div class="payment-details">
+                                    <div class="payment-item">
+                                        <span>مجموع هزینه:</span>
+                                        <span class="amount">@Model.ServicePrice.ToString("N0") تومان</span>
+                                    </div>
+                                    <div class="payment-item paid">
+                                        <span>پرداخت شده (بیعانه):</span>
+                                        <span class="amount">@Model.PaidAmount.ToString("N0") تومان</span>
+                                    </div>
+                                    <div class="payment-item remaining">
+                                        <span>باقیمانده:</span>
+                                        <span class="amount">@Model.RemainingAmount.ToString("N0") تومان</span>
+                                    </div>
+                                </div>
+                                <div class="payment-note">
+                                    <i class="fas fa-info-circle"></i>
+                                    مبلغ باقیمانده در آرایشگاه پرداخت خواهد شد
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <hr>
-                    
-                    <div class="row mb-3">
-                        <div class="col-4"><strong>مجموع هزینه:</strong></div>
-                        <div class="col-8 text-primary"><strong>@Model.TotalPrice.ToString("N0") تومان</strong></div>
+                </div>
+
+                <!-- Important Notes -->
+                <div class="important-notes">
+                    <h4><i class="fas fa-exclamation-triangle"></i> نکات مهم</h4>
+                    <ul>
+                        <li>لطفاً 15 دقیقه قبل از ساعت نوبت در آرایشگاه حضور یابید</li>
+                        <li>در صورت تأخیر بیش از 15 دقیقه، نوبت شما لغو خواهد شد</li>
+                        <li>برای کنسل کردن نوبت، حداقل 24 ساعت قبل اطلاع دهید</li>
+                        <li>همراه داشتن کارت شناسایی الزامی است</li>
+                        <li>در صورت بروز مشکل با شماره آرایشگاه تماس بگیرید</li>
+                    </ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons text-center">
+                    <button class="btn btn-gold" onclick="printAppointment()">
+                        <i class="fas fa-print"></i>
+                        چاپ جزئیات نوبت
+                    </button>
+                    <button class="btn btn-outline-gold" onclick="shareAppointment()">
+                        <i class="fas fa-share-alt"></i>
+                        اشتراک‌گذاری
+                    </button>
+                    <a href="/Booking" class="btn btn-secondary">
+                        <i class="fas fa-plus"></i>
+                        رزرو نوبت جدید
+                    </a>
+                </div>
+
+                <!-- QR Code -->
+                <div class="qr-section text-center">
+                    <h5>کد QR نوبت</h5>
+                    <div class="qr-code" id="qrCode">
+                        <!-- QR Code will be generated here -->
                     </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-4"><strong>بیعانه پرداختی:</strong></div>
-                        <div class="col-8 text-success"><strong>@Model.PaidAmount.ToString("N0") تومان</strong></div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-4"><strong>باقیمانده:</strong></div>
-                        <div class="col-8 text-warning"><strong>@((Model.TotalPrice - Model.PaidAmount).ToString("N0")) تومان</strong></div>
-                    </div>
-                    
-                    <div class="alert alert-info">
-                        <strong>توجه:</strong> مبلغ باقیمانده در آرایشگاه پرداخت می‌شود.
-                        <br>
-                        لطفا ۱۵ دقیقه قبل از ساعت نوبت در آرایشگاه حضور یابید.
-                    </div>
-                    
-                    <div class="text-center">
-                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary">بازگشت به صفحه اصلی</a>
-                        <button onclick="window.print()" class="btn btn-secondary">چاپ رسید</button>
-                    </div>
+                    <p class="qr-note">این کد را در آرایشگاه نشان دهید</p>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
 <style>
-    @@media print {
-        .btn { display: none; }
-        .card { border: none; box-shadow: none; }
+.confirmation-section {
+    background: var(--gradient-primary);
+    min-height: 100vh;
+    padding: 120px 0 60px;
+}
+
+.confirmation-header {
+    margin-bottom: 50px;
+}
+
+.success-icon {
+    width: 100px;
+    height: 100px;
+    background: var(--primary-gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px;
+    animation: successPulse 2s ease-in-out;
+}
+
+.success-icon i {
+    font-size: 3rem;
+    color: var(--primary-black);
+}
+
+keyframes successPulse {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.confirmation-title {
+    color: var(--text-white);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.confirmation-subtitle {
+    color: var(--text-gray);
+    font-size: 1.2rem;
+}
+
+.appointment-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-heavy);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    margin-bottom: 40px;
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--primary-gold), #f4c430);
+    color: var(--primary-black);
+    padding: 25px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.appointment-id {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.card-body {
+    padding: 40px 30px;
+}
+
+.info-section {
+    margin-bottom: 35px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.info-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.info-section h4 {
+    color: var(--primary-gold);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.datetime-display {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.date-info,
+.time-info {
+    background: var(--medium-gray);
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.date-info .date,
+.time-info .time {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-white);
+    margin-bottom: 5px;
+}
+
+.date-info .day,
+.time-info .period {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+}
+
+.barbershop-details {
+    background: var(--medium-gray);
+    padding: 25px;
+    border-radius: 15px;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.barbershop-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-white);
+    margin-bottom: 15px;
+}
+
+.barbershop-location,
+.barbershop-contact {
+    color: var(--text-gray);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.barbershop-contact a {
+    color: var(--primary-gold);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.barbershop-contact a:hover {
+    text-decoration: underline;
+}
+
+.services-list {
+    background: var(--medium-gray);
+    border-radius: 15px;
+    overflow: hidden;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.service-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.service-item:last-child {
+    border-bottom: none;
+}
+
+.service-name {
+    color: var(--text-white);
+    font-weight: 600;
+}
+
+.service-price {
+    color: var(--primary-gold);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.customer-details {
+    background: var(--medium-gray);
+    padding: 25px;
+    border-radius: 15px;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.customer-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-white);
+    margin-bottom: 10px;
+}
+
+.customer-phone {
+    color: var(--text-gray);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.payment-section {
+    background: rgba(212, 175, 55, 0.05);
+    padding: 25px;
+    border-radius: 15px;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.payment-details {
+    margin-bottom: 20px;
+}
+
+.payment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.payment-item:last-child {
+    border-bottom: none;
+}
+
+.payment-item.paid {
+    color: var(--primary-gold);
+    font-weight: 600;
+}
+
+.payment-item.remaining {
+    color: #ffc107;
+    font-weight: 600;
+}
+
+.payment-item .amount {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.payment-note {
+    background: rgba(212, 175, 55, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.important-notes {
+    background: rgba(255, 193, 7, 0.1);
+    border: 2px solid rgba(255, 193, 7, 0.3);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 40px;
+}
+
+.important-notes h4 {
+    color: #ffc107;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.important-notes ul {
+    margin: 0;
+    padding-right: 20px;
+}
+
+.important-notes li {
+    color: var(--text-gray);
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.action-buttons {
+    margin-bottom: 50px;
+}
+
+.action-buttons .btn {
+    margin: 0 10px 10px;
+    padding: 15px 30px;
+    font-weight: 600;
+}
+
+.qr-section {
+    background: var(--medium-gray);
+    padding: 30px;
+    border-radius: 15px;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.qr-section h5 {
+    color: var(--primary-gold);
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.qr-code {
+    width: 150px;
+    height: 150px;
+    background: white;
+    margin: 0 auto 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: #333;
+}
+
+.qr-note {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Responsive */
+media (max-width: 768px) {
+    .confirmation-title {
+        font-size: 2rem;
     }
+    
+    .datetime-display {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .date-info,
+    .time-info {
+        width: 100%;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .action-buttons .btn {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+    }
+}
 </style>
+
+<script>
+// چاپ جزئیات نوبت
+function printAppointment() {
+    window.print();
+}
+
+// اشتراک‌گذاری نوبت
+function shareAppointment() {
+    const appointmentText = `نوبت آرایشگاه رزرو شد
+آرایشگاه: @Model.BarbershopName
+تاریخ: @Model.AppointmentDate.ToString("yyyy/MM/dd")
+ساعت: @Model.AppointmentTime.ToString(@"hh\:mm")
+شماره نوبت: #@Model.AppointmentId`;
+
+    if (navigator.share) {
+        navigator.share({
+            title: 'جزئیات نوبت آرایشگاه',
+            text: appointmentText
+        });
+    } else {
+        // کپی در کلیپ‌بورد
+        navigator.clipboard.writeText(appointmentText).then(() => {
+            alert('جزئیات نوبت کپی شد');
+        });
+    }
+}
+
+// تولید QR Code
+document.addEventListener('DOMContentLoaded', function() {
+    const qrData = `APPOINTMENT:@Model.AppointmentId:@Model.BarbershopName:@Model.AppointmentDate.ToString("yyyy-MM-dd"):@Model.AppointmentTime.ToString(@"hh\:mm")`;
+    document.getElementById('qrCode').innerHTML = `
+        <div style="font-size: 12px; padding: 20px;">
+            <div>نوبت #@Model.AppointmentId</div>
+            <div>@Model.AppointmentDate.ToString("yyyy/MM/dd")</div>
+            <div>@Model.AppointmentTime.ToString(@"hh\:mm")</div>
+        </div>
+    `;
+});
+</script>
+
+@functions {
+    public string GetPersianDayName(DayOfWeek dayOfWeek)
+    {
+        return dayOfWeek switch
+        {
+            DayOfWeek.Saturday => "شنبه",
+            DayOfWeek.Sunday => "یکشنبه",
+            DayOfWeek.Monday => "دوشنبه",
+            DayOfWeek.Tuesday => "سه‌شنبه",
+            DayOfWeek.Wednesday => "چهارشنبه",
+            DayOfWeek.Thursday => "پنج‌شنبه",
+            DayOfWeek.Friday => "جمعه",
+            _ => ""
+        };
+    }
+}

@@ -10,11 +10,14 @@
     margin: 0 auto;
     padding: 0 80px;
     overflow: hidden;
+    width: 100%;
 }
 
 .cities-slider-track {
     display: flex;
     transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+    width: fit-content;
 }
 
 .cities-row {
@@ -23,10 +26,15 @@
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     width: 100%;
+    max-width: 1040px; /* Maximum width to ensure proper spacing */
+    min-height: 350px;
+    justify-items: center;
 }
 
 .city-slide-item {
     width: 100%;
+    min-width: 250px; /* Minimum width for each city card */
+    max-width: 250px; /* Maximum width to ensure exactly 4 per row */
 }
 
 /* Navigation Buttons */
@@ -58,12 +66,18 @@
     transform: translateY(-50%) scale(0.95);
 }
 
+.cities-nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .cities-nav-prev {
-    right: 10px;
+    left: 10px;
 }
 
 .cities-nav-next {
-    left: 10px;
+    right: 10px;
 }
 
 /* Dots Indicator */
@@ -126,6 +140,11 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.city-card.animate {
     opacity: 1;
     transform: translateY(0);
 }
@@ -379,11 +398,11 @@
     }
     
     .cities-nav-prev {
-        right: 5px;
+        left: 5px;
     }
     
     .cities-nav-next {
-        left: 5px;
+        right: 5px;
     }
     
     .city-card {
@@ -439,4 +458,64 @@
     .city-info p {
         font-size: 0.75rem;
     }
+}
+/* A
+nimation Classes */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+    animation: slideInFromRight 0.6s ease-out forwards;
+}
+
+/* Smooth transitions for slider */
+.cities-slider-track {
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+.cities-row {
+    backface-visibility: hidden;
+}
+
+/* Loading state for cities */
+.cities-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 350px;
+    color: var(--primary-gold);
+}
+
+.cities-loading i {
+    font-size: 2rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }

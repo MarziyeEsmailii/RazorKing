@@ -380,6 +380,132 @@
     border-top: 1px solid rgba(212, 175, 55, 0.2);
 }
 
+.navigation-btn {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+.navigation-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.navigation-btn[data-visible="false"] {
+    display: none !important;
+}
+
+/* Message System */
+.booking-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    animation: slideInDown 0.3s ease-out;
+}
+
+.booking-message-success {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+}
+
+.booking-message-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.booking-message-info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #3b82f6;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced Barbershop Cards */
+.barbershop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.barbershop-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    color: var(--primary-gold);
+}
+
+.barbershop-address {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.barbershop-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 0.85rem;
+}
+
+.service-count {
+    color: var(--primary-gold);
+    font-weight: 600;
+}
+
+.price-range {
+    color: var(--text-gray);
+}
+
+.barbershop-contact {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--text-gray);
+    padding-top: 10px;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+/* Loading and Empty States */
+.loading-container,
+.empty-state,
+.error-state {
+    padding: 40px 20px;
+    color: var(--text-gray);
+}
+
+.loading-container i {
+    color: var(--primary-gold);
+}
+
+.empty-state i,
+.error-state i {
+    opacity: 0.5;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .wizard-steps {

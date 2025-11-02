@@ -39,6 +39,7 @@ namespace RazorKing.Models
         public decimal PaidAmount { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? CompletedAt { get; set; }
+        public string? Notes { get; set; }
         
         // Navigation Properties
         public virtual ApplicationUser? Customer { get; set; }
