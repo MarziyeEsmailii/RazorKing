@@ -1,0 +1,253 @@
+@model RazorKing.Models.ViewModels.CityViewModel
+@{
+    ViewData["Title"] = $"آرایشگاه‌های {Model.City.Name} | ریزر کینگ";
+    Layout = "_LayoutModern";
+}
+
+<div class="city-page">
+    <!-- City Header -->
+    <section class="city-header">
+        <div class="city-header-bg">
+            <img src="~/img/city-bg.jpg" alt="@Model.City.Name" />
+            <div class="city-header-overlay"></div>
+        </div>
+        <div class="container">
+            <div class="city-header-content">
+                <nav class="breadcrumb-nav">
+                    <a href="@Url.Action("Index", "Home")">خانه</a>
+                    <i class="fas fa-chevron-left"></i>
+                    <span>@Model.City.Name</span>
+                </nav>
+                <h1 class="city-title">
+                    <i class="fas fa-map-marker-alt"></i>
+                    آرایشگاه‌های @Model.City.Name
+                </h1>
+                <div class="city-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">@Model.Barbershops.Count</span>
+                        <span class="stat-label">آرایشگاه</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">@Model.TotalServices</span>
+                        <span class="stat-label">خدمت</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">@Model.MinPrice.ToString("N0")</span>
+                        <span class="stat-label">کمترین قیمت</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="filters-section">
+        <div class="container">
+            <div class="filters-card">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="جستجو در آرایشگاه‌ها..." />
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="priceFilter">
+                            <option value="">همه قیمت‌ها</option>
+                            <option value="0-50000">زیر 50 هزار</option>
+                            <option value="50000-100000">50-100 هزار</option>
+                            <option value="100000-200000">100-200 هزار</option>
+                            <option value="200000+">بالای 200 هزار</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="serviceFilter">
+                            <option value="">همه خدمات</option>
+                            @{
+                                var allServices = Model.Barbershops
+                                    .SelectMany(b => b.Services)
+                                    .Select(s => s.Name)
+                                    .Distinct()
+                                    .OrderBy(s => s)
+                                    .ToList();
+                            }
+                            @foreach (var serviceName in allServices)
+                            {
+                                <option value="@serviceName">@serviceName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="sortFilter">
+                            <option value="name">نام</option>
+                            <option value="price-low">قیمت ↑</option>
+                            <option value="price-high">قیمت ↓</option>
+                            <option value="services">خدمات بیشتر</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-gold w-100" onclick="applyFilters()">
+                            <i class="fas fa-filter"></i>
+                            فیلتر
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Barbershops Grid -->
+    <section class="barbershops-section">
+        <div class="container">
+            <div class="results-header mb-2">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h3 class="results-title">
+                            <i class="fas fa-store text-gold me-2"></i>
+                            آرایشگاه‌های موجود
+                        </h3>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div class="results-count" id="resultsCount">
+                            <span class="count-number">@Model.Barbershops.Count</span>
+                            <span class="count-text">آرایشگاه یافت شد</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="barbershops-grid" id="barbershopsGrid">
+                @foreach (var barbershop in Model.Barbershops)
+                {
+                    <div class="barbershop-card" data-barbershop-id="@barbershop.Id">
+                        <div class="barbershop-image">
+                            @if (!string.IsNullOrEmpty(barbershop.ImageUrl))
+                            {
+                                <img src="@barbershop.ImageUrl" alt="@barbershop.Name" />
+                            }
+                            else
+                            {
+                                <img src="~/img/default-barbershop.jpg" alt="@barbershop.Name" />
+                            }
+                            <div class="barbershop-overlay">
+                                <button class="btn btn-gold me-2" onclick="showBarbershopDetails(@barbershop.Id)">
+                                    <i class="fas fa-eye"></i>
+                                    جزئیات
+                                </button>
+                                <a href="@Url.Action("Index", "Booking", new { barbershopId = barbershop.Id })" class="btn btn-outline-light">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    رزرو
+                                </a>
+                            </div>
+                        </div>
+                        <div class="barbershop-content">
+                            <h3 class="barbershop-name">@barbershop.Name</h3>
+                            <p class="barbershop-address">
+                                <i class="fas fa-map-marker-alt"></i>
+                                @barbershop.Address
+                            </p>
+                            <p class="barbershop-phone">
+                                <i class="fas fa-phone"></i>
+                                @barbershop.Phone
+                            </p>
+                            <div class="barbershop-services">
+                                <h5>خدمات:</h5>
+                                <div class="services-list">
+                                    @foreach (var service in barbershop.Services.Take(3))
+                                    {
+                                        <span class="service-tag">
+                                            @service.Name
+                                            <small>@service.Price.ToString("N0") ت</small>
+                                        </span>
+                                    }
+                                    @if (barbershop.Services.Count > 3)
+                                    {
+                                        <span class="service-tag more">
+                                            +@(barbershop.Services.Count - 3) خدمت دیگر
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="barbershop-footer">
+                                <div class="price-range">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    @if (barbershop.Services.Any())
+                                    {
+                                        <span>@barbershop.Services.Min(s => s.Price).ToString("N0") - @barbershop.Services.Max(s => s.Price).ToString("N0") تومان</span>
+                                    }
+                                    else
+                                    {
+                                        <span>قیمت موجود نیست</span>
+                                    }
+                                </div>
+                                <div class="working-hours">
+                                    <i class="fas fa-clock"></i>
+                                    <span>@barbershop.OpenTime.ToString(@"hh\:mm") - @barbershop.CloseTime.ToString(@"hh\:mm")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (!Model.Barbershops.Any())
+            {
+                <div class="empty-state">
+                    <i class="fas fa-store-slash fa-3x"></i>
+                    <h3>آرایشگاهی یافت نشد</h3>
+                    <p>در حال حاضر آرایشگاهی در @Model.City.Name ثبت نشده است</p>
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-gold">
+                        <i class="fas fa-arrow-right"></i>
+                        بازگشت به صفحه اصلی
+                    </a>
+                </div>
+            }
+        </div>
+    </section>
+</div>
+
+<!-- Barbershop Details Modal -->
+<div class="modal fade" id="barbershopModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content barbershop-modal-content">
+            <div class="modal-header barbershop-modal-header">
+                <h5 class="modal-title" id="barbershopModalTitle">
+                    <i class="fas fa-store text-gold me-2"></i>
+                    جزئیات آرایشگاه
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body barbershop-modal-body">
+                <div id="barbershopDetailsLoading" class="text-center py-5">
+                    <div class="spinner-border text-gold" role="status">
+                        <span class="visually-hidden">در حال بارگذاری...</span>
+                    </div>
+                    <p class="mt-3 text-muted">در حال بارگذاری اطلاعات...</p>
+                </div>
+                <div id="barbershopDetailsContent" class="d-none">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer barbershop-modal-footer">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">بستن</button>
+                <button type="button" class="btn btn-gold" id="bookNowBtn">
+                    <i class="fas fa-calendar-plus"></i>
+                    رزرو نوبت
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/city-page.css" asp-append-version="true">
+}
+
+@section Scripts {
+    <script>
+        window.cityData = {
+            cityId: @Model.City.Id,
+            cityName: '@Model.City.Name'
+        };
+    </script>
+    <script src="~/js/city-page.js" asp-append-version="true"></script>
+}

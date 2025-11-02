@@ -1,0 +1,345 @@
+@model RazorKing.Models.ViewModels.BarberScheduleViewModel
+@{
+    ViewData["Title"] = "برنامه کاری";
+    Layout = "_LayoutBarber";
+}
+
+<section class="manage-schedule">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="schedule-header">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="page-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        مدیریت برنامه کاری
+                    </h1>
+                    <p class="page-subtitle">برنامه کاری و نوبت‌های خود را مدیریت کنید</p>
+                </div>
+                <div class="col-lg-4 text-end">
+                    <div class="header-actions">
+                        <a href="@Url.Action("Dashboard")" class="btn btn-outline-gold">
+                            <i class="fas fa-arrow-right"></i>
+                            بازگشت
+                        </a>
+                        <button class="btn btn-gold" onclick="openTimeSlotModal()">
+                            <i class="fas fa-plus"></i>
+                            تنظیم ساعات کاری
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Working Hours Info -->
+        <div class="working-hours-info">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="info-content">
+                            <h5>ساعات کاری</h5>
+                            <p>@Model.OpenTime.ToString(@"HH\:mm") - @Model.CloseTime.ToString(@"HH\:mm")</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="info-content">
+                            <h5>روزهای کاری</h5>
+                            <p>@Model.WorkingDays</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="info-content">
+                            <h5>نوبت‌های امروز</h5>
+                            <p>@Model.Appointments.Count(a => a.AppointmentDate.Date == DateTime.Today) نوبت</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="info-content">
+                            <h5>نوبت‌های این هفته</h5>
+                            <p>@Model.Appointments.Count(a => a.AppointmentDate >= DateTime.Today && a.AppointmentDate <= DateTime.Today.AddDays(7)) نوبت</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar View -->
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="schedule-calendar">
+                    <div class="calendar-header">
+                        <div class="calendar-nav">
+                            <button class="btn btn-outline-gold" onclick="previousWeek()">
+                                <i class="fas fa-chevron-right"></i>
+                                هفته قبل
+                            </button>
+                            <h3 id="currentWeekTitle">هفته جاری</h3>
+                            <button class="btn btn-outline-gold" onclick="nextWeek()">
+                                هفته بعد
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                        </div>
+                        <div class="view-options">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-gold active" onclick="setView('week')">هفتگی</button>
+                                <button class="btn btn-sm btn-outline-gold" onclick="setView('day')">روزانه</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="calendar-body">
+                        <div class="time-slots-grid" id="timeSlotsGrid">
+                            <!-- Time slots will be generated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-3">
+                <!-- Today's Appointments -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h4>
+                            <i class="fas fa-calendar-day"></i>
+                            نوبت‌های امروز
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        @{
+                            var todayAppointments = Model.Appointments.Where(a => a.AppointmentDate.Date == DateTime.Today).OrderBy(a => a.AppointmentTime).ToList();
+                        }
+                        @if (todayAppointments.Any())
+                        {
+                            <div class="appointments-list">
+                                @foreach (var appointment in todayAppointments)
+                                {
+                                    <div class="appointment-item status-@appointment.Status.ToString().ToLower()">
+                                        <div class="appointment-time">
+                                            @appointment.AppointmentTime.ToString(@"HH\:mm")
+                                        </div>
+                                        <div class="appointment-info">
+                                            <h6>@appointment.CustomerName</h6>
+                                            <small>@appointment.Service?.Name</small>
+                                        </div>
+                                        <div class="appointment-status">
+                                            @switch (appointment.Status)
+                                            {
+                                                case AppointmentStatus.Pending:
+                                                    <span class="badge bg-warning">انتظار</span>
+                                                    break;
+                                                case AppointmentStatus.Confirmed:
+                                                    <span class="badge bg-success">تایید</span>
+                                                    break;
+                                                case AppointmentStatus.Completed:
+                                                    <span class="badge bg-info">تکمیل</span>
+                                                    break;
+                                                case AppointmentStatus.Cancelled:
+                                                    <span class="badge bg-danger">لغو</span>
+                                                    break;
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-state-small">
+                                <i class="fas fa-calendar-times"></i>
+                                <p>نوبتی برای امروز ندارید</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h4>
+                            <i class="fas fa-bolt"></i>
+                            عملیات سریع
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="quick-actions">
+                            <button class="quick-action-btn" onclick="blockTimeSlot()">
+                                <i class="fas fa-ban"></i>
+                                <span>مسدود کردن زمان</span>
+                            </button>
+                            <button class="quick-action-btn" onclick="setBreakTime()">
+                                <i class="fas fa-coffee"></i>
+                                <span>تنظیم استراحت</span>
+                            </button>
+                            <button class="quick-action-btn" onclick="viewStatistics()">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>آمار نوبت‌ها</span>
+                            </button>
+                            <button class="quick-action-btn" onclick="exportSchedule()">
+                                <i class="fas fa-download"></i>
+                                <span>خروجی برنامه</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h4>
+                            <i class="fas fa-info-circle"></i>
+                            راهنما
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-color available"></div>
+                                <span>زمان آزاد</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color booked"></div>
+                                <span>رزرو شده</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color blocked"></div>
+                                <span>مسدود شده</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color break"></div>
+                                <span>استراحت</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Time Slot Modal -->
+<div class="modal fade" id="timeSlotModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-clock"></i>
+                    تنظیم ساعات کاری
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">ساعت شروع کار</label>
+                                <input type="time" class="form-control" id="openTime" value="@Model.OpenTime.ToString(@"HH\:mm")" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">ساعت پایان کار</label>
+                                <input type="time" class="form-control" id="closeTime" value="@Model.CloseTime.ToString(@"HH\:mm")" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">روزهای کاری</label>
+                        <div class="working-days-modal">
+                            @{
+                                var modalDays = new Dictionary<string, string>
+                                {
+                                    { "شنبه", "Saturday" },
+                                    { "یکشنبه", "Sunday" },
+                                    { "دوشنبه", "Monday" },
+                                    { "سه‌شنبه", "Tuesday" },
+                                    { "چهارشنبه", "Wednesday" },
+                                    { "پنج‌شنبه", "Thursday" },
+                                    { "جمعه", "Friday" }
+                                };
+                                var modalSelectedDays = Model.WorkingDays?.Split(',').Select(d => d.Trim()).ToList() ?? new List<string>();
+                            }
+                            @foreach (var day in modalDays)
+                            {
+                                <div class="day-checkbox-modal">
+                                    <input type="checkbox" id="modal_day_@day.Value" name="workingDays" value="@day.Key" 
+                                           @(modalSelectedDays.Contains(day.Key) ? "checked" : "") />
+                                    <label for="modal_day_@day.Value">@day.Key</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">فاصله بین نوبت‌ها (دقیقه)</label>
+                        <select class="form-select" id="slotInterval">
+                            <option value="15">15 دقیقه</option>
+                            <option value="30" selected>30 دقیقه</option>
+                            <option value="45">45 دقیقه</option>
+                            <option value="60">60 دقیقه</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">زمان استراحت بین نوبت‌ها (دقیقه)</label>
+                        <select class="form-select" id="breakTime">
+                            <option value="0">بدون استراحت</option>
+                            <option value="5">5 دقیقه</option>
+                            <option value="10">10 دقیقه</option>
+                            <option value="15" selected>15 دقیقه</option>
+                            <option value="30">30 دقیقه</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">انصراف</button>
+                <button type="button" class="btn btn-gold" onclick="saveScheduleSettings()">ذخیره تنظیمات</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/manage-schedule.css" asp-append-version="true">
+}
+
+@section Scripts {
+    <script src="~/js/manage-schedule.js" asp-append-version="true"></script>
+    <script>
+        // Pass server data to JavaScript
+        window.scheduleData = {
+            appointments: @Html.Raw(Json.Serialize(Model.Appointments.Select(a => new {
+                id = a.Id,
+                date = a.AppointmentDate.ToString("yyyy-MM-dd"),
+                time = a.AppointmentTime.ToString(@"HH\:mm"),
+                customerName = a.CustomerName,
+                serviceName = a.Service?.Name ?? "",
+                status = a.Status.ToString()
+            }))),
+            openTime: '@Model.OpenTime.ToString(@"HH\:mm")',
+            closeTime: '@Model.CloseTime.ToString(@"HH\:mm")',
+            workingDays: '@Model.WorkingDays'
+        };
+    </script>
+}

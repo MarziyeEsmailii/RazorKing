@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RazorKing.Data;
 using RazorKing.Models;
+using RazorKing.Models.ViewModels;
 
 namespace RazorKing.Controllers
 {
@@ -12,128 +13,667 @@ namespace RazorKing.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<BarberController> _logger;
 
-        public BarberController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public BarberController(
+            ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager,
+            ILogger<BarberController> logger)
         {
             _context = context;
             _userManager = userManager;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Dashboard()
         {
             var user = await _userManager.GetUserAsync(User);
-            
-            // آمار روزانه آرایشگر
-            var today = DateTime.Today;
-            var thisWeek = today.AddDays(-(int)today.DayOfWeek);
-            var thisMonth = new DateTime(today.Year, today.Month, 1);
+            if (user == null) return RedirectToAction("Login", "Account");
 
-            var stats = new
+            // Find barber's barbershop
+            var barbershop = await _context.Barbershops
+                .Include(b => b.City)
+                .Include(b => b.Services)
+                .Include(b => b.Appointments.Where(a => a.AppointmentDate >= DateTime.Today))
+                .ThenInclude(a => a.Service)
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (barbershop == null)
             {
-                TodayAppointments = await _context.Appointments
-                    .CountAsync(a => a.BarberId == user.Id && 
-                               a.AppointmentDate.Date == today &&
-                               a.Status != AppointmentStatus.Cancelled),
-                
-                WeeklyAppointments = await _context.Appointments
-                    .CountAsync(a => a.BarberId == user.Id && 
-                               a.AppointmentDate >= thisWeek &&
-                               a.Status != AppointmentStatus.Cancelled),
-                
-                MonthlyRevenue = await _context.Appointments
-                    .Where(a => a.BarberId == user.Id && 
-                           a.AppointmentDate >= thisMonth &&
-                           a.Status == AppointmentStatus.Confirmed)
-                    .SumAsync(a => a.TotalPrice),
-                
-                CompletedAppointments = await _context.Appointments
-                    .CountAsync(a => a.BarberId == user.Id && 
-                               a.Status == AppointmentStatus.Completed)
+                return RedirectToAction("CreateBarbershop");
+            }
+
+            var viewModel = new BarberDashboardViewModel
+            {
+                Barbershop = barbershop,
+                TodayAppointments = barbershop.Appointments
+                    .Where(a => a.AppointmentDate.Date == DateTime.Today)
+                    .OrderBy(a => a.AppointmentTime)
+                    .ToList(),
+                UpcomingAppointments = barbershop.Appointments
+                    .Where(a => a.AppointmentDate > DateTime.Today)
+                    .OrderBy(a => a.AppointmentDate)
+                    .ThenBy(a => a.AppointmentTime)
+                    .Take(10)
+                    .ToList(),
+                MonthlyStats = new BarberStatsViewModel
+                {
+                    TotalAppointments = barbershop.Appointments.Count(a => a.AppointmentDate.Month == DateTime.Now.Month),
+                    CompletedAppointments = barbershop.Appointments.Count(a => a.Status == AppointmentStatus.Completed && a.AppointmentDate.Month == DateTime.Now.Month),
+                    TotalRevenue = barbershop.Appointments
+                        .Where(a => a.Status == AppointmentStatus.Completed && a.AppointmentDate.Month == DateTime.Now.Month)
+                        .Sum(a => a.Service?.Price ?? 0)
+                }
             };
 
-            ViewBag.Stats = stats;
-            
-            // نوبت‌های امروز
-            var todayAppointments = await _context.Appointments
-                .Include(a => a.AppointmentServices)
-                .ThenInclude(aps => aps.Service)
-                .Include(a => a.Barbershop)
-                .Where(a => a.BarberId == user.Id && 
-                           a.AppointmentDate.Date == today)
-                .OrderBy(a => a.AppointmentTime)
-                .ToListAsync();
-
-            return View(todayAppointments);
+            return View(viewModel);
         }
 
-        public async Task<IActionResult> Schedule()
+        [HttpGet]
+        public async Task<IActionResult> CreateBarbershop()
         {
             var user = await _userManager.GetUserAsync(User);
-            
-            var appointments = await _context.Appointments
-                .Include(a => a.AppointmentServices)
-                .ThenInclude(aps => aps.Service)
-                .Include(a => a.Barbershop)
-                .Where(a => a.BarberId == user.Id)
-                .OrderBy(a => a.AppointmentDate)
-                .ThenBy(a => a.AppointmentTime)
-                .ToListAsync();
+            if (user == null) return RedirectToAction("Login", "Account");
 
-            return View(appointments);
-        }
+            // Check if user already has a barbershop
+            var existingBarbershop = await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
 
-        public async Task<IActionResult> WorkingHours()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            
-            // اینجا می‌توانید سیستم ساعات کاری آرایشگر را پیاده‌سازی کنید
-            // فعلاً لیست آرایشگاه‌هایی که آرایشگر در آن‌ها کار می‌کند را نمایش می‌دهیم
-            
-            var barbershops = await _context.Barbershops
-                .Where(b => b.IsActive)
-                .ToListAsync();
+            if (existingBarbershop != null)
+            {
+                return RedirectToAction("Dashboard");
+            }
 
-            return View(barbershops);
+            var viewModel = new CreateBarbershopViewModel
+            {
+                Cities = await _context.Cities.OrderBy(c => c.Name).ToListAsync()
+            };
+
+            return View(viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateAppointmentStatus(int appointmentId, AppointmentStatus status)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateBarbershop(CreateBarbershopViewModel model, IFormFile? imageFile)
         {
-            var user = await _userManager.GetUserAsync(User);
-            var appointment = await _context.Appointments
-                .FirstOrDefaultAsync(a => a.Id == appointmentId && a.BarberId == user.Id);
-
-            if (appointment != null)
+            // Process working days array
+            if (model.WorkingDaysArray != null && model.WorkingDaysArray.Any())
             {
-                appointment.Status = status;
-                
-                if (status == AppointmentStatus.Completed)
-                {
-                    appointment.CompletedAt = DateTime.Now;
-                }
-
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "وضعیت نوبت بروزرسانی شد";
+                model.WorkingDays = string.Join(",", model.WorkingDaysArray);
+            }
+            
+            if (!ModelState.IsValid)
+            {
+                model.Cities = await _context.Cities.OrderBy(c => c.Name).ToListAsync();
+                return View(model);
             }
 
-            return RedirectToAction("Dashboard");
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            // Check if user already has a barbershop
+            var existingBarbershop = await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (existingBarbershop != null)
+            {
+                return RedirectToAction("Dashboard");
+            }
+
+            var barbershop = new Barbershop
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Address = model.Address,
+                Phone = model.Phone,
+                CityId = model.CityId,
+                OpenTime = model.OpenTime,
+                CloseTime = model.CloseTime,
+                WorkingDays = model.WorkingDays,
+                IsActive = true,
+                UserId = user.Id,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            // Handle image upload
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "barbershops");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(fileStream);
+                }
+
+                barbershop.ImageUrl = "/uploads/barbershops/" + uniqueFileName;
+            }
+
+            try
+            {
+                _context.Barbershops.Add(barbershop);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "آرایشگاه شما با موفقیت ایجاد شد";
+                return RedirectToAction("Dashboard");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating barbershop for user {UserId}", user.Id);
+                ModelState.AddModelError("", "خطا در ایجاد آرایشگاه");
+                model.Cities = await _context.Cities.OrderBy(c => c.Name).ToListAsync();
+                return View(model);
+            }
         }
 
-        public async Task<IActionResult> AppointmentDetails(int id)
+        [HttpGet]
+        public async Task<IActionResult> EditBarbershop()
         {
             var user = await _userManager.GetUserAsync(User);
-            var appointment = await _context.Appointments
-                .Include(a => a.AppointmentServices)
-                .ThenInclude(aps => aps.Service)
-                .Include(a => a.Barbershop)
-                .FirstOrDefaultAsync(a => a.Id == id && a.BarberId == user.Id);
+            if (user == null) return RedirectToAction("Login", "Account");
 
-            if (appointment == null)
+            var barbershop = await _context.Barbershops
+                .Include(b => b.City)
+                .Include(b => b.Services)
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (barbershop == null)
+            {
+                return RedirectToAction("CreateBarbershop");
+            }
+
+            var viewModel = new EditBarbershopViewModel
+            {
+                Id = barbershop.Id,
+                Name = barbershop.Name,
+                Description = barbershop.Description,
+                Address = barbershop.Address,
+                Phone = barbershop.Phone,
+                CityId = barbershop.CityId,
+                OpenTime = barbershop.OpenTime,
+                CloseTime = barbershop.CloseTime,
+                WorkingDays = barbershop.WorkingDays,
+                IsActive = barbershop.IsActive,
+                Cities = await _context.Cities.OrderBy(c => c.Name).ToListAsync(),
+                Services = barbershop.Services.ToList()
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditBarbershop(EditBarbershopViewModel model, IFormFile? imageFile)
+        {
+            // Process working days array
+            if (model.WorkingDaysArray != null && model.WorkingDaysArray.Any())
+            {
+                model.WorkingDays = string.Join(",", model.WorkingDaysArray);
+            }
+            
+            if (!ModelState.IsValid)
+            {
+                model.Cities = await _context.Cities.OrderBy(c => c.Name).ToListAsync();
+                return View(model);
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            var barbershop = await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.Id == model.Id && b.UserId == user.Id);
+
+            if (barbershop == null)
             {
                 return NotFound();
             }
 
-            return View(appointment);
+            // Update barbershop info
+            barbershop.Name = model.Name;
+            barbershop.Description = model.Description;
+            barbershop.Address = model.Address;
+            barbershop.Phone = model.Phone;
+            barbershop.CityId = model.CityId;
+            barbershop.OpenTime = model.OpenTime;
+            barbershop.CloseTime = model.CloseTime;
+            barbershop.WorkingDays = model.WorkingDays;
+            barbershop.IsActive = model.IsActive;
+            barbershop.UpdatedAt = DateTime.Now;
+
+            // Handle image upload
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "barbershops");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(fileStream);
+                }
+
+                barbershop.ImageUrl = "/uploads/barbershops/" + uniqueFileName;
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "اطلاعات آرایشگاه با موفقیت به‌روزرسانی شد";
+                return RedirectToAction("Dashboard");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating barbershop {BarbershopId}", model.Id);
+                ModelState.AddModelError("", "خطا در به‌روزرسانی اطلاعات");
+                model.Cities = await _context.Cities.OrderBy(c => c.Name).ToListAsync();
+                return View(model);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ManageServices()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            var barbershop = await _context.Barbershops
+                .Include(b => b.Services)
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (barbershop == null)
+            {
+                return RedirectToAction("CreateBarbershop");
+            }
+
+            return View(barbershop.Services.OrderBy(s => s.Name).ToList());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddService([FromBody] AddServiceViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "اطلاعات وارد شده صحیح نیست" });
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var barbershop = await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (barbershop == null)
+            {
+                return Json(new { success = false, message = "آرایشگاه یافت نشد" });
+            }
+
+            var service = new Service
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Price = model.Price,
+                Duration = model.Duration,
+                BarbershopId = barbershop.Id,
+                IsActive = true,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.Services.Add(service);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "خدمت جدید با موفقیت اضافه شد" });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ManageSchedule()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            var barbershop = await _context.Barbershops
+                .Include(b => b.Appointments.Where(a => a.AppointmentDate >= DateTime.Today))
+                .ThenInclude(a => a.Service)
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (barbershop == null)
+            {
+                return RedirectToAction("CreateBarbershop");
+            }
+
+            var viewModel = new BarberScheduleViewModel
+            {
+                Barbershop = barbershop,
+                WorkingDays = barbershop.WorkingDays,
+                OpenTime = barbershop.OpenTime,
+                CloseTime = barbershop.CloseTime,
+                Appointments = barbershop.Appointments
+                    .Where(a => a.AppointmentDate >= DateTime.Today && a.AppointmentDate <= DateTime.Today.AddDays(30))
+                    .OrderBy(a => a.AppointmentDate)
+                    .ThenBy(a => a.AppointmentTime)
+                    .ToList()
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateSchedule([FromBody] UpdateScheduleViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var barbershop = await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (barbershop == null)
+            {
+                return Json(new { success = false, message = "آرایشگاه یافت نشد" });
+            }
+
+            barbershop.WorkingDays = model.WorkingDays;
+            barbershop.OpenTime = model.OpenTime;
+            barbershop.CloseTime = model.CloseTime;
+            barbershop.UpdatedAt = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "برنامه کاری با موفقیت به‌روزرسانی شد" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteService(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var service = await _context.Services
+                .Include(s => s.Barbershop)
+                .FirstOrDefaultAsync(s => s.Id == id && s.Barbershop.UserId == user.Id);
+
+            if (service == null)
+            {
+                return Json(new { success = false, message = "خدمت یافت نشد" });
+            }
+
+            // Check if service has appointments
+            var hasAppointments = await _context.Appointments
+                .AnyAsync(a => a.ServiceId == id && a.AppointmentDate >= DateTime.Today);
+
+            if (hasAppointments)
+            {
+                return Json(new { success = false, message = "این خدمت دارای نوبت‌های آینده است و قابل حذف نیست" });
+            }
+
+            _context.Services.Remove(service);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "خدمت با موفقیت حذف شد" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateService([FromBody] EditServiceViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "اطلاعات وارد شده صحیح نیست" });
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var service = await _context.Services
+                .Include(s => s.Barbershop)
+                .FirstOrDefaultAsync(s => s.Id == model.Id && s.Barbershop.UserId == user.Id);
+
+            if (service == null)
+            {
+                return Json(new { success = false, message = "خدمت یافت نشد" });
+            }
+
+            service.Name = model.Name;
+            service.Description = model.Description;
+            service.Price = model.Price;
+            service.Duration = model.Duration;
+            service.IsActive = model.IsActive;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "خدمت با موفقیت به‌روزرسانی شد" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeAppointmentStatus([FromBody] ChangeAppointmentStatusViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var appointment = await _context.Appointments
+                .Include(a => a.Service)
+                .ThenInclude(s => s.Barbershop)
+                .FirstOrDefaultAsync(a => a.Id == model.AppointmentId && a.Service.Barbershop.UserId == user.Id);
+
+            if (appointment == null)
+            {
+                return Json(new { success = false, message = "نوبت یافت نشد" });
+            }
+
+            appointment.Status = model.Status;
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "وضعیت نوبت با موفقیت تغییر کرد" });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTodayAppointments()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var appointments = await _context.Appointments
+                .Include(a => a.Service)
+                .ThenInclude(s => s.Barbershop)
+                .Where(a => a.Service.Barbershop.UserId == user.Id && a.AppointmentDate.Date == DateTime.Today)
+                .OrderBy(a => a.AppointmentTime)
+                .Select(a => new
+                {
+                    id = a.Id,
+                    customerName = a.CustomerName,
+                    customerPhone = a.CustomerPhone,
+                    serviceName = a.Service.Name,
+                    servicePrice = a.Service.Price,
+                    appointmentTime = a.AppointmentTime.ToString(@"HH\:mm"),
+                    status = a.Status.ToString()
+                })
+                .ToListAsync();
+
+            return Json(appointments);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ManageAppointments()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            var barbershop = await _context.Barbershops
+                .Include(b => b.Appointments.Where(a => a.AppointmentDate >= DateTime.Today))
+                .ThenInclude(a => a.Service)
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (barbershop == null)
+            {
+                return RedirectToAction("CreateBarbershop");
+            }
+
+            var viewModel = new BarberScheduleViewModel
+            {
+                Barbershop = barbershop,
+                WorkingDays = barbershop.WorkingDays,
+                OpenTime = barbershop.OpenTime,
+                CloseTime = barbershop.CloseTime,
+                Appointments = barbershop.Appointments
+                    .Where(a => a.AppointmentDate >= DateTime.Today && a.AppointmentDate <= DateTime.Today.AddDays(30))
+                    .OrderBy(a => a.AppointmentDate)
+                    .ThenBy(a => a.AppointmentTime)
+                    .ToList()
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BlockTime([FromBody] Models.ViewModels.BlockTimeViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var barbershop = await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (barbershop == null)
+            {
+                return Json(new { success = false, message = "آرایشگاه یافت نشد" });
+            }
+
+            try
+            {
+                // Parse times
+                var startTime = TimeSpan.Parse(model.StartTime);
+                var endTime = TimeSpan.Parse(model.EndTime);
+                
+                // Create blocked time slots (15-minute intervals)
+                var currentTime = startTime;
+                var blockedSlots = new List<BlockedTimeSlot>();
+                
+                while (currentTime < endTime)
+                {
+                    var blockedSlot = new BlockedTimeSlot
+                    {
+                        BarbershopId = barbershop.Id,
+                        Date = model.Date.Date,
+                        Time = currentTime,
+                        Reason = model.Reason,
+                        CreatedAt = DateTime.Now
+                    };
+                    
+                    blockedSlots.Add(blockedSlot);
+                    currentTime = currentTime.Add(TimeSpan.FromMinutes(15));
+                }
+
+                _context.BlockedTimeSlots.AddRange(blockedSlots);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "زمان با موفقیت مسدود شد" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error blocking time for barbershop {BarbershopId}", barbershop.Id);
+                return Json(new { success = false, message = "خطا در مسدود کردن زمان" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetWeeklyAppointments(DateTime weekStart)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var weekEnd = weekStart.AddDays(7);
+            
+            var appointments = await _context.Appointments
+                .Include(a => a.Service)
+                .ThenInclude(s => s.Barbershop)
+                .Where(a => a.Service.Barbershop.UserId == user.Id && 
+                           a.AppointmentDate >= weekStart && 
+                           a.AppointmentDate < weekEnd)
+                .OrderBy(a => a.AppointmentDate)
+                .ThenBy(a => a.AppointmentTime)
+                .Select(a => new
+                {
+                    id = a.Id,
+                    date = a.AppointmentDate.ToString("yyyy-MM-dd"),
+                    time = a.AppointmentTime.ToString(@"HH\:mm"),
+                    customerName = a.CustomerName,
+                    customerPhone = a.CustomerPhone,
+                    serviceName = a.Service.Name,
+                    servicePrice = a.Service.Price,
+                    status = a.Status.ToString()
+                })
+                .ToListAsync();
+
+            return Json(appointments);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableSlots(DateTime date)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var barbershop = await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (barbershop == null)
+            {
+                return Json(new { success = false, message = "آرایشگاه یافت نشد" });
+            }
+
+            // Check if it's a working day
+            var dayName = GetPersianDayName(date.DayOfWeek);
+            var workingDays = barbershop.WorkingDays?.Split(',').Select(d => d.Trim()).ToList() ?? new List<string>();
+            
+            if (!workingDays.Contains(dayName))
+            {
+                return Json(new { success = false, message = "این روز جزو روزهای کاری نیست" });
+            }
+
+            // Get existing appointments
+            var existingAppointments = await _context.Appointments
+                .Where(a => a.BarbershopId == barbershop.Id && a.AppointmentDate.Date == date.Date)
+                .Select(a => a.AppointmentTime)
+                .ToListAsync();
+
+            // Get blocked time slots
+            var blockedSlots = await _context.BlockedTimeSlots
+                .Where(b => b.BarbershopId == barbershop.Id && b.Date.Date == date.Date)
+                .Select(b => b.Time)
+                .ToListAsync();
+
+            // Generate available slots
+            var availableSlots = new List<string>();
+            var currentTime = barbershop.OpenTime;
+            
+            while (currentTime < barbershop.CloseTime)
+            {
+                if (!existingAppointments.Contains(currentTime) && !blockedSlots.Contains(currentTime))
+                {
+                    availableSlots.Add(currentTime.ToString(@"HH\:mm"));
+                }
+                currentTime = currentTime.Add(TimeSpan.FromMinutes(15));
+            }
+
+            return Json(new { success = true, slots = availableSlots });
+        }
+
+        private string GetPersianDayName(DayOfWeek dayOfWeek)
+        {
+            return dayOfWeek switch
+            {
+                DayOfWeek.Saturday => "شنبه",
+                DayOfWeek.Sunday => "یکشنبه",
+                DayOfWeek.Monday => "دوشنبه",
+                DayOfWeek.Tuesday => "سه‌شنبه",
+                DayOfWeek.Wednesday => "چهارشنبه",
+                DayOfWeek.Thursday => "پنج‌شنبه",
+                DayOfWeek.Friday => "جمعه",
+                _ => ""
+            };
         }
     }
 }

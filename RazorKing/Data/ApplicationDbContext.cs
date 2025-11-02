@@ -16,6 +16,8 @@ namespace RazorKing.Data
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<AppointmentService> AppointmentServices { get; set; }
         public DbSet<BarberSchedule> BarberSchedules { get; set; }
+        public DbSet<BlockedDate> BlockedDates { get; set; }
+        public DbSet<BlockedTimeSlot> BlockedTimeSlots { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -51,7 +53,7 @@ namespace RazorKing.Data
             modelBuilder.Entity<Barbershop>()
                 .HasOne(b => b.Owner)
                 .WithMany(u => u.OwnedBarbershops)
-                .HasForeignKey(b => b.OwnerId)
+                .HasForeignKey(b => b.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Appointment>()
@@ -92,6 +94,13 @@ namespace RazorKing.Data
                 .HasForeignKey(a => a.BarbershopId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Appointment-Service relationship
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Service)
+                .WithMany(s => s.Appointments)
+                .HasForeignKey(a => a.ServiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Configure decimal precision
             modelBuilder.Entity<Service>()
                 .Property(s => s.Price)
@@ -108,6 +117,20 @@ namespace RazorKing.Data
             modelBuilder.Entity<AppointmentService>()
                 .Property(aps => aps.Price)
                 .HasPrecision(18, 2);
+
+            // Configure BlockedDate relationships
+            modelBuilder.Entity<BlockedDate>()
+                .HasOne(bd => bd.Barbershop)
+                .WithMany()
+                .HasForeignKey(bd => bd.BarbershopId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure BlockedTimeSlot relationships
+            modelBuilder.Entity<BlockedTimeSlot>()
+                .HasOne(bts => bts.Barbershop)
+                .WithMany()
+                .HasForeignKey(bts => bts.BarbershopId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Seed data for Golestan cities
             modelBuilder.Entity<City>().HasData(

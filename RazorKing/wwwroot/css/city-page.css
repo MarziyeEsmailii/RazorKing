@@ -1,0 +1,742 @@
+/**
+ * City Page CSS
+ * ریزر کینگ - صفحه شهر
+ */
+
+.city-page {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
+    min-height: 100vh;
+    padding-top: 0;
+}
+
+/* City Header */
+.city-header {
+    position: relative;
+    padding: 100px 0;
+    overflow: hidden;
+}
+
+.city-header-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.city-header-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.city-header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(10, 10, 10, 0.8), rgba(26, 26, 26, 0.6));
+    z-index: 2;
+}
+
+.city-header-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    color: #ffffff;
+}
+
+.breadcrumb-nav {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-nav a {
+    color: #d4af37;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-nav a:hover {
+    color: #f4e4bc;
+}
+
+.breadcrumb-nav i {
+    margin: 0 10px;
+    color: #b0b0b0;
+}
+
+.city-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.city-title i {
+    color: #d4af37;
+    margin-left: 15px;
+}
+
+.city-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 30px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #d4af37;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #b0b0b0;
+}
+
+/* Filters Section */
+.filters-section {
+    padding: 20px 0;
+    background: rgba(26, 26, 26, 0.5);
+}
+
+.filters-card {
+    background: rgba(42, 42, 42, 0.9);
+    border-radius: 20px;
+    padding: 30px;
+    border: 2px solid rgba(212, 175, 55, 0.2);
+    backdrop-filter: blur(15px);
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-box i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #d4af37;
+    z-index: 2;
+}
+
+.search-box input {
+    background: rgba(26, 26, 26, 0.8);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 12px 45px 12px 15px;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+    border-color: #d4af37;
+    box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25);
+    outline: none;
+}
+
+.form-select {
+    background: rgba(26, 26, 26, 0.8);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: #d4af37;
+    box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25);
+    color: #ffffff;
+}
+
+.form-select option {
+    background: #2a2a2a;
+    color: #ffffff;
+}
+
+/* Barbershops Section */
+.barbershops-section {
+    padding: 20px 0;
+}
+
+.barbershops-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+}
+
+.barbershop-card {
+    background: rgba(26, 26, 26, 0.95);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 2px solid rgba(212, 175, 55, 0.2);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(15px);
+}
+
+.barbershop-card:hover {
+    border-color: #d4af37;
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(212, 175, 55, 0.3);
+}
+
+.barbershop-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.barbershop-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.barbershop-card:hover .barbershop-image img {
+    transform: scale(1.1);
+}
+
+.barbershop-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 10, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.barbershop-card:hover .barbershop-overlay {
+    opacity: 1;
+}
+
+.barbershop-content {
+    padding: 25px;
+}
+
+.barbershop-name {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+}
+
+.barbershop-address,
+.barbershop-phone {
+    color: #b0b0b0;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.barbershop-address i,
+.barbershop-phone i {
+    color: #d4af37;
+    width: 16px;
+}
+
+.barbershop-services {
+    margin: 20px 0;
+}
+
+.barbershop-services h5 {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.services-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.service-tag {
+    background: rgba(212, 175, 55, 0.2);
+    color: #d4af37;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.service-tag small {
+    font-size: 0.7rem;
+    color: #f4e4bc;
+    margin-top: 2px;
+}
+
+.service-tag.more {
+    background: rgba(255, 255, 255, 0.1);
+    color: #b0b0b0;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.barbershop-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    font-size: 0.9rem;
+}
+
+.price-range,
+.working-hours {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #b0b0b0;
+}
+
+.price-range i,
+.working-hours i {
+    color: #d4af37;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: #b0b0b0;
+}
+
+.empty-state i {
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    color: #ffffff;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.empty-state p {
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
+
+/* Buttons */
+.btn-gold {
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 100%);
+    color: #0a0a0a;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+    color: #0a0a0a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .city-page {
+        padding-top: 60px;
+    }
+    
+    .city-header {
+        padding: 60px 0;
+    }
+    
+    .city-title {
+        font-size: 2rem;
+    }
+    
+    .city-stats {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .filters-card {
+        padding: 20px;
+    }
+    
+    .filters-card .row > div {
+        margin-bottom: 15px;
+    }
+    
+    .barbershops-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 0 15px;
+    }
+    
+    .barbershop-footer {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 576px) {
+    .barbershop-content {
+        padding: 20px;
+    }
+    
+    .service-tag {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+    }
+}
+
+/* Barbershop Modal */
+.barbershop-modal-content {
+    background: #2a2a2a;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.barbershop-modal-header {
+    background: rgba(212, 175, 55, 0.1);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    padding: 1.5rem;
+}
+
+.barbershop-modal-header .modal-title {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+.barbershop-modal-body {
+    padding: 2rem;
+    color: #b0b0b0;
+}
+
+.barbershop-modal-footer {
+    background: rgba(212, 175, 55, 0.05);
+    border-top: 1px solid rgba(212, 175, 55, 0.3);
+    padding: 1.5rem;
+}
+
+.barbershop-details {
+    display: grid;
+    gap: 2rem;
+}
+
+.barbershop-header {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.barbershop-image-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #d4af37;
+    margin-bottom: 1rem;
+}
+
+.barbershop-name-large {
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.barbershop-description {
+    color: #b0b0b0;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.barbershop-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 1.5rem;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.info-section h6 {
+    color: #d4af37;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    color: #b0b0b0;
+}
+
+.info-item:last-child {
+    margin-bottom: 0;
+}
+
+.info-item i {
+    color: #d4af37;
+    width: 16px;
+    text-align: center;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.service-item {
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.service-item:hover {
+    background: rgba(212, 175, 55, 0.2);
+    transform: translateY(-2px);
+}
+
+.service-name {
+    color: #ffffff;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.service-price {
+    color: #d4af37;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.service-duration {
+    color: #b0b0b0;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+.working-days {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.day-badge {
+    background: rgba(212, 175, 55, 0.2);
+    color: #d4af37;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.btn-close {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.btn-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    opacity: 1;
+}
+
+/* Loading Animation */
+.spinner-border.text-gold {
+    color: #d4af37 !important;
+    border-color: rgba(212, 175, 55, 0.3);
+    border-top-color: #d4af37;
+}
+
+/* Responsive Modal */
+@media (max-width: 768px) {
+    .barbershop-modal-body {
+        padding: 1rem;
+    }
+    
+    .barbershop-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .working-days {
+        justify-content: center;
+    }
+}
+
+/* Enhanced Overlay Buttons */
+.barbershop-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.btn-outline-light {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.barbershop-overlay .btn-gold {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}/*
+ Results Header */
+.results-header {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 1rem;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.results-title {
+    color: #ffffff;
+    font-weight: 700;
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.results-count {
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 25px;
+    padding: 0.5rem 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.count-number {
+    color: #d4af37;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.count-text {
+    color: #b0b0b0;
+    font-size: 0.9rem;
+}
+
+/* Enhanced Filter Section */
+.filters-card .row > div {
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+    .filters-card .row > div {
+        margin-bottom: 0;
+    }
+}
+
+/* Quick Stats Enhancement */
+.city-stats .stat-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 1rem 1.5rem;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    transition: all 0.3s ease;
+}
+
+.city-stats .stat-item:hover {
+    background: rgba(212, 175, 55, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Loading States */
+.barbershop-card.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.barbershop-card.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 3px solid rgba(212, 175, 55, 0.3);
+    border-top-color: #d4af37;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 10;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

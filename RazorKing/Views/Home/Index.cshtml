@@ -1,15 +1,18 @@
-﻿@model RazorKing.Models.ViewModels.HomeViewModel
+@model RazorKing.Models.ViewModels.HomeViewModel
 @{
     ViewData["Title"] = "ریزر کینگ | آرایشگاه مردانه لوکس - رزرو آنلاین";
     Layout = "_LayoutModern";
 }
+
+<!-- Meta tag for base URL -->
+<meta name="base-url" content="@Url.Content("~")" />
 
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="hero-background">
         <div class="hero-overlay"></div>
         <div class="hero-image">
-            <img src="~/img/footer-bg.png" />
+            <img src="~/img/footer-bg.png" alt="Background" />
         </div>
     </div>
     <div class="hero-content">
@@ -57,14 +60,14 @@
                     </div>
                 </div>
                 <div class="col-lg-5">
-                    <div class="hero-stats animate-fade-in-right delay-1200">
+                    <div class="hero-stats animate-fade-in-right delay-1200" style="display: block !important; visibility: visible !important; opacity: 1 !important;">
                         <div class="stats-container">
                             <div class="stat-item hover-lift">
                                 <div class="stat-icon">
                                     <i class="fas fa-users"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <div class="stat-number" data-count="@Model.TotalCustomers">0</div>
+                                    <div class="stat-number" data-count="@Model.TotalCustomers">@Model.TotalCustomers</div>
                                     <div class="stat-label">مشتری راضی</div>
                                 </div>
                             </div>
@@ -73,7 +76,7 @@
                                     <i class="fas fa-store"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <div class="stat-number" data-count="@Model.TotalBarbershops">0</div>
+                                    <div class="stat-number" data-count="@Model.TotalBarbershops">@Model.TotalBarbershops</div>
                                     <div class="stat-label">آرایشگاه فعال</div>
                                 </div>
                             </div>
@@ -82,7 +85,7 @@
                                     <i class="fas fa-map-marker-alt"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <div class="stat-number" data-count="@Model.Cities.Count">0</div>
+                                    <div class="stat-number" data-count="@Model.Cities.Count">@Model.Cities.Count</div>
                                     <div class="stat-label">شهر فعال</div>
                                 </div>
                             </div>
@@ -136,44 +139,58 @@
             <p class="section-subtitle">در تمام شهرهای استان گلستان خدمات ما را دریافت کنید</p>
         </div>
         
-        <div class="cities-slider-container">
-            <div class="cities-slider" id="citiesSlider">
-                @foreach (var city in Model.Cities)
-                {
-                    <div class="city-slide">
-                        <div class="city-card" data-city="@city.Id">
-                            <div class="city-image">
-                                <img src="~/img/pic-@(new Random().Next(2, 5)).jpg" alt="@city.Name" onerror="this.src='~/img/background.webp'">
-                                <div class="city-overlay">
-                                    <i class="fas fa-map-marker-alt"></i>
+        <!-- Cities Slider - 4 Per Row -->
+        <div class="cities-slider-wrapper">
+            <div class="cities-slider-container" id="citiesSliderContainer">
+                <div class="cities-slider-track" id="citiesSliderTrack">
+                    @{
+                        var citiesPerRow = 4;
+                        var totalRows = (int)Math.Ceiling((double)Model.Cities.Count / citiesPerRow);
+                    }
+                    
+                    @for (int row = 0; row < totalRows; row++)
+                    {
+                        <div class="cities-row">
+                            @for (int i = row * citiesPerRow; i < Math.Min((row + 1) * citiesPerRow, Model.Cities.Count); i++)
+                            {
+                                var city = Model.Cities[i];
+                                <div class="city-slide-item">
+                                    <div class="city-card" data-city-id="@city.Id" onclick="window.location.href='@Url.Action("City", "Home", new { id = city.Id })'">
+                                        <div class="city-image">
+                                            <img src="~/img/pic-@(new Random().Next(2, 5)).jpg" alt="@city.Name" onerror="this.src='~/img/background.webp'">
+                                            <div class="city-overlay">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                            </div>
+                                        </div>
+                                        <div class="city-info">
+                                            <h4>@city.Name</h4>
+                                            <p>@city.Barbershops.Count(b => b.IsActive) آرایشگاه فعال</p>
+                                            <div class="city-btn">
+                                                مشاهده آرایشگاه‌ها
+                                                <i class="fas fa-arrow-left"></i>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="city-info">
-                                <h4>@city.Name</h4>
-                                <p>@city.Barbershops.Count(b => b.IsActive) آرایشگاه فعال</p>
-                                <a href="@Url.Action("Index", "Booking", new { cityId = city.Id })" class="city-btn">
-                                    انتخاب شهر
-                                    <i class="fas fa-arrow-left"></i>
-                                </a>
-                            </div>
+                            }
                         </div>
-                    </div>
-                }
+                    }
+                </div>
+                
+                <!-- Navigation Arrows -->
+                <button class="cities-nav-btn cities-nav-prev" id="citiesPrevBtn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <button class="cities-nav-btn cities-nav-next" id="citiesNextBtn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
             </div>
             
-            <!-- Navigation Buttons -->
-            <button class="slider-btn slider-btn-prev" onclick="slideCity(-1)">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            <button class="slider-btn slider-btn-next" onclick="slideCity(1)">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            
             <!-- Dots Indicator -->
-            <div class="slider-dots">
-                @for (int i = 0; i < Model.Cities.Count; i++)
+            <div class="cities-dots-container" id="citiesDotsContainer">
+                @for (int i = 0; i < totalRows; i++)
                 {
-                    <span class="slider-dot @(i == 0 ? "active" : "")" onclick="currentSlide(@(i + 1))"></span>
+                    <div class="cities-dot @(i == 0 ? "active" : "")" onclick="goToCityRow(@i)"></div>
                 }
             </div>
         </div>
@@ -190,78 +207,105 @@
         </div>
         
         <div class="services-grid">
-            <div class="service-card">
-                <div class="service-icon">
-                    <i class="fas fa-cut"></i>
-                </div>
-                <div class="service-content">
-                    <h4>کوتاهی مو</h4>
-                    <p>انواع مدل‌های مدرن و کلاسیک کوتاهی مو با بهترین تکنیک‌ها</p>
-                    <ul class="service-features">
-                        <li>فید و لاین</li>
-                        <li>مدل‌های مدرن</li>
-                        <li>کوتاهی کلاسیک</li>
-                    </ul>
-                    <div class="service-price">
-                        از 50,000 تومان
+            @if (Model.PopularServices != null && Model.PopularServices.Any())
+            {
+                @foreach (var service in Model.PopularServices)
+                {
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-cut"></i>
+                        </div>
+                        <div class="service-content">
+                            <h4>@service.Name</h4>
+                            <p>خدمات حرفه‌ای @service.Name با بهترین کیفیت</p>
+                            <ul class="service-features">
+                                <li>کیفیت بالا</li>
+                                <li>قیمت مناسب</li>
+                                <li>خدمات سریع</li>
+                            </ul>
+                            <div class="service-price">
+                                از @service.MinPrice.ToString("N0") تومان
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <!-- Default Services -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-cut"></i>
+                    </div>
+                    <div class="service-content">
+                        <h4>کوتاهی مو</h4>
+                        <p>انواع مدل‌های مدرن و کلاسیک کوتاهی مو با بهترین تکنیک‌ها</p>
+                        <ul class="service-features">
+                            <li>فید و لاین</li>
+                            <li>مدل‌های مدرن</li>
+                            <li>کوتاهی کلاسیک</li>
+                        </ul>
+                        <div class="service-price">
+                            از 50,000 تومان
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="service-card featured">
-                <div class="service-badge">محبوب</div>
-                <div class="service-icon">
-                    <i class="fas fa-user-tie"></i>
-                </div>
-                <div class="service-content">
-                    <h4>اصلاح صورت</h4>
-                    <p>اصلاح حرفه‌ای ریش و سبیل با تیغ‌های تیز و محصولات لوکس</p>
-                    <ul class="service-features">
-                        <li>اصلاح با تیغ</li>
-                        <li>طراحی ریش</li>
-                        <li>ماساژ صورت</li>
-                    </ul>
-                    <div class="service-price">
-                        از 40,000 تومان
+                
+                <div class="service-card featured">
+                    <div class="service-badge">محبوب</div>
+                    <div class="service-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="service-content">
+                        <h4>اصلاح صورت</h4>
+                        <p>اصلاح حرفه‌ای ریش و سبیل با تیغ‌های تیز و محصولات لوکس</p>
+                        <ul class="service-features">
+                            <li>اصلاح با تیغ</li>
+                            <li>طراحی ریش</li>
+                            <li>ماساژ صورت</li>
+                        </ul>
+                        <div class="service-price">
+                            از 40,000 تومان
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="service-card">
-                <div class="service-icon">
-                    <i class="fas fa-palette"></i>
-                </div>
-                <div class="service-content">
-                    <h4>رنگ و مش</h4>
-                    <p>رنگ‌آمیزی و مش مو با بهترین محصولات و رنگ‌های مد روز</p>
-                    <ul class="service-features">
-                        <li>هایلایت</li>
-                        <li>آمبره</li>
-                        <li>بالیاژ</li>
-                    </ul>
-                    <div class="service-price">
-                        از 80,000 تومان
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <div class="service-content">
+                        <h4>رنگ و مش</h4>
+                        <p>رنگ‌آمیزی و مش مو با بهترین محصولات و رنگ‌های مد روز</p>
+                        <ul class="service-features">
+                            <li>هایلایت</li>
+                            <li>آمبره</li>
+                            <li>بالیاژ</li>
+                        </ul>
+                        <div class="service-price">
+                            از 80,000 تومان
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="service-card">
-                <div class="service-icon">
-                    <i class="fas fa-spa"></i>
-                </div>
-                <div class="service-content">
-                    <h4>ماساژ و اسپا</h4>
-                    <p>ماساژ آرام‌بخش صورت و سر برای رفع خستگی و استرس</p>
-                    <ul class="service-features">
-                        <li>ماساژ صورت</li>
-                        <li>ماساژ سر</li>
-                        <li>ماسک صورت</li>
-                    </ul>
-                    <div class="service-price">
-                        از 60,000 تومان
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-spa"></i>
+                    </div>
+                    <div class="service-content">
+                        <h4>ماساژ و اسپا</h4>
+                        <p>ماساژ آرام‌بخش صورت و سر برای رفع خستگی و استرس</p>
+                        <ul class="service-features">
+                            <li>ماساژ صورت</li>
+                            <li>ماساژ سر</li>
+                            <li>ماسک صورت</li>
+                        </ul>
+                        <div class="service-price">
+                            از 60,000 تومان
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
         </div>
         
         <div class="text-center mt-5">
@@ -332,230 +376,87 @@
     </div>
 </section>
 
-<script>
-// Counter Animation
-function animateCounter(element, target, duration = 2000) {
-    const start = 0;
-    const increment = target / (duration / 16);
-    let current = start;
-    
-    const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-            current = target;
-            clearInterval(timer);
-        }
-        element.textContent = Math.floor(current).toLocaleString('fa-IR');
-    }, 16);
+<!-- City Barbershops Modal -->
+<div class="modal fade" id="cityModal" tabindex="-1" aria-labelledby="cityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content city-modal-content">
+            <div class="modal-header city-modal-header">
+                <h5 class="modal-title" id="cityModalLabel">
+                    <i class="fas fa-map-marker-alt text-gold"></i>
+                    <span id="cityModalTitle">آرایشگاه‌های شهر</span>
+                </h5>
+                <button type="button" class="btn-close city-modal-close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body city-modal-body">
+                <div id="cityBarbershopsLoading" class="text-center py-5">
+                    <div class="spinner-border text-gold" role="status">
+                        <span class="visually-hidden">در حال بارگذاری...</span>
+                    </div>
+                    <p class="mt-3 text-muted">در حال بارگذاری آرایشگاه‌ها...</p>
+                </div>
+                <div id="cityBarbershopsContent" class="d-none">
+                    <div class="row" id="barbershopsGrid">
+                        <!-- Barbershops will be loaded here -->
+                    </div>
+                </div>
+                <div id="cityBarbershopsEmpty" class="text-center py-5 d-none">
+                    <i class="fas fa-store-slash fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">آرایشگاهی یافت نشد</h5>
+                    <p class="text-muted">در حال حاضر آرایشگاه فعالی در این شهر وجود ندارد.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/home.js" asp-append-version="true"></script>
+    <script>
+        // Debug script to ensure stats are visible
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Debug: Page loaded');
+            const statsContainer = document.querySelector('.hero-stats');
+            if (statsContainer) {
+                console.log('Debug: Stats container found');
+                statsContainer.style.display = 'block';
+                statsContainer.style.visibility = 'visible';
+                statsContainer.style.opacity = '1';
+                
+                const statItems = document.querySelectorAll('.stat-item');
+                console.log('Debug: Found', statItems.length, 'stat items');
+                
+                statItems.forEach((item, index) => {
+                    item.style.display = 'block';
+                    item.style.visibility = 'visible';
+                    item.style.opacity = '1';
+                    console.log('Debug: Stat item', index, 'made visible');
+                });
+            } else {
+                console.log('Debug: Stats container NOT found');
+            }
+        });
+    </script>
 }
-
-// Intersection Observer for triggering animations
-const observerOptions = {
-    threshold: 0.5,
-    rootMargin: '0px 0px -100px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const statNumbers = entry.target.querySelectorAll('.stat-number');
-            statNumbers.forEach(statNumber => {
-                const target = parseInt(statNumber.getAttribute('data-count'));
-                animateCounter(statNumber, target);
-            });
-            observer.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
-
-// Start observing when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    const statsContainer = document.querySelector('.hero-stats');
-    if (statsContainer) {
-        observer.observe(statsContainer);
-    }
-    
-    // Add pulse animation to stat items
-    const statItems = document.querySelectorAll('.stat-item');
-    statItems.forEach((item, index) => {
-        setTimeout(() => {
-            item.style.animation = 'fadeInUp 0.6s ease forwards';
-        }, index * 200);
-    });
-});
-
-// Quick booking functionality
-function quickBooking() {
-    const citySelect = document.getElementById('quickCitySelect');
-    const selectedCity = citySelect.value;
-    
-    if (selectedCity) {
-        window.location.href = '@Url.Action("Index", "Booking")?cityId=' + selectedCity;
-    } else {
-        alert('لطفاً ابتدا شهر خود را انتخاب کنید');
-    }
-}
-
-// City Slider Functionality
-let currentSlideIndex = 0;
-const totalSlides = @Model.Cities.Count;
-let slidesPerView = getSlidesPerView();
-
-function getSlidesPerView() {
-    if (window.innerWidth >= 1200) return 4;
-    if (window.innerWidth >= 1024) return 3;
-    if (window.innerWidth >= 768) return 2;
-    return 1;
-}
-
-function updateSlider() {
-    const slider = document.getElementById('citiesSlider');
-    const slideWidth = 100 / slidesPerView;
-    const translateX = -(currentSlideIndex * slideWidth);
-    slider.style.transform = `translateX(${translateX}%)`;
-    
-    // Update dots
-    const dots = document.querySelectorAll('.slider-dot');
-    dots.forEach((dot, index) => {
-        dot.classList.toggle('active', index === currentSlideIndex);
-    });
-}
-
-function slideCity(direction) {
-    const maxSlideIndex = Math.max(0, totalSlides - slidesPerView);
-    
-    currentSlideIndex += direction;
-    
-    if (currentSlideIndex < 0) {
-        currentSlideIndex = maxSlideIndex;
-    } else if (currentSlideIndex > maxSlideIndex) {
-        currentSlideIndex = 0;
-    }
-    
-    updateSlider();
-}
-
-function currentSlide(slideIndex) {
-    const maxSlideIndex = Math.max(0, totalSlides - slidesPerView);
-    currentSlideIndex = Math.min(slideIndex - 1, maxSlideIndex);
-    updateSlider();
-}
-
-// Auto-slide functionality
-let autoSlideInterval;
-
-function startAutoSlide() {
-    autoSlideInterval = setInterval(() => {
-        slideCity(1);
-    }, 4000);
-}
-
-function stopAutoSlide() {
-    clearInterval(autoSlideInterval);
-}
-
-// Initialize slider
-document.addEventListener('DOMContentLoaded', () => {
-    updateSlider();
-    startAutoSlide();
-    
-    // Pause auto-slide on hover
-    const sliderContainer = document.querySelector('.cities-slider-container');
-    if (sliderContainer) {
-        sliderContainer.addEventListener('mouseenter', stopAutoSlide);
-        sliderContainer.addEventListener('mouseleave', startAutoSlide);
-    }
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        slidesPerView = getSlidesPerView();
-        currentSlideIndex = Math.min(currentSlideIndex, Math.max(0, totalSlides - slidesPerView));
-        updateSlider();
-    });
-});
-</script>
 
 <style>
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.stat-item {
-    opacity: 0;
-    transform: translateY(30px);
-}
-
-/* Additional responsive improvements for stats */
-@media (max-width: 768px) {
-    .stats-container {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
+    /* Force stats to be visible for debugging */
+    .hero-stats {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
     
     .stat-item {
-        padding: 15px 10px;
-    }
-    
-    .stat-icon {
-        width: 35px;
-        height: 35px;
-        margin-bottom: 8px;
-    }
-    
-    .stat-icon i {
-        font-size: var(--font-size-base);
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
     
     .stat-number {
-        font-size: var(--font-size-xl);
+        color: #d4af37 !important;
+        font-size: 1.5rem !important;
+        font-weight: 900 !important;
     }
-    
-    .stat-label {
-        font-size: 0.7rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .stats-container {
-        grid-template-columns: 1fr;
-        gap: 15px;
-        max-width: 200px;
-        margin: 0 auto;
-    }
-    
-    .stat-item {
-        padding: 20px 15px;
-    }
-}
-
-/* Add a subtle glow effect */
-.stat-item:hover {
-    box-shadow: 
-        0 8px 25px rgba(212, 175, 55, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-/* Improve the overall stats section layout */
-.hero-stats {
-    position: relative;
-}
-
-.hero-stats::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: -20px;
-    right: -20px;
-    bottom: -20px;
-    background: radial-gradient(circle at center, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
-    border-radius: 20px;
-    z-index: -1;
-}
 </style>

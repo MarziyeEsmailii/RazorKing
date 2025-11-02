@@ -1,0 +1,243 @@
+@model List<RazorKing.Models.Service>
+@{
+    ViewData["Title"] = "خدمات";
+    Layout = "_LayoutBarber";
+}
+
+<div class="manage-services">
+    <div class="container">
+        <div class="services-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2>
+                        <i class="fas fa-cut text-gold"></i>
+                        مدیریت خدمات آرایشگاه
+                    </h2>
+                    <p>خدمات آرایشگاه خود را مدیریت کنید</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button type="button" class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                        <i class="fas fa-plus"></i>
+                        اضافه کردن خدمت جدید
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="services-grid">
+            @if (Model.Any())
+            {
+                @foreach (var service in Model)
+                {
+                    <div class="service-card" data-service-id="@service.Id">
+                        <div class="service-header">
+                            <h4>@service.Name</h4>
+                            <div class="service-status">
+                                <span class="status-badge @(service.IsActive ? "active" : "inactive")">
+                                    @(service.IsActive ? "فعال" : "غیرفعال")
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="service-body">
+                            @if (!string.IsNullOrEmpty(service.Description))
+                            {
+                                <p class="service-description">@service.Description</p>
+                            }
+                            
+                            <div class="service-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>@service.Price.ToString("N0") تومان</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>@service.Duration دقیقه</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-actions">
+                            <button type="button" class="btn btn-sm btn-outline-gold edit-service-btn" 
+                                    data-service-id="@service.Id"
+                                    data-service-name="@service.Name"
+                                    data-service-description="@service.Description"
+                                    data-service-price="@service.Price"
+                                    data-service-duration="@service.Duration"
+                                    data-service-active="@service.IsActive.ToString().ToLower()">
+                                <i class="fas fa-edit"></i>
+                                ویرایش
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger delete-service-btn" 
+                                    data-service-id="@service.Id">
+                                <i class="fas fa-trash"></i>
+                                حذف
+                            </button>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-services">
+                    <i class="fas fa-cut fa-3x text-muted"></i>
+                    <h4>هنوز خدمتی اضافه نکرده‌اید</h4>
+                    <p>برای شروع، اولین خدمت آرایشگاه خود را اضافه کنید</p>
+                    <button type="button" class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                        <i class="fas fa-plus"></i>
+                        اضافه کردن خدمت
+                    </button>
+                </div>
+            }
+        </div>
+
+        <div class="services-footer">
+            <a href="@Url.Action("Dashboard")" class="btn btn-outline-light">
+                <i class="fas fa-arrow-right"></i>
+                بازگشت به پنل
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Add Service Modal -->
+<div class="modal fade" id="addServiceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus text-gold"></i>
+                    اضافه کردن خدمت جدید
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addServiceForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-cut"></i>
+                            نام خدمت
+                        </label>
+                        <input type="text" id="serviceName" class="form-control" placeholder="مثال: اصلاح مو" required />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-align-left"></i>
+                            توضیحات
+                        </label>
+                        <textarea id="serviceDescription" class="form-control" rows="3" placeholder="توضیحات خدمت (اختیاری)"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    قیمت (تومان)
+                                </label>
+                                <input type="number" id="servicePrice" class="form-control" min="1000" max="1000000" placeholder="50000" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-clock"></i>
+                                    مدت زمان (دقیقه)
+                                </label>
+                                <input type="number" id="serviceDuration" class="form-control" min="15" max="300" placeholder="30" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">انصراف</button>
+                    <button type="submit" class="btn btn-gold">
+                        <i class="fas fa-plus"></i>
+                        اضافه کردن
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Service Modal -->
+<div class="modal fade" id="editServiceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit text-gold"></i>
+                    ویرایش خدمت
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editServiceForm">
+                <input type="hidden" id="editServiceId" />
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-cut"></i>
+                            نام خدمت
+                        </label>
+                        <input type="text" id="editServiceName" class="form-control" required />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-align-left"></i>
+                            توضیحات
+                        </label>
+                        <textarea id="editServiceDescription" class="form-control" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    قیمت (تومان)
+                                </label>
+                                <input type="number" id="editServicePrice" class="form-control" min="1000" max="1000000" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-clock"></i>
+                                    مدت زمان (دقیقه)
+                                </label>
+                                <input type="number" id="editServiceDuration" class="form-control" min="15" max="300" required />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input type="checkbox" id="editServiceActive" class="form-check-input" />
+                            <label for="editServiceActive" class="form-check-label">
+                                خدمت فعال است
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">انصراف</button>
+                    <button type="submit" class="btn btn-gold">
+                        <i class="fas fa-save"></i>
+                        ذخیره تغییرات
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/manage-services.css" asp-append-version="true">
+}
+
+@section Scripts {
+    <script src="~/js/manage-services.js" asp-append-version="true"></script>
+}

@@ -18,45 +18,71 @@ namespace RazorKing.Controllers
             _context = context;
         }
 
+        [ResponseCache(Duration = 300, VaryByHeader = "User-Agent", Location = ResponseCacheLocation.Any)]
         public async Task<IActionResult> Index()
         {
-            var viewModel = new HomeViewModel
+            try
             {
-                Cities = await _context.Cities.OrderBy(c => c.Name).ToListAsync(),
-                TotalBarbershops = await _context.Barbershops.CountAsync(),
-                TotalAppointments = await _context.Appointments.CountAsync(),
-                TotalCustomers = await _context.Appointments.Select(a => a.CustomerPhone).Distinct().CountAsync(),
-                FeaturedBarbershops = await _context.Barbershops
-                    .Include(b => b.City)
-                    .Include(b => b.Services)
-                    .Where(b => b.IsActive)
-                    .OrderByDescending(b => b.CreatedAt)
-                    .Take(6)
-                    .ToListAsync(),
-                PopularServices = await _context.Services
-                    .Include(s => s.Barbershop)
-                    .GroupBy(s => s.Name)
-                    .Select(g => new ServiceSummary
-                    {
-                        Name = g.Key,
-                        Count = g.Count(),
-                        AveragePrice = g.Average(s => s.Price),
-                        MinPrice = g.Min(s => s.Price),
-                        MaxPrice = g.Max(s => s.Price)
-                    })
-                    .OrderByDescending(s => s.Count)
-                    .Take(4)
-                    .ToListAsync(),
-                RecentAppointments = await _context.Appointments
-                    .Include(a => a.Barbershop)
-                    .ThenInclude(b => b.City)
-                    .Where(a => a.Status == AppointmentStatus.Confirmed)
-                    .OrderByDescending(a => a.CreatedAt)
-                    .Take(5)
-                    .ToListAsync()
-            };
+                var viewModel = new HomeViewModel
+                {
+                    Cities = await _context.Cities
+                        .Include(c => c.Barbershops.Where(b => b.IsActive))
+                        .OrderBy(c => c.Name)
+                        .ToListAsync(),
+                    TotalBarbershops = await _context.Barbershops.CountAsync(b => b.IsActive),
+                    TotalAppointments = await _context.Appointments.CountAsync(),
+                    TotalCustomers = await _context.Appointments
+                        .Select(a => a.CustomerPhone)
+                        .Distinct()
+                        .CountAsync(),
+                    FeaturedBarbershops = await _context.Barbershops
+                        .Include(b => b.City)
+                        .Include(b => b.Services)
+                        .Where(b => b.IsActive)
+                        .OrderByDescending(b => b.CreatedAt)
+                        .Take(6)
+                        .ToListAsync(),
+                    PopularServices = await _context.Services
+                        .Include(s => s.Barbershop)
+                        .Where(s => s.Barbershop.IsActive)
+                        .GroupBy(s => s.Name)
+                        .Select(g => new ServiceSummary
+                        {
+                            Name = g.Key,
+                            Count = g.Count(),
+                            AveragePrice = g.Average(s => s.Price),
+                            MinPrice = g.Min(s => s.Price),
+                            MaxPrice = g.Max(s => s.Price)
+                        })
+                        .OrderByDescending(s => s.Count)
+                        .Take(4)
+                        .ToListAsync(),
+                    RecentAppointments = await _context.Appointments
+                        .Include(a => a.Barbershop)
+                        .ThenInclude(b => b.City)
+                        .Where(a => a.Status == AppointmentStatus.Confirmed)
+                        .OrderByDescending(a => a.CreatedAt)
+                        .Take(5)
+                        .ToListAsync()
+                };
 
-            return View(viewModel);
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading home page data");
+                
+                // Return view with empty model in case of error
+                var emptyModel = new HomeViewModel
+                {
+                    Cities = new List<City>(),
+                    FeaturedBarbershops = new List<Barbershop>(),
+                    PopularServices = new List<ServiceSummary>(),
+                    RecentAppointments = new List<Appointment>()
+                };
+                
+                return View(emptyModel);
+            }
         }
 
         [HttpGet]
@@ -74,6 +100,40 @@ namespace RazorKing.Controllers
                 .ToListAsync();
 
             return Json(cityStats);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCityBarbershops(int cityId)
+        {
+            try
+            {
+                var barbershops = await _context.Barbershops
+                    .Include(b => b.Services)
+                    .Include(b => b.City)
+                    .Where(b => b.CityId == cityId && b.IsActive)
+                    .OrderBy(b => b.Name)
+                    .Select(b => new
+                    {
+                        b.Id,
+                        b.Name,
+                        b.Address,
+                        b.Phone,
+                        b.Description,
+                        Services = b.Services.Select(s => new
+                        {
+                            s.Name,
+                            s.Price
+                        }).ToList()
+                    })
+                    .ToListAsync();
+
+                return Json(barbershops);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading barbershops for city {CityId}", cityId);
+                return Json(new List<object>());
+            }
         }
 
         [HttpGet]
@@ -127,5 +187,78 @@ namespace RazorKing.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-    }
+
+        [HttpGet]
+        public async Task<IActionResult> City(int id)
+        {
+            var city = await _context.Cities
+                .Include(c => c.Barbershops.Where(b => b.IsActive))
+                .ThenInclude(b => b.Services.Where(s => s.IsActive))
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (city == null)
+            {
+                return NotFound();
+            }
+
+            var allServices = city.Barbershops.SelectMany(b => b.Services).ToList();
+
+            var viewModel = new CityViewModel
+            {
+                City = city,
+                Barbershops = city.Barbershops.OrderBy(b => b.Name).ToList(),
+                TotalServices = allServices.Count,
+                MinPrice = allServices.Any() ? allServices.Min(s => s.Price) : 0,
+                MaxPrice = allServices.Any() ? allServices.Max(s => s.Price) : 0,
+                AveragePrice = allServices.Any() ? allServices.Average(s => s.Price) : 0
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBarbershopDetails(int barbershopId)
+        {
+            try
+            {
+                var barbershop = await _context.Barbershops
+                    .Include(b => b.City)
+                    .Include(b => b.Services.Where(s => s.IsActive))
+                    .FirstOrDefaultAsync(b => b.Id == barbershopId && b.IsActive);
+
+                if (barbershop == null)
+                {
+                    return Json(null);
+                }
+
+                var result = new
+                {
+                    id = barbershop.Id,
+                    name = barbershop.Name,
+                    description = barbershop.Description,
+                    address = barbershop.Address,
+                    phone = barbershop.Phone,
+                    imageUrl = barbershop.ImageUrl,
+                    openTime = barbershop.OpenTime.ToString(@"HH\:mm"),
+                    closeTime = barbershop.CloseTime.ToString(@"HH\:mm"),
+                    workingDays = barbershop.WorkingDays,
+                    cityName = barbershop.City?.Name,
+                    services = barbershop.Services.Select(s => new
+                    {
+                        id = s.Id,
+                        name = s.Name,
+                        description = s.Description,
+                        price = s.Price,
+                        duration = s.Duration
+                    }).ToList()
+                };
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading barbershop details for {BarbershopId}", barbershopId);
+                return Json(null);
+            }
+        }    }
 }

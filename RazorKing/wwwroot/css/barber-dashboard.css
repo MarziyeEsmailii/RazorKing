@@ -1,0 +1,526 @@
+/**
+ * Barber Dashboard CSS
+ * ریزر کینگ - پنل مدیریت آرایشگر
+ */
+
+/* Dashboard Layout */
+.barber-dashboard {
+    background: var(--gradient-primary);
+    min-height: 100vh;
+    padding: 120px 0 40px;
+}
+
+.dashboard-header {
+    background: rgba(26, 26, 26, 0.95);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    box-shadow: var(--shadow-heavy);
+}
+
+.welcome-section {
+    color: var(--text-white);
+}
+
+.dashboard-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary-gold);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.dashboard-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-gray);
+    margin: 0;
+}
+
+.quick-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* Stats Section */
+.stats-section {
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: rgba(26, 26, 26, 0.95);
+    border-radius: 15px;
+    padding: 25px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    transition: all var(--transition-normal);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.stat-card:hover::before {
+    left: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-gold);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(212, 175, 55, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    transition: all var(--transition-normal);
+}
+
+.stat-card:hover .stat-icon {
+    background: rgba(212, 175, 55, 0.25);
+    border-color: var(--primary-gold);
+    transform: rotate(360deg);
+}
+
+.stat-icon i {
+    font-size: 1.5rem;
+    color: var(--primary-gold);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--primary-gold);
+    margin-bottom: 5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.stat-label {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    background: rgba(26, 26, 26, 0.95);
+    border-radius: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    box-shadow: var(--shadow-heavy);
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.card-header {
+    background: rgba(42, 42, 42, 0.8);
+    padding: 20px 25px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-white);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-title i {
+    color: var(--primary-gold);
+}
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+/* Schedule Timeline */
+.schedule-timeline {
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    transition: all var(--transition-normal);
+}
+
+.timeline-item:last-child {
+    border-bottom: none;
+}
+
+.timeline-item:hover {
+    background: rgba(212, 175, 55, 0.05);
+    border-radius: 10px;
+    margin: 0 -10px;
+    padding: 20px 10px;
+}
+
+.timeline-time {
+    min-width: 80px;
+    background: var(--primary-gold);
+    color: var(--primary-black);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-align: center;
+    font-size: 0.9rem;
+    height: fit-content;
+}
+
+.timeline-content {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.appointment-info {
+    flex: 1;
+}
+
+.customer-name {
+    color: var(--text-white);
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.service-info {
+    color: var(--text-gray);
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.service-info i {
+    color: var(--primary-gold);
+}
+
+.price {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--primary-gold);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.contact-info {
+    color: var(--text-gray);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.contact-info i {
+    color: var(--primary-gold);
+}
+
+.appointment-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    min-width: 100px;
+}
+
+.status-pending {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.status-confirmed {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.status-completed {
+    background: rgba(23, 162, 184, 0.2);
+    color: #17a2b8;
+    border: 1px solid rgba(23, 162, 184, 0.3);
+}
+
+.status-cancelled {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+}
+
+/* Info Items */
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    color: var(--text-gray);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-item i {
+    color: var(--primary-gold);
+    width: 20px;
+    text-align: center;
+}
+
+/* Upcoming Appointments */
+.upcoming-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.upcoming-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    align-items: center;
+}
+
+.upcoming-item:last-child {
+    border-bottom: none;
+}
+
+.upcoming-date {
+    min-width: 60px;
+    text-align: center;
+    background: rgba(212, 175, 55, 0.1);
+    padding: 8px;
+    border-radius: 8px;
+    color: var(--primary-gold);
+    font-weight: 700;
+}
+
+.upcoming-date small {
+    display: block;
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+.upcoming-info h6 {
+    color: var(--text-white);
+    margin-bottom: 2px;
+    font-size: 0.9rem;
+}
+
+.upcoming-info small {
+    color: var(--text-gray);
+    font-size: 0.8rem;
+}
+
+/* Empty States */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-gray);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: var(--primary-gold);
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state h4 {
+    color: var(--text-white);
+    margin-bottom: 10px;
+}
+
+.empty-state-small {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-gray);
+}
+
+.empty-state-small i {
+    font-size: 2rem;
+    color: var(--primary-gold);
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .dashboard-title {
+        font-size: 2rem;
+    }
+    
+    .quick-actions {
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .timeline-content {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .appointment-actions {
+        align-items: flex-start;
+        width: 100%;
+    }
+    
+    .action-buttons {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .barber-dashboard {
+        padding: 100px 0 20px;
+    }
+    
+    .dashboard-header {
+        padding: 20px;
+        text-align: center;
+    }
+    
+    .dashboard-title {
+        font-size: 1.8rem;
+        justify-content: center;
+    }
+    
+    .timeline-item {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .timeline-time {
+        align-self: flex-start;
+    }
+    
+    .card-header {
+        padding: 15px 20px;
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+}
+
+/* Scrollbar Styling */
+.schedule-timeline::-webkit-scrollbar,
+.upcoming-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.schedule-timeline::-webkit-scrollbar-track,
+.upcoming-list::-webkit-scrollbar-track {
+    background: rgba(42, 42, 42, 0.5);
+    border-radius: 3px;
+}
+
+.schedule-timeline::-webkit-scrollbar-thumb,
+.upcoming-list::-webkit-scrollbar-thumb {
+    background: var(--primary-gold);
+    border-radius: 3px;
+}
+
+.schedule-timeline::-webkit-scrollbar-thumb:hover,
+.upcoming-list::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-gold);
+}
+
+/* Loading States */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--primary-gold);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dashboard-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }

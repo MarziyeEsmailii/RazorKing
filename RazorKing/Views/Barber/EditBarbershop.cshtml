@@ -1,0 +1,446 @@
+@model RazorKing.Models.ViewModels.EditBarbershopViewModel
+@{
+    ViewData["Title"] = "ویرایش آرایشگاه";
+    Layout = "_LayoutBarber";
+}
+
+<section class="edit-barbershop">
+    <div class="container">
+        <!-- Header -->
+        <div class="edit-header">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="page-title">
+                        <i class="fas fa-edit"></i>
+                        ویرایش اطلاعات آرایشگاه
+                    </h1>
+                    <p class="page-subtitle">اطلاعات آرایشگاه خود را به‌روزرسانی کنید</p>
+                </div>
+                <div class="col-lg-4 text-end">
+                    <a href="@Url.Action("Dashboard")" class="btn btn-outline-gold">
+                        <i class="fas fa-arrow-right"></i>
+                        بازگشت به داشبورد
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="edit-card">
+                    <form asp-action="EditBarbershop" method="post" enctype="multipart/form-data" class="edit-form">
+                        <input asp-for="Id" type="hidden" />
+                        <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                        <!-- Basic Information -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h3>
+                                    <i class="fas fa-info-circle"></i>
+                                    اطلاعات پایه
+                                </h3>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Name" class="form-label">
+                                            <i class="fas fa-store"></i>
+                                            نام آرایشگاه
+                                        </label>
+                                        <input asp-for="Name" class="form-control" placeholder="نام آرایشگاه" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Phone" class="form-label">
+                                            <i class="fas fa-phone"></i>
+                                            شماره تماس
+                                        </label>
+                                        <input asp-for="Phone" class="form-control" placeholder="021-12345678" />
+                                        <span asp-validation-for="Phone" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Description" class="form-label">
+                                    <i class="fas fa-align-left"></i>
+                                    توضیحات
+                                </label>
+                                <textarea asp-for="Description" class="form-control" rows="3" placeholder="توضیحات آرایشگاه"></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label asp-for="Address" class="form-label">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            آدرس
+                                        </label>
+                                        <textarea asp-for="Address" class="form-control" rows="2" placeholder="آدرس کامل"></textarea>
+                                        <span asp-validation-for="Address" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="CityId" class="form-label">
+                                            <i class="fas fa-city"></i>
+                                            شهر
+                                        </label>
+                                        <select asp-for="CityId" class="form-select">
+                                            <option value="">انتخاب شهر...</option>
+                                            @foreach (var city in Model.Cities)
+                                            {
+                                                <option value="@city.Id">@city.Name</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="CityId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-image"></i>
+                                    تصویر آرایشگاه
+                                </label>
+                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                                <small class="form-text text-muted">برای تغییر تصویر، فایل جدید انتخاب کنید</small>
+                            </div>
+                        </div>
+
+                        <!-- Working Hours -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h3>
+                                    <i class="fas fa-clock"></i>
+                                    ساعات کاری
+                                </h3>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="OpenTime" class="form-label">
+                                            <i class="fas fa-sun"></i>
+                                            ساعت شروع کار
+                                        </label>
+                                        <input asp-for="OpenTime" type="time" class="form-control" />
+                                        <span asp-validation-for="OpenTime" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="CloseTime" class="form-label">
+                                            <i class="fas fa-moon"></i>
+                                            ساعت پایان کار
+                                        </label>
+                                        <input asp-for="CloseTime" type="time" class="form-control" />
+                                        <span asp-validation-for="CloseTime" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar-week"></i>
+                                    روزهای کاری
+                                </label>
+                                <div class="working-days">
+                                    @{
+                                        var days = new Dictionary<string, string>
+                                        {
+                                            { "شنبه", "Saturday" },
+                                            { "یکشنبه", "Sunday" },
+                                            { "دوشنبه", "Monday" },
+                                            { "سه‌شنبه", "Tuesday" },
+                                            { "چهارشنبه", "Wednesday" },
+                                            { "پنج‌شنبه", "Thursday" },
+                                            { "جمعه", "Friday" }
+                                        };
+                                        var selectedDays = Model.WorkingDays?.Split(',').Select(d => d.Trim()).ToList() ?? new List<string>();
+                                    }
+                                    @foreach (var day in days)
+                                    {
+                                        <div class="day-checkbox">
+                                            <input type="checkbox" id="day_@day.Value" name="WorkingDaysArray" value="@day.Key" 
+                                                   @(selectedDays.Contains(day.Key) ? "checked" : "") />
+                                            <label for="day_@day.Value">@day.Key</label>
+                                        </div>
+                                    }
+                                </div>
+                                <input asp-for="WorkingDays" type="hidden" id="workingDaysHidden" />
+                                <span asp-validation-for="WorkingDays" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h3>
+                                    <i class="fas fa-toggle-on"></i>
+                                    وضعیت
+                                </h3>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="form-check form-switch">
+                                    <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                                    <label asp-for="IsActive" class="form-check-label">
+                                        آرایشگاه فعال است
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    در صورت غیرفعال بودن، مشتریان نمی‌توانند نوبت رزرو کنند
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-gold btn-lg">
+                                <i class="fas fa-save"></i>
+                                ذخیره تغییرات
+                            </button>
+                            <a href="@Url.Action("Dashboard")" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-times"></i>
+                                انصراف
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Current Services -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h4>
+                            <i class="fas fa-cut"></i>
+                            خدمات فعلی
+                        </h4>
+                        <a href="@Url.Action("ManageServices")" class="btn btn-sm btn-outline-gold">
+                            مدیریت
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Services.Any())
+                        {
+                            <div class="services-list">
+                                @foreach (var service in Model.Services.Take(5))
+                                {
+                                    <div class="service-item">
+                                        <div class="service-info">
+                                            <h6>@service.Name</h6>
+                                            <small>@service.Price.ToString("N0") تومان - @service.Duration دقیقه</small>
+                                        </div>
+                                        <div class="service-status">
+                                            @if (service.IsActive)
+                                            {
+                                                <span class="badge bg-success">فعال</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">غیرفعال</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                @if (Model.Services.Count > 5)
+                                {
+                                    <div class="text-center mt-3">
+                                        <small class="text-muted">و @(Model.Services.Count - 5) خدمت دیگر...</small>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-state-small">
+                                <i class="fas fa-cut"></i>
+                                <p>هنوز خدمتی اضافه نکرده‌اید</p>
+                                <a href="@Url.Action("ManageServices")" class="btn btn-sm btn-gold">
+                                    اضافه کردن خدمت
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h4>
+                            <i class="fas fa-chart-bar"></i>
+                            آمار سریع
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="quick-stat">
+                            <div class="stat-icon">
+                                <i class="fas fa-cut"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h5>@Model.Services.Count</h5>
+                                <small>خدمت ثبت شده</small>
+                            </div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h5>@((Model.CloseTime - Model.OpenTime).Hours) ساعت</h5>
+                                <small>ساعات کاری روزانه</small>
+                            </div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="stat-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h5>@(Model.WorkingDays?.Split(',').Length ?? 0) روز</h5>
+                                <small>روزهای کاری هفته</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/barber-edit.css" asp-append-version="true">
+    <style>
+        .edit-barbershop {
+            background: var(--gradient-primary);
+            min-height: 100vh;
+            padding: 120px 0 40px;
+        }
+        
+        .edit-header {
+            background: rgba(26, 26, 26, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: var(--shadow-heavy);
+        }
+        
+        .edit-card {
+            background: rgba(26, 26, 26, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: var(--shadow-heavy);
+        }
+        
+        .sidebar-card {
+            background: rgba(26, 26, 26, 0.95);
+            border-radius: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .sidebar-card .card-header {
+            background: rgba(42, 42, 42, 0.8);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-card .card-header h4 {
+            color: var(--text-white);
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sidebar-card .card-header h4 i {
+            color: var(--primary-gold);
+        }
+        
+        .sidebar-card .card-body {
+            padding: 20px;
+        }
+        
+        .services-list {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .service-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        
+        .service-item:last-child {
+            border-bottom: none;
+        }
+        
+        .service-info h6 {
+            color: var(--text-white);
+            margin-bottom: 2px;
+            font-size: 0.9rem;
+        }
+        
+        .service-info small {
+            color: var(--text-gray);
+            font-size: 0.8rem;
+        }
+        
+        .quick-stat {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        
+        .quick-stat:last-child {
+            border-bottom: none;
+        }
+        
+        .quick-stat .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(212, 175, 55, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-gold);
+        }
+        
+        .quick-stat .stat-info h5 {
+            color: var(--text-white);
+            margin-bottom: 2px;
+            font-size: 1rem;
+        }
+        
+        .quick-stat .stat-info small {
+            color: var(--text-gray);
+            font-size: 0.8rem;
+        }
+    </style>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/barber-edit.js" asp-append-version="true"></script>
+}

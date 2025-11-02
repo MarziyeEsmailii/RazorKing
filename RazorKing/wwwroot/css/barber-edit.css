@@ -1,0 +1,425 @@
+/**
+ * Barber Edit CSS
+ * ریزر کینگ - ویرایش و ایجاد آرایشگاه
+ */
+
+.edit-barbershop,
+.create-barbershop {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
+    min-height: 100vh;
+    padding: 120px 0 40px;
+}
+
+/* Edit/Create Card */
+.edit-card,
+.create-card {
+    background: rgba(26, 26, 26, 0.95);
+    border-radius: 25px;
+    padding: 40px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+}
+
+.edit-card::before,
+.create-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 100%);
+}
+
+/* Header */
+.edit-header,
+.create-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.edit-header h2,
+.create-header h2 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.edit-header p,
+.create-header p {
+    color: #b0b0b0;
+    font-size: 1.1rem;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Form Sections */
+.form-section {
+    background: rgba(42, 42, 42, 0.6);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.form-section h4 {
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.3rem;
+}
+
+.form-section h4 i {
+    color: #d4af37;
+    width: 20px;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.form-label i {
+    color: #d4af37;
+    width: 18px;
+    font-size: 1rem;
+}
+
+.form-control,
+.form-select {
+    background: rgba(26, 26, 26, 0.8);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    color: #ffffff;
+    border-radius: 15px;
+    padding: 15px 18px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background: rgba(26, 26, 26, 0.95);
+    border-color: #d4af37;
+    box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25);
+    color: #ffffff;
+    outline: none;
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.form-select option {
+    background: #2a2a2a;
+    color: #ffffff;
+}
+
+/* Working Days */
+.working-days {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.day-checkbox {
+    position: relative;
+}
+
+.day-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.day-checkbox label {
+    display: block;
+    padding: 12px 15px;
+    background: rgba(26, 26, 26, 0.6);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    color: #ffffff;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.day-checkbox input[type="checkbox"]:checked + label {
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 100%);
+    color: #0a0a0a;
+    border-color: #d4af37;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+}
+
+.day-checkbox label:hover {
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.1);
+}
+
+/* Services List */
+.services-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.service-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(26, 26, 26, 0.6);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    transition: all 0.3s ease;
+}
+
+.service-item:hover {
+    background: rgba(26, 26, 26, 0.8);
+    border-color: #d4af37;
+}
+
+.service-info h6 {
+    color: #ffffff;
+    margin: 0 0 5px 0;
+    font-weight: 600;
+}
+
+.service-info p {
+    color: #b0b0b0;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Empty Services */
+.empty-services {
+    text-align: center;
+    padding: 40px 20px;
+    background: rgba(26, 26, 26, 0.4);
+    border-radius: 15px;
+    border: 2px dashed rgba(212, 175, 55, 0.3);
+}
+
+.empty-services i {
+    font-size: 2.5rem;
+    color: #d4af37;
+    margin-bottom: 15px;
+    opacity: 0.7;
+}
+
+.empty-services p {
+    color: #b0b0b0;
+    margin-bottom: 20px;
+}
+
+/* Info Box */
+.info-box {
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.info-box h5 {
+    color: #d4af37;
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.info-box ul {
+    margin: 0;
+    padding-right: 20px;
+}
+
+.info-box li {
+    color: #ffffff;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.btn-gold {
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 100%);
+    color: #0a0a0a;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 15px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-gold:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
+    color: #0a0a0a;
+}
+
+.btn-outline-light {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    background: transparent;
+    padding: 15px 30px;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.btn-outline-gold {
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    color: #d4af37;
+    background: transparent;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-outline-gold:hover {
+    background: #d4af37;
+    color: #0a0a0a;
+    border-color: #d4af37;
+    transform: translateY(-2px);
+}
+
+/* Validation */
+.text-danger {
+    color: #ff6b6b !important;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: block;
+}
+
+.alert-danger {
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    color: #ff6b6b;
+    border-radius: 15px;
+    padding: 15px 20px;
+    margin-bottom: 25px;
+}
+
+.form-text {
+    color: #b0b0b0;
+    font-size: 0.85rem;
+    margin-top: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .edit-barbershop,
+    .create-barbershop {
+        padding: 100px 0 20px;
+    }
+    
+    .edit-card,
+    .create-card {
+        margin: 0 15px;
+        padding: 30px 25px;
+    }
+    
+    .form-section {
+        padding: 25px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .edit-header h2,
+    .create-header h2 {
+        font-size: 1.8rem;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .working-days {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 576px) {
+    .edit-card,
+    .create-card {
+        padding: 25px 20px;
+    }
+    
+    .form-section {
+        padding: 20px 15px;
+    }
+    
+    .working-days {
+        grid-template-columns: 1fr;
+    }
+    
+    .service-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}

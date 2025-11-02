@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RazorKing.Data;
 using RazorKing.Models;
 using RazorKing.Models.ViewModels;
+using System.Linq;
 
 namespace RazorKing.Controllers
 {
@@ -50,7 +51,7 @@ namespace RazorKing.Controllers
                     b.Address,
                     b.Phone,
                     b.Description,
-                    b.ImagePath,
+                    b.ImageUrl,
                     ServiceCount = b.Services.Count,
                     MinPrice = b.Services.Any() ? b.Services.Min(s => s.Price) : 0,
                     MaxPrice = b.Services.Any() ? b.Services.Max(s => s.Price) : 0,
@@ -83,10 +84,19 @@ namespace RazorKing.Controllers
                     .Where(s => selectedServiceIds.Contains(s.Id))
                     .ToListAsync();
 
-                var totalDuration = services.Sum(s => s.DurationMinutes);
+                var totalDuration = services.Sum(s => s.Duration);
                 
                 var barbershop = await _context.Barbershops.FindAsync(barbershopId);
                 if (barbershop == null) return Json(new List<string>());
+
+                // بررسی روزهای کاری آرایشگاه
+                var dayOfWeek = GetPersianDayOfWeek(date.DayOfWeek);
+                var workingDays = barbershop.WorkingDays.Split(',').Select(d => d.Trim()).ToList();
+                
+                if (!workingDays.Contains(dayOfWeek))
+                {
+                    return Json(new { message = "آرایشگاه در این روز تعطیل است", times = new List<string>() });
+                }
 
                 // دریافت نوبت‌های موجود در آن روز
                 var existingAppointments = await _context.Appointments
@@ -97,51 +107,99 @@ namespace RazorKing.Controllers
                                (a.Status == AppointmentStatus.Confirmed || a.Status == AppointmentStatus.Pending))
                     .ToListAsync();
 
-                var availableTimes = new List<TimeSpan>();
-                var currentTime = barbershop.OpenTime;
+                // بررسی برنامه کاری خاص آرایشگران در آن روز
+                var barberSchedules = await _context.BarberSchedules
+                    .Where(bs => bs.BarbershopId == barbershopId && 
+                                bs.Date.Date == date.Date && 
+                                bs.IsAvailable)
+                    .ToListAsync();
 
-                // بررسی هر 15 دقیقه یک بار
-                while (currentTime.Add(TimeSpan.FromMinutes(totalDuration)) <= barbershop.CloseTime)
+                var availableTimes = new List<TimeSpan>();
+                
+                // اگر برنامه خاصی برای آن روز تعریف شده، از آن استفاده کن
+                if (barberSchedules.Any())
                 {
-                    var endTime = currentTime.Add(TimeSpan.FromMinutes(totalDuration));
-                    
-                    // بررسی تداخل با نوبت‌های موجود
-                    bool isAvailable = true;
-                    
-                    foreach (var appointment in existingAppointments)
+                    foreach (var schedule in barberSchedules)
                     {
-                        var appointmentDuration = appointment.AppointmentServices.Sum(aps => aps.Service.DurationMinutes);
-                        var appointmentEndTime = appointment.AppointmentTime.Add(TimeSpan.FromMinutes(appointmentDuration));
-                        
-                        // بررسی تداخل زمانی
-                        if ((currentTime < appointmentEndTime && endTime > appointment.AppointmentTime))
+                        var currentTime = schedule.StartTime;
+                        while (currentTime.Add(TimeSpan.FromMinutes(totalDuration)) <= schedule.EndTime)
                         {
-                            isAvailable = false;
-                            break;
+                            if (IsTimeSlotAvailable(currentTime, totalDuration, existingAppointments, date))
+                            {
+                                availableTimes.Add(currentTime);
+                            }
+                            currentTime = currentTime.Add(TimeSpan.FromMinutes(15));
                         }
                     }
-
-                    // بررسی اینکه زمان در گذشته نباشد
-                    if (date.Date == DateTime.Today && currentTime <= DateTime.Now.TimeOfDay)
+                }
+                else
+                {
+                    // استفاده از ساعات کاری عادی آرایشگاه
+                    var currentTime = barbershop.OpenTime;
+                    while (currentTime.Add(TimeSpan.FromMinutes(totalDuration)) <= barbershop.CloseTime)
                     {
-                        isAvailable = false;
+                        if (IsTimeSlotAvailable(currentTime, totalDuration, existingAppointments, date))
+                        {
+                            availableTimes.Add(currentTime);
+                        }
+                        currentTime = currentTime.Add(TimeSpan.FromMinutes(15));
                     }
-
-                    if (isAvailable)
-                    {
-                        availableTimes.Add(currentTime);
-                    }
-
-                    currentTime = currentTime.Add(TimeSpan.FromMinutes(15)); // 15-minute intervals
                 }
 
-                var timeStrings = availableTimes.Select(t => t.ToString(@"hh\:mm")).ToList();
-                return Json(timeStrings);
+                // مرتب‌سازی و تبدیل به رشته
+                var timeStrings = availableTimes
+                    .Distinct()
+                    .OrderBy(t => t)
+                    .Select(t => t.ToString(@"hh\:mm"))
+                    .ToList();
+
+                return Json(new { times = timeStrings, message = timeStrings.Any() ? "" : "متاسفانه در این تاریخ ساعت خالی وجود ندارد" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return Json(new List<string>());
+                return Json(new { times = new List<string>(), message = "خطا در بارگذاری ساعات" });
             }
+        }
+
+        private bool IsTimeSlotAvailable(TimeSpan startTime, int durationMinutes, List<Appointment> existingAppointments, DateTime date)
+        {
+            var endTime = startTime.Add(TimeSpan.FromMinutes(durationMinutes));
+            
+            // بررسی تداخل با نوبت‌های موجود
+            foreach (var appointment in existingAppointments)
+            {
+                var appointmentDuration = appointment.AppointmentServices.Sum(aps => aps.Service.Duration);
+                var appointmentEndTime = appointment.AppointmentTime.Add(TimeSpan.FromMinutes(appointmentDuration));
+                
+                // بررسی تداخل زمانی
+                if (startTime < appointmentEndTime && endTime > appointment.AppointmentTime)
+                {
+                    return false;
+                }
+            }
+
+            // بررسی اینکه زمان در گذشته نباشد
+            if (date.Date == DateTime.Today && startTime <= DateTime.Now.TimeOfDay.Add(TimeSpan.FromMinutes(30)))
+            {
+                return false; // حداقل 30 دقیقه از الان
+            }
+
+            return true;
+        }
+
+        private string GetPersianDayOfWeek(DayOfWeek dayOfWeek)
+        {
+            return dayOfWeek switch
+            {
+                DayOfWeek.Saturday => "شنبه",
+                DayOfWeek.Sunday => "یکشنبه",
+                DayOfWeek.Monday => "دوشنبه",
+                DayOfWeek.Tuesday => "سه‌شنبه",
+                DayOfWeek.Wednesday => "چهارشنبه",
+                DayOfWeek.Thursday => "پنج‌شنبه",
+                DayOfWeek.Friday => "جمعه",
+                _ => ""
+            };
         }
 
         [HttpPost]
@@ -166,6 +224,7 @@ namespace RazorKing.Controllers
                 AppointmentDate = model.SelectedDate!.Value,
                 AppointmentTime = model.SelectedTime!.Value,
                 BarbershopId = model.SelectedBarbershopId!.Value,
+                ServiceId = services.First().Id, // Use first service as primary
                 TotalPrice = totalPrice,
                 PaidAmount = depositAmount,
                 Status = AppointmentStatus.Pending
@@ -196,6 +255,7 @@ namespace RazorKing.Controllers
             var appointment = await _context.Appointments
                 .Include(a => a.Barbershop)
                 .ThenInclude(b => b.City)
+                .Include(a => a.Service)
                 .Include(a => a.AppointmentServices)
                 .ThenInclude(aps => aps.Service)
                 .FirstOrDefaultAsync(a => a.Id == id);
@@ -205,7 +265,54 @@ namespace RazorKing.Controllers
                 return NotFound();
             }
 
-            return View(appointment);
+            var services = appointment.AppointmentServices.Any() 
+                ? appointment.AppointmentServices.Select(aps => aps.Service).ToList()
+                : new List<Service> { appointment.Service }.Where(s => s != null).ToList();
+
+            var viewModel = new BookingConfirmationViewModel
+            {
+                AppointmentId = appointment.Id,
+                BarbershopName = appointment.Barbershop.Name,
+                BarbershopAddress = appointment.Barbershop.Address,
+                BarbershopPhone = appointment.Barbershop.Phone,
+                CityName = appointment.Barbershop.City?.Name ?? "",
+                AppointmentDate = appointment.AppointmentDate,
+                AppointmentTime = appointment.AppointmentTime,
+                ServiceName = services.Any() ? string.Join(", ", services.Select(s => s.Name)) : "",
+                ServicePrice = services.Sum(s => s.Price),
+                CustomerName = appointment.CustomerName,
+                CustomerPhone = appointment.CustomerPhone
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBarbershopDetails(int barbershopId)
+        {
+            try
+            {
+                var barbershop = await _context.Barbershops
+                    .Include(b => b.City)
+                    .FirstOrDefaultAsync(b => b.Id == barbershopId && b.IsActive);
+
+                if (barbershop == null)
+                {
+                    return Json(null);
+                }
+
+                return Json(new
+                {
+                    id = barbershop.Id,
+                    name = barbershop.Name,
+                    cityId = barbershop.CityId,
+                    cityName = barbershop.City?.Name
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(null);
+            }
         }
     }
 }

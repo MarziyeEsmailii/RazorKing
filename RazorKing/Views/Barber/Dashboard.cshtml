@@ -1,0 +1,269 @@
+@model RazorKing.Models.ViewModels.BarberDashboardViewModel
+@{
+    ViewData["Title"] = "داشبورد";
+    Layout = "_LayoutBarber";
+}
+
+<section class="barber-dashboard">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="welcome-section">
+                        <h1 class="dashboard-title">
+                            <i class="fas fa-tachometer-alt"></i>
+                            پنل مدیریت آرایشگاه
+                        </h1>
+                        <p class="dashboard-subtitle">
+                            خوش آمدید، <strong>@Model.Barbershop.Name</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-end">
+                    <div class="quick-actions">
+                        <a href="@Url.Action("EditBarbershop")" class="btn btn-outline-gold">
+                            <i class="fas fa-edit"></i>
+                            ویرایش آرایشگاه
+                        </a>
+                        <a href="@Url.Action("ManageServices")" class="btn btn-gold">
+                            <i class="fas fa-cut"></i>
+                            مدیریت خدمات
+                        </a>
+                        <a href="@Url.Action("ManageSchedule")" class="btn btn-outline-gold">
+                            <i class="fas fa-calendar-alt"></i>
+                            مدیریت برنامه
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-section">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number">@Model.TodayAppointments.Count</h3>
+                            <p class="stat-label">نوبت امروز</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number">@Model.UpcomingAppointments.Count</h3>
+                            <p class="stat-label">نوبت‌های آینده</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number">@Model.MonthlyStats.TotalAppointments</h3>
+                            <p class="stat-label">نوبت این ماه</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number">@Model.MonthlyStats.TotalRevenue.ToString("N0")</h3>
+                            <p class="stat-label">درآمد ماه (تومان)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row">
+            <!-- Today's Schedule -->
+            <div class="col-lg-8">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-calendar-day"></i>
+                            برنامه امروز
+                        </h3>
+                        <div class="card-actions">
+                            <button class="btn btn-sm btn-outline-gold" onclick="refreshTodaySchedule()">
+                                <i class="fas fa-sync-alt"></i>
+                                بروزرسانی
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="todaySchedule" class="schedule-timeline">
+                            @if (Model.TodayAppointments.Any())
+                            {
+                                @foreach (var appointment in Model.TodayAppointments)
+                                {
+                                    <div class="timeline-item" data-appointment-id="@appointment.Id">
+                                        <div class="timeline-time">
+                                            @appointment.AppointmentTime.ToString(@"HH\:mm")
+                                        </div>
+                                        <div class="timeline-content">
+                                            <div class="appointment-info">
+                                                <h5 class="customer-name">@appointment.CustomerName</h5>
+                                                <p class="service-info">
+                                                    <i class="fas fa-cut"></i>
+                                                    @appointment.Service?.Name
+                                                    <span class="price">@appointment.Service?.Price.ToString("N0") تومان</span>
+                                                </p>
+                                                <p class="contact-info">
+                                                    <i class="fas fa-phone"></i>
+                                                    @appointment.CustomerPhone
+                                                </p>
+                                            </div>
+                                            <div class="appointment-actions">
+                                                <div class="status-badge status-@appointment.Status.ToString().ToLower()">
+                                                    @GetStatusText(appointment.Status)
+                                                </div>
+                                                <div class="action-buttons">
+                                                    @if (appointment.Status == AppointmentStatus.Pending)
+                                                    {
+                                                        <button class="btn btn-sm btn-success" onclick="changeStatus(@appointment.Id, 'Confirmed')">
+                                                            <i class="fas fa-check"></i>
+                                                            تایید
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger" onclick="changeStatus(@appointment.Id, 'Cancelled')">
+                                                            <i class="fas fa-times"></i>
+                                                            لغو
+                                                        </button>
+                                                    }
+                                                    else if (appointment.Status == AppointmentStatus.Confirmed)
+                                                    {
+                                                        <button class="btn btn-sm btn-primary" onclick="changeStatus(@appointment.Id, 'Completed')">
+                                                            <i class="fas fa-check-double"></i>
+                                                            تکمیل
+                                                        </button>
+                                                        <button class="btn btn-sm btn-warning" onclick="changeStatus(@appointment.Id, 'Cancelled')">
+                                                            <i class="fas fa-ban"></i>
+                                                            لغو
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="empty-state">
+                                    <i class="fas fa-calendar-times"></i>
+                                    <h4>نوبتی برای امروز وجود ندارد</h4>
+                                    <p>شما امروز نوبت رزرو شده‌ای ندارید</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Quick Info -->
+                <div class="dashboard-card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-info-circle"></i>
+                            اطلاعات آرایشگاه
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>@Model.Barbershop.Address</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-phone"></i>
+                            <span>@Model.Barbershop.Phone</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>@Model.Barbershop.OpenTime.ToString(@"HH\:mm") - @Model.Barbershop.CloseTime.ToString(@"HH\:mm")</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>@Model.Barbershop.WorkingDays</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Appointments -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-calendar-alt"></i>
+                            نوبت‌های آینده
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.UpcomingAppointments.Any())
+                        {
+                            <div class="upcoming-list">
+                                @foreach (var appointment in Model.UpcomingAppointments.Take(5))
+                                {
+                                    <div class="upcoming-item">
+                                        <div class="upcoming-date">
+                                            @appointment.AppointmentDate.ToString("dd/MM")
+                                            <small>@appointment.AppointmentTime.ToString(@"HH\:mm")</small>
+                                        </div>
+                                        <div class="upcoming-info">
+                                            <h6>@appointment.CustomerName</h6>
+                                            <small>@appointment.Service?.Name</small>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-state-small">
+                                <i class="fas fa-calendar-times"></i>
+                                <p>نوبت آینده‌ای وجود ندارد</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@functions {
+    string GetStatusText(AppointmentStatus status)
+    {
+        return status switch
+        {
+            AppointmentStatus.Pending => "در انتظار تایید",
+            AppointmentStatus.Confirmed => "تایید شده",
+            AppointmentStatus.Completed => "تکمیل شده",
+            AppointmentStatus.Cancelled => "لغو شده",
+            _ => "نامشخص"
+        };
+    }
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/barber-dashboard.css" asp-append-version="true">
+}
+
+@section Scripts {
+    <script src="~/js/barber-dashboard.js" asp-append-version="true"></script>
+}

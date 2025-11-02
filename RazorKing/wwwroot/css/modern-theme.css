@@ -615,46 +615,36 @@ section {
     z-index: -1;
 }
 
-/* Cities Slider */
-.cities-slider-container {
-    position: relative;
+/* Cities Grid - Simple & Clean */
+.cities-grid-container {
     margin-top: 60px;
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.cities-slider {
-    display: flex;
-    overflow: hidden;
-    border-radius: 20px;
-    position: relative;
-}
-
-.city-slide {
-    min-width: 100%;
-    transition: transform 0.5s ease-in-out;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     padding: 0 20px;
 }
 
-@media (min-width: 768px) {
-    .city-slide {
-        min-width: 50%;
+.cities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Responsive Grid */
+@media (max-width: 768px) {
+    .cities-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
     }
 }
 
-@media (min-width: 1024px) {
-    .city-slide {
-        min-width: 33.333%;
+@media (max-width: 576px) {
+    .cities-grid-container {
+        padding: 0 15px;
     }
-}
 
-@media (min-width: 1200px) {
-    .city-slide {
-        min-width: 25%;
+    .cities-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
 }
 
@@ -666,9 +656,13 @@ section {
     border: 2px solid rgba(212, 175, 55, 0.2);
     cursor: pointer;
     backdrop-filter: blur(15px);
-    max-width: 300px;
     width: 100%;
+    height: 380px;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(30px);
 }
 
 .city-card::before {
@@ -710,6 +704,7 @@ section {
     transition: all var(--transition-normal);
     z-index: 10;
     backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .slider-btn:hover {
@@ -719,11 +714,28 @@ section {
 }
 
 .slider-btn-prev {
-    right: -25px;
+    right: 15px;
 }
 
 .slider-btn-next {
-    left: -25px;
+    left: 15px;
+}
+
+/* Mobile Navigation Buttons */
+@media (max-width: 768px) {
+    .slider-btn {
+        width: 40px;
+        height: 40px;
+        font-size: var(--font-size-sm);
+    }
+
+    .slider-btn-prev {
+        right: 10px;
+    }
+
+    .slider-btn-next {
+        left: 10px;
+    }
 }
 
 /* Slider Dots */
@@ -751,8 +763,9 @@ section {
 
 .city-image {
     position: relative;
-    height: 200px;
+    height: 220px;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .city-image img {
@@ -791,6 +804,10 @@ section {
 
 .city-info {
     padding: 25px;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .city-info h4 {
@@ -825,20 +842,24 @@ section {
 /* Services Section */
 .services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
     margin-top: 60px;
 }
 
 .service-card {
     background: var(--medium-gray);
-    padding: 40px 30px;
+    padding: 25px 20px;
     border-radius: 20px;
     text-align: center;
     transition: all var(--transition-normal);
     border: 1px solid rgba(212, 175, 55, 0.1);
     position: relative;
     overflow: hidden;
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .service-card::before {
@@ -882,46 +903,49 @@ section {
 }
 
 .service-icon {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     background: rgba(212, 175, 55, 0.1);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 25px;
+    margin: 0 auto 20px;
     border: 2px solid rgba(212, 175, 55, 0.3);
 }
 
 .service-icon i {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
     color: var(--primary-gold);
 }
 
 .service-content h4 {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
     font-weight: 700;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     color: var(--text-white);
+    line-height: 1.2;
 }
 
 .service-content p {
     color: var(--text-gray);
-    margin-bottom: 20px;
-    line-height: 1.6;
+    margin-bottom: 15px;
+    line-height: 1.4;
+    font-size: var(--font-size-sm);
 }
 
 .service-features {
     list-style: none;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .service-features li {
     color: var(--text-gray);
-    margin-bottom: 8px;
-    font-size: var(--font-size-sm);
+    margin-bottom: 6px;
+    font-size: var(--font-size-xs);
     position: relative;
-    padding-right: 20px;
+    padding-right: 18px;
+    line-height: 1.3;
 }
 
 .service-features li::before {
@@ -1299,8 +1323,8 @@ section {
     }
 
     .services-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
     }
 
     .features-content {
@@ -1633,21 +1657,23 @@ section:nth-child(3) {
         width: 10px;
         height: 10px;
     }
-}/*
+}
+
+/*
  Logo Responsive Design */
 @media (max-width: 768px) {
     .brand-logo-img {
         height: 35px;
     }
-    
+
     .footer-logo-img {
         height: 40px;
     }
-    
+
     .brand-logo {
         font-size: var(--font-size-lg);
     }
-    
+
     .footer-logo {
         font-size: var(--font-size-lg);
     }
@@ -1657,15 +1683,15 @@ section:nth-child(3) {
     .brand-logo-img {
         height: 30px;
     }
-    
+
     .footer-logo-img {
         height: 35px;
     }
-    
+
     .brand-logo span {
         display: none;
     }
-    
+
     .footer-logo {
         justify-content: center;
         margin-bottom: 15px;
@@ -1674,9 +1700,17 @@ section:nth-child(3) {
 
 /* Logo Animation Effects */
 @keyframes logoGlow {
-    0% { filter: brightness(1) drop-shadow(0 0 5px rgba(212, 175, 55, 0.3)); }
-    50% { filter: brightness(1.1) drop-shadow(0 0 15px rgba(212, 175, 55, 0.6)); }
-    100% { filter: brightness(1) drop-shadow(0 0 5px rgba(212, 175, 55, 0.3)); }
+    0% {
+        filter: brightness(1) drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));
+    }
+
+    50% {
+        filter: brightness(1.1) drop-shadow(0 0 15px rgba(212, 175, 55, 0.6));
+    }
+
+    100% {
+        filter: brightness(1) drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));
+    }
 }
 
 .brand-logo-img:hover,
@@ -1723,4 +1757,538 @@ section:nth-child(3) {
 
 .footer-logo:hover::before {
     left: 100%;
+}
+
+/* Enhan
+ced City Slider Styles */
+.cities-slider-container {
+    position: relative;
+    margin: 60px auto 0;
+    overflow: visible;
+}
+
+.cities-slider {
+    display: flex;
+    align-items: stretch;
+    gap: 20px;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    padding: 10px 0;
+}
+
+.city-slide {
+    flex: 0 0 auto;
+    width: 280px;
+}
+
+/* Improved City Cards */
+.city-card {
+    height: 320px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.city-card:hover {
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(212, 175, 55, 0.3);
+}
+
+/* Better Image Handling */
+.city-image {
+    height: 160px;
+    background: linear-gradient(135deg, var(--medium-gray), var(--light-gray));
+}
+
+.city-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.city-card:hover .city-image img {
+    transform: scale(1.1);
+}
+
+/* Enhanced Info Section */
+.city-info {
+    padding: 20px;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.city-info h4 {
+    font-size: var(--font-size-lg);
+    margin-bottom: 8px;
+    color: var(--text-white);
+}
+
+.city-info p {
+    color: var(--text-gray);
+    font-size: var(--font-size-sm);
+    margin-bottom: 15px;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .cities-slider-container {
+        padding: 0 50px;
+        margin-top: 40px;
+    }
+
+    .city-slide {
+        width: 260px;
+    }
+
+    .city-card {
+        height: 300px;
+    }
+
+    .city-image {
+        height: 140px;
+    }
+
+    .city-info {
+        height: 160px;
+        padding: 15px;
+    }
+
+    .slider-btn {
+        width: 40px;
+        height: 40px;
+        font-size: var(--font-size-sm);
+    }
+
+    .slider-btn-prev {
+        right: 5px;
+    }
+
+    .slider-btn-next {
+        left: 5px;
+    }
+}
+
+@media (max-width: 576px) {
+    .cities-slider-container {
+        padding: 0 45px;
+    }
+
+    .city-slide {
+        width: 240px;
+    }
+
+    .city-card {
+        height: 280px;
+    }
+
+    .city-image {
+        height: 120px;
+    }
+
+    .city-info {
+        height: 160px;
+        padding: 12px;
+    }
+
+    .city-info h4 {
+        font-size: var(--font-size-base);
+    }
+
+    .city-info p {
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* Smooth Scrolling Effect */
+.cities-slider {
+    scroll-behavior: smooth;
+}
+
+/* Loading State */
+.city-card.loading {
+    background: linear-gradient(90deg, var(--medium-gray) 25%, var(--light-gray) 50%, var(--medium-gray) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Ci
+ty Slider Final Touches */
+.city-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary-gold);
+    box-shadow: 0 15px 35px rgba(212, 175, 55, 0.3);
+}
+
+.city-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.city-card:hover .city-image img {
+    transform: scale(1.05);
+}
+
+.city-info h4 {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-white);
+}
+
+.city-info p {
+    color: var(--text-gray);
+    font-size: var(--font-size-sm);
+    margin-bottom: 15px;
+}
+
+/* Slider Dots Enhancement */
+.slider-dots {
+    margin-top: 30px;
+}
+
+.slider-dot {
+    transition: all 0.3s ease;
+}
+
+.slider-dot:hover {
+    background: var(--primary-gold);
+    transform: scale(1.2);
+}
+
+/* Mobile Responsive Final */
+@media (max-width: 576px) {
+    .city-card {
+        height: 280px;
+    }
+
+    .city-image {
+        height: 140px;
+    }
+
+    .city-info {
+        height: 140px;
+        padding: 15px;
+    }
+
+    .city-info h4 {
+        font-size: var(--font-size-base);
+    }
+
+    .city-info p {
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* En
+hanced City Slider Styles */
+.slide-group .city-card {
+    margin: 0 auto;
+}
+
+.city-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary-gold);
+    box-shadow: 0 15px 35px rgba(212, 175, 55, 0.3);
+}
+
+.city-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.city-card:hover .city-image img {
+    transform: scale(1.05);
+}
+
+/* Navigation Buttons Enhancement */
+.slider-btn {
+    z-index: 100;
+}
+
+.slider-btn-prev {
+    right: 15px;
+}
+
+.slider-btn-next {
+    left: 15px;
+}
+
+/* Dots Styling */
+.slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.slider-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.slider-dot.active {
+    background: var(--primary-gold);
+    transform: scale(1.3);
+}
+
+.slider-dot:hover {
+    background: var(--primary-gold);
+    transform: scale(1.2);
+}
+
+/* Responsive Enhancements */
+@media (max-width: 1024px) {
+    .slide-group {
+        gap: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .slide-group {
+        gap: 20px;
+        padding: 0 10px;
+    }
+
+    .city-card {
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 576px) {
+    .cities-slider-container {
+        padding: 0 40px;
+    }
+
+    .slide-group {
+        padding: 0;
+    }
+
+    .city-card {
+        height: 300px;
+        max-width: 100%;
+    }
+
+    .city-image {
+        height: 160px;
+    }
+
+    .city-info {
+        height: 140px;
+        padding: 15px;
+    }
+}
+
+/* Enhan
+ced Services Grid - Always 4 in a row */
+.services-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 15px !important;
+    margin-top: 60px;
+}
+
+/* Laptop and Desktop - Keep 4 columns */
+@media (min-width: 1024px) {
+    .services-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 20px !important;
+    }
+
+    .service-card {
+        padding: 25px 15px !important;
+        min-height: 350px;
+    }
+}
+
+/* Medium Laptop - Still 4 columns but smaller */
+@media (max-width: 1200px) and (min-width: 900px) {
+    .services-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 15px !important;
+    }
+
+    .service-card {
+        padding: 20px 12px !important;
+        min-height: 320px;
+    }
+
+    .service-icon {
+        width: 50px !important;
+        height: 50px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .service-icon i {
+        font-size: 1rem !important;
+    }
+
+    .service-content h4 {
+        font-size: 1rem !important;
+        margin-bottom: 10px !important;
+    }
+
+    .service-content p {
+        font-size: 0.8rem !important;
+        margin-bottom: 15px !important;
+    }
+
+    .service-features li {
+        font-size: 0.75rem !important;
+        margin-bottom: 5px !important;
+    }
+
+    .service-price {
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Small Laptop - Still try to keep 4 columns */
+@media (max-width: 900px) and (min-width: 768px) {
+    .services-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 10px !important;
+    }
+
+    .service-card {
+        padding: 15px 8px !important;
+        min-height: 300px;
+    }
+
+    .service-icon {
+        width: 40px !important;
+        height: 40px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .service-icon i {
+        font-size: 0.9rem !important;
+    }
+
+    .service-content h4 {
+        font-size: 0.9rem !important;
+        margin-bottom: 8px !important;
+    }
+
+    .service-content p {
+        font-size: 0.7rem !important;
+        margin-bottom: 12px !important;
+    }
+
+    .service-features {
+        margin-bottom: 15px !important;
+    }
+
+    .service-features li {
+        font-size: 0.65rem !important;
+        margin-bottom: 4px !important;
+    }
+
+    .service-price {
+        font-size: 0.8rem !important;
+    }
+}
+
+/* Tablet - 2 columns */
+@media (max-width: 768px) and (min-width: 576px) {
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+    }
+
+    .service-card {
+        padding: 25px 20px !important;
+        min-height: 350px;
+    }
+}
+
+/* Mobile - 1 column */
+@media (max-width: 576px) {
+    .services-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+
+    .service-card {
+        padding: 30px 20px !important;
+        min-height: auto;
+    }
+}
+
+* Force equal height for all service cards */ .service-card {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+}
+
+.service-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.service-features {
+    flex-grow: 1;
+}
+
+/* Ensure no wrapping on any screen size above 768px */
+@media (min-width: 768px) {
+    .services-grid {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        overflow: hidden;
+    }
+
+    .service-card {
+        min-width: 0;
+        /* Allow flex items to shrink */
+        overflow: hidden;
+    }
+}
+
+/* Very small laptops - ultra compact */
+@media (max-width: 1024px) and (min-width: 768px) {
+    .service-card {
+        padding: 15px 10px !important;
+        min-height: 280px !important;
+    }
+
+    .service-content h4 {
+        font-size: 0.85rem !important;
+        margin-bottom: 8px !important;
+    }
+
+    .service-content p {
+        font-size: 0.7rem !important;
+        margin-bottom: 10px !important;
+        line-height: 1.3 !important;
+    }
+
+    .service-features li {
+        font-size: 0.6rem !important;
+        margin-bottom: 3px !important;
+    }
+
+    .service-price {
+        font-size: 0.75rem !important;
+        margin-top: auto;
+    }
 }

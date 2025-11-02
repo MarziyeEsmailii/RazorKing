@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RazorKing.Data;
 using RazorKing.Models;
@@ -14,115 +13,20 @@ namespace RazorKing.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<AccountController> _logger;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole> roleManager,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _context = context;
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Register()
-        {
-            ViewBag.Cities = new SelectList(await _context.Cities.ToListAsync(), "Id", "Name");
-            return View();
-        }
-
-        [HttpGet]
-        public IActionResult AuthForm()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                // اعتبارسنجی فیلدهای آرایشگاه برای صاحب آرایشگاه
-                if (model.Role == UserRole.BarbershopOwner)
-                {
-                    if (string.IsNullOrEmpty(model.BarbershopName))
-                    {
-                        ModelState.AddModelError("BarbershopName", "نام آرایشگاه الزامی است");
-                    }
-                    if (string.IsNullOrEmpty(model.BarbershopAddress))
-                    {
-                        ModelState.AddModelError("BarbershopAddress", "آدرس آرایشگاه الزامی است");
-                    }
-                    if (!model.CityId.HasValue)
-                    {
-                        ModelState.AddModelError("CityId", "انتخاب شهر الزامی است");
-                    }
-                }
-
-                if (ModelState.IsValid)
-                {
-                    var user = new ApplicationUser
-                    {
-                        UserName = model.Email,
-                        Email = model.Email,
-                        FirstName = model.FirstName,
-                        LastName = model.LastName,
-                        PhoneNumber = model.PhoneNumber,
-                        Role = model.Role
-                    };
-
-                    var result = await _userManager.CreateAsync(user, model.Password);
-
-                    if (result.Succeeded)
-                    {
-                        // Create roles if they don't exist
-                        await EnsureRolesExist();
-
-                        // Assign role to user
-                        string roleName = model.Role.ToString();
-                        await _userManager.AddToRoleAsync(user, roleName);
-
-                        // اگر کاربر صاحب آرایشگاه است، آرایشگاه جدید ایجاد کن
-                        if (model.Role == UserRole.BarbershopOwner)
-                        {
-                            var barbershop = new Barbershop
-                            {
-                                Name = model.BarbershopName!,
-                                Address = model.BarbershopAddress!,
-                                Description = model.BarbershopDescription ?? "",
-                                CityId = model.CityId!.Value,
-                                OwnerId = user.Id,
-                                IsActive = true,
-                                CreatedAt = DateTime.Now
-                            };
-
-                            _context.Barbershops.Add(barbershop);
-                            await _context.SaveChangesAsync();
-                        }
-
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-
-                        // Redirect based on role
-                        return model.Role switch
-                        {
-                            UserRole.BarbershopOwner => RedirectToAction("Dashboard", "Owner"),
-                            UserRole.Barber => RedirectToAction("Dashboard", "Barber"),
-                            _ => RedirectToAction("Index", "Home")
-                        };
-                    }
-
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                }
-            }
-
-            ViewBag.Cities = new SelectList(await _context.Cities.ToListAsync(), "Id", "Name");
-            return View(model);
+            _logger = logger;
         }
 
         [HttpGet]
@@ -132,48 +36,220 @@ namespace RazorKing.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(
-                    model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                return View(model);
+            }
 
-                if (result.Succeeded)
+            var result = await _signInManager.PasswordSignInAsync(
+                model.Email, 
+                model.Password, 
+                model.RememberMe, 
+                lockoutOnFailure: false);
+
+            if (result.Succeeded)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user != null)
                 {
-                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    var roles = await _userManager.GetRolesAsync(user);
                     
-                    // Redirect based on role
-                    return user.Role switch
+                    // Redirect based on user role
+                    if (roles.Contains("Barber"))
                     {
-                        UserRole.BarbershopOwner => RedirectToAction("Dashboard", "Owner"),
-                        UserRole.Barber => RedirectToAction("Dashboard", "Barber"),
-                        _ => RedirectToAction("Index", "Home")
-                    };
+                        return RedirectToAction("Dashboard", "Barber");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
+                return RedirectToAction("Index", "Home");
+            }
 
-                ModelState.AddModelError(string.Empty, "ایمیل یا رمز عبور اشتباه است.");
+            ModelState.AddModelError(string.Empty, "ایمیل یا رمز عبور اشتباه است");
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Check if email already exists
+            var existingUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("Email", "این ایمیل قبلاً ثبت شده است");
+                return View(model);
+            }
+
+            var user = new ApplicationUser
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                PhoneNumber = model.PhoneNumber,
+                EmailConfirmed = true // For simplicity, we'll confirm emails automatically
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (result.Succeeded)
+            {
+                // Ensure roles exist
+                await EnsureRolesExist();
+
+                // Assign role based on user type
+                string roleName = model.UserType == "Barber" ? "Barber" : "Customer";
+                await _userManager.AddToRoleAsync(user, roleName);
+
+                // Sign in the user
+                await _signInManager.SignInAsync(user, isPersistent: false);
+
+                // Redirect based on role
+                if (roleName == "Barber")
+                {
+                    TempData["SuccessMessage"] = "ثبت نام با موفقیت انجام شد. حالا می‌توانید آرایشگاه خود را ایجاد کنید";
+                    return RedirectToAction("CreateBarbershop", "Barber");
+                }
+                else
+                {
+                    TempData["SuccessMessage"] = "ثبت نام با موفقیت انجام شد. خوش آمدید!";
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
             }
 
             return View(model);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
 
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                return RedirectToAction("ForgotPasswordConfirmation");
+            }
+
+            // For demo purposes, we'll just redirect to reset password
+            // In production, you would send an email with a reset token
+            TempData["ResetEmail"] = model.Email;
+            return RedirectToAction("ResetPassword");
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPasswordConfirmation()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token = null)
+        {
+            if (token == null && TempData["ResetEmail"] == null)
+            {
+                return BadRequest("A code must be supplied for password reset.");
+            }
+
+            var model = new ResetPasswordViewModel
+            {
+                Email = TempData["ResetEmail"]?.ToString() ?? "",
+                Token = token ?? "demo-token"
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return RedirectToAction("ResetPasswordConfirmation");
+            }
+
+            // For demo purposes, we'll reset the password directly
+            // In production, you would use the token to verify the request
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction("ResetPasswordConfirmation");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult ResetPasswordConfirmation()
+        {
+            return View();
+        }
+
         private async Task EnsureRolesExist()
         {
-            string[] roles = { "Customer", "BarbershopOwner", "Barber" };
+            string[] roleNames = { "Customer", "Barber" };
 
-            foreach (string role in roles)
+            foreach (var roleName in roleNames)
             {
-                if (!await _roleManager.RoleExistsAsync(role))
+                var roleExist = await _roleManager.RoleExistsAsync(roleName);
+                if (!roleExist)
                 {
-                    await _roleManager.CreateAsync(new IdentityRole(role));
+                    await _roleManager.CreateAsync(new IdentityRole(roleName));
                 }
             }
         }

@@ -35,20 +35,11 @@ namespace RazorKing.Models.ViewModels
 
         [Required(ErrorMessage = "نوع کاربری الزامی است")]
         [Display(Name = "نوع کاربری")]
-        public UserRole Role { get; set; } = UserRole.Customer;
+        public string UserType { get; set; } = "Customer";
 
-        // فیلدهای مخصوص صاحب آرایشگاه
-        [Display(Name = "نام آرایشگاه")]
-        public string? BarbershopName { get; set; }
-
-        [Display(Name = "آدرس آرایشگاه")]
-        public string? BarbershopAddress { get; set; }
-
-        [Display(Name = "توضیحات آرایشگاه")]
-        public string? BarbershopDescription { get; set; }
-
-        [Display(Name = "شهر")]
-        public int? CityId { get; set; }
+        [Required(ErrorMessage = "پذیرش قوانین الزامی است")]
+        [Display(Name = "پذیرش قوانین")]
+        public bool AgreeToTerms { get; set; }
     }
 
 

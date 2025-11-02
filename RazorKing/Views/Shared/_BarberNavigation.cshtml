@@ -1,0 +1,112 @@
+<div class="barber-navigation">
+    <div class="nav-header">
+        <div class="nav-brand">
+            <i class="fas fa-cut text-gold"></i>
+            <span>پنل آرایشگر</span>
+        </div>
+        <button class="nav-toggle d-lg-none" id="navToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+    
+    <nav class="nav-menu" id="navMenu">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="@Url.Action("Dashboard", "Barber")" class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "active" : "")">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>داشبورد</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a href="@Url.Action("ManageAppointments", "Barber")" class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageAppointments" ? "active" : "")">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>مدیریت نوبت‌ها</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a href="@Url.Action("ManageSchedule", "Barber")" class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageSchedule" ? "active" : "")">
+                    <i class="fas fa-clock"></i>
+                    <span>برنامه کاری</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a href="@Url.Action("ManageServices", "Barber")" class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageServices" ? "active" : "")">
+                    <i class="fas fa-scissors"></i>
+                    <span>خدمات</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a href="@Url.Action("EditBarbershop", "Barber")" class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "EditBarbershop" ? "active" : "")">
+                    <i class="fas fa-store"></i>
+                    <span>ویرایش آرایشگاه</span>
+                </a>
+            </li>
+            
+            <li class="nav-divider"></li>
+            
+            <li class="nav-item">
+                <a href="@Url.Action("Index", "Home")" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>بازگشت به سایت</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <form asp-controller="Account" asp-action="Logout" method="post" class="nav-form">
+                    <button type="submit" class="nav-link logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>خروج</span>
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.querySelector('.barber-navigation');
+    const body = document.body;
+    
+    if (navToggle) {
+        navToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('show');
+            
+            // Create overlay for mobile
+            let overlay = document.querySelector('.nav-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.className = 'nav-overlay';
+                body.appendChild(overlay);
+                
+                overlay.addEventListener('click', function() {
+                    navMenu.classList.remove('show');
+                    overlay.classList.remove('show');
+                });
+            }
+            
+            overlay.classList.toggle('show');
+        });
+    }
+    
+    // Close navigation when clicking on a link (mobile)
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 991.98) {
+                navMenu.classList.remove('show');
+                const overlay = document.querySelector('.nav-overlay');
+                if (overlay) {
+                    overlay.classList.remove('show');
+                }
+            }
+        });
+    });
+});
+</script>

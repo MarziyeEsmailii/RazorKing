@@ -1,0 +1,265 @@
+@model RazorKing.Models.ViewModels.BarberScheduleViewModel
+@{
+    ViewData["Title"] = "مدیریت نوبت‌ها";
+    Layout = "_LayoutBarber";
+}
+
+<div class="manage-appointments-container">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="page-title">
+                        <i class="fas fa-calendar-alt text-gold me-3"></i>
+                        مدیریت نوبت‌ها
+                    </h1>
+                    <p class="page-subtitle">مدیریت کامل نوبت‌های مشتریان و برنامه‌ریزی ساعت به ساعت</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="header-actions">
+                        <button class="btn btn-outline-gold me-2" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i>
+                            بروزرسانی
+                        </button>
+                        <button class="btn btn-gold" id="blockTimeBtn">
+                            <i class="fas fa-ban"></i>
+                            مسدود کردن زمان
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats mb-4">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="todayAppointments">0</h3>
+                            <p>نوبت‌های امروز</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="availableSlots">0</h3>
+                            <p>ساعت‌های آزاد</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalCustomers">0</h3>
+                            <p>مشتریان هفته</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="weeklyRevenue">0</h3>
+                            <p>درآمد هفته</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Controls -->
+        <div class="calendar-controls">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="date-navigation">
+                        <button class="btn btn-outline-light" id="prevWeek">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <div class="current-week">
+                            <span id="currentWeekText">هفته جاری</span>
+                        </div>
+                        <button class="btn btn-outline-light" id="nextWeek">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="view-controls">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-outline-gold active" data-view="week">
+                                <i class="fas fa-calendar-week"></i>
+                                هفتگی
+                            </button>
+                            <button class="btn btn-outline-gold" data-view="day">
+                                <i class="fas fa-calendar-day"></i>
+                                روزانه
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar -->
+        <div class="calendar-container">
+            <div class="calendar-wrapper">
+                <!-- Time Column -->
+                <div class="time-column">
+                    <div class="time-header">ساعت</div>
+                    <div class="time-slots" id="timeSlots">
+                        <!-- Time slots will be generated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Days Columns -->
+                <div class="days-container" id="daysContainer">
+                    <!-- Day columns will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="calendar-legend">
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-color available"></div>
+                    <span>آزاد</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color booked"></div>
+                    <span>رزرو شده</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color blocked"></div>
+                    <span>مسدود</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color break"></div>
+                    <span>استراحت</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color completed"></div>
+                    <span>تکمیل شده</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Appointment Details Modal -->
+<div class="modal fade" id="appointmentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-clock text-gold me-2"></i>
+                    جزئیات نوبت
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="appointment-details">
+                    <!-- Appointment details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">بستن</button>
+                <button type="button" class="btn btn-success" id="completeAppointment">
+                    <i class="fas fa-check"></i>
+                    تکمیل نوبت
+                </button>
+                <button type="button" class="btn btn-warning" id="rescheduleAppointment">
+                    <i class="fas fa-calendar-alt"></i>
+                    تغییر زمان
+                </button>
+                <button type="button" class="btn btn-danger" id="cancelAppointment">
+                    <i class="fas fa-times"></i>
+                    لغو نوبت
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Block Time Modal -->
+<div class="modal fade" id="blockTimeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-ban text-danger me-2"></i>
+                    مسدود کردن زمان
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="blockTimeForm">
+                    <div class="mb-3">
+                        <label class="form-label">تاریخ</label>
+                        <input type="date" class="form-control" id="blockDate" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">از ساعت</label>
+                            <input type="time" class="form-control" id="blockStartTime" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">تا ساعت</label>
+                            <input type="time" class="form-control" id="blockEndTime" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">دلیل (اختیاری)</label>
+                        <textarea class="form-control" id="blockReason" rows="3" placeholder="دلیل مسدود کردن این زمان..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">انصراف</button>
+                <button type="button" class="btn btn-danger" id="confirmBlockTime">
+                    <i class="fas fa-ban"></i>
+                    مسدود کردن
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/manage-appointments.css" asp-append-version="true">
+}
+
+@section Scripts {
+    <script>
+        window.barbershopData = {
+            openTime: '@Model.OpenTime',
+            closeTime: '@Model.CloseTime',
+            workingDays: '@Model.WorkingDays',
+            appointments: @Html.Raw(Json.Serialize(Model.Appointments.Select(a => new {
+                id = a.Id,
+                date = a.AppointmentDate.ToString("yyyy-MM-dd"),
+                time = a.AppointmentTime.ToString(@"HH\:mm"),
+                customerName = a.CustomerName,
+                customerPhone = a.CustomerPhone,
+                serviceName = a.Service?.Name,
+                servicePrice = a.Service?.Price,
+                status = a.Status.ToString()
+            })))
+        };
+    </script>
+    <script src="~/js/manage-appointments.js" asp-append-version="true"></script>
+}

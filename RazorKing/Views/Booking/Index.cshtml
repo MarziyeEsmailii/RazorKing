@@ -484,7 +484,38 @@
     margin-bottom: 30px;
 }
 
-.time-slots-grid {
+.date-form-group {
+    position: relative;
+}
+
+.persian-date-input {
+    background: var(--medium-gray) !important;
+    border: 2px solid rgba(212, 175, 55, 0.4) !important;
+    color: var(--text-white) !important;
+    border-radius: 15px !important;
+    padding: 18px 50px 18px 20px !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    cursor: pointer !important;
+}
+
+.persian-date-input:focus {
+    border-color: var(--primary-gold) !important;
+    box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25) !important;
+}
+
+.date-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-gold);
+    font-size: 1.2rem;
+    pointer-events: none;
+}
+
+.time-slots-grid,
+.time-slots-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 10px;
@@ -587,45 +618,13 @@
     font-size: var(--font-size-sm);
 }
 
-.form-navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 40px;
-    padding-top: 30px;
-    border-top: 1px solid rgba(212, 175, 55, 0.2);
-}
 
-media (max-width: 768px) {
-    .wizard-steps {
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-    
-    .wizard-steps::before {
-        display: none;
-    }
-    
-    .datetime-selection {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    .cities-grid,
-    .barbershops-grid,
-    .services-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .time-slots-grid {
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    }
-}
-</style>
 
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Booking page loaded');
+            
             let currentStep = 1;
             let selectedData = {
                 cityId: null,
@@ -638,8 +637,70 @@ media (max-width: 768px) {
                 totalPrice: 0
             };
 
+            // Check URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const barbershopIdFromUrl = urlParams.get('barbershopId');
+            const cityIdFromUrl = urlParams.get('cityId');
+            
+            console.log('URL params - barbershopId:', barbershopIdFromUrl, 'cityId:', cityIdFromUrl);
+            
+            // If barbershopId is provided, we need to handle it properly
+            if (barbershopIdFromUrl && barbershopIdFromUrl !== '') {
+                // First, we need to find which city this barbershop belongs to
+                fetch(`/Booking/GetBarbershopDetails?barbershopId=${barbershopIdFromUrl}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.cityId) {
+                            // Set the city data
+                            selectedData.cityId = data.cityId;
+                            selectedData.cityName = data.cityName;
+                            
+                            // Set the barbershop data
+                            selectedData.barbershopId = barbershopIdFromUrl;
+                            selectedData.barbershopName = data.name;
+                            
+                            // Select the city visually
+                            const cityOption = document.querySelector(`[data-city-id="${data.cityId}"]`);
+                            if (cityOption) {
+                                cityOption.classList.add('selected');
+                            }
+                            
+                            // Move to step 3 (services selection)
+                            currentStep = 3;
+                            document.querySelector('#step1').classList.remove('active');
+                            document.querySelector('#step3').classList.add('active');
+                            document.querySelector('.step[data-step="1"]').classList.add('completed');
+                            document.querySelector('.step[data-step="2"]').classList.add('completed');
+                            document.querySelector('.step[data-step="3"]').classList.add('active');
+                            
+                            // Load services
+                            loadServices(barbershopIdFromUrl);
+                            
+                            // Update navigation
+                            updateNavigation();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading barbershop details:', error);
+                    });
+            }
+            
             // Initialize
             updateNavigation();
+            
+            // Debug: Log initial state
+            console.log('Initial selectedData:', selectedData);
+            console.log('Initial currentStep:', currentStep);
+            
+            // Debug: Check if date input exists
+            const dateInput = document.getElementById('appointmentDate');
+            if (dateInput) {
+                console.log('Date input found');
+                dateInput.style.display = 'block';
+                dateInput.style.visibility = 'visible';
+            } else {
+                console.error('Date input not found');
+            }
             
             // City selection
             document.querySelectorAll('.city-option').forEach(option => {
@@ -650,7 +711,12 @@ media (max-width: 768px) {
                     selectedData.cityId = this.dataset.cityId;
                     selectedData.cityName = this.querySelector('h5').textContent;
                     
-                    nextStep();
+                    console.log('City selected:', selectedData.cityName, 'ID:', selectedData.cityId);
+                    
+                    // Update navigation to show next button
+                    updateNavigation();
+                    
+                    // Load barbershops for next step
                     loadBarbershops(selectedData.cityId);
                 });
             });
@@ -697,8 +763,31 @@ media (max-width: 768px) {
                 const nextBtn = document.getElementById('nextBtn');
                 const submitBtn = document.getElementById('submitBtn');
 
+                console.log('updateNavigation called - Step:', currentStep, 'CityId:', selectedData.cityId);
+
                 prevBtn.style.display = currentStep > 1 ? 'inline-flex' : 'none';
-                nextBtn.style.display = currentStep < 5 ? 'inline-flex' : 'none';
+                
+                // Show next button based on step and selection
+                if (currentStep < 5) {
+                    if (currentStep === 1) {
+                        // Step 1: Show next only if city is selected
+                        nextBtn.style.display = selectedData.cityId ? 'inline-flex' : 'none';
+                    } else if (currentStep === 2) {
+                        // Step 2: Show next only if barbershop is selected
+                        nextBtn.style.display = selectedData.barbershopId ? 'inline-flex' : 'none';
+                    } else if (currentStep === 3) {
+                        // Step 3: Show next only if services are selected
+                        nextBtn.style.display = selectedData.services.length > 0 ? 'inline-flex' : 'none';
+                    } else if (currentStep === 4) {
+                        // Step 4: Show next only if date and time are selected
+                        nextBtn.style.display = selectedData.date && selectedData.time ? 'inline-flex' : 'none';
+                    } else {
+                        nextBtn.style.display = 'inline-flex';
+                    }
+                } else {
+                    nextBtn.style.display = 'none';
+                }
+                
                 submitBtn.style.display = currentStep === 5 ? 'inline-flex' : 'none';
             }
 
@@ -726,10 +815,11 @@ media (max-width: 768px) {
                                 selectedData.barbershopId = barbershop.id;
                                 selectedData.barbershopName = barbershop.name;
                                 
-                                setTimeout(() => {
-                                    nextStep();
-                                    loadServices(barbershop.id);
-                                }, 300);
+                                // Update navigation to show next button
+                                updateNavigation();
+                                
+                                // Load services for next step
+                                loadServices(barbershop.id);
                             });
                             
                             container.appendChild(card);
@@ -786,34 +876,90 @@ media (max-width: 768px) {
                 document.getElementById('totalPrice').textContent = selectedData.totalPrice.toLocaleString() + ' تومان';
                 document.getElementById('depositAmount').textContent = (selectedData.totalPrice * 0.3).toLocaleString() + ' تومان';
                 
-                // Enable next button if services selected
-                const nextBtn = document.getElementById('nextBtn');
-                if (currentStep === 3) {
-                    nextBtn.disabled = selectedData.services.length === 0;
-                }
+                // Update navigation based on service selection
+                updateNavigation();
             }
 
-            // Date selection
+            // Initialize Persian Date Picker
+            const dateInput = document.getElementById('appointmentDate');
+            
+            // Check if PersianDatePicker is available
+            if (typeof PersianDatePicker !== 'undefined') {
+                console.log('PersianDatePicker is available');
+                const datePicker = new PersianDatePicker(dateInput, {
+                    disablePastDates: true,
+                    onSelect: function(formattedDate, gregorianDate) {
+                        selectedData.date = gregorianDate.toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
+                        
+                        // Show selected date
+                        document.getElementById('selectedDateDisplay').style.display = 'block';
+                        document.getElementById('selectedDateText').textContent = formattedDate;
+                        
+                        // Load available times if all required data is present
+                        if (selectedData.date && selectedData.barbershopId && selectedData.services.length > 0) {
+                            loadAvailableTimes();
+                        }
+                    }
+                });
+            } else {
+                console.error('PersianDatePicker is not available');
+                // Fallback: make input clickable and show a simple date picker
+                dateInput.type = 'date';
+                dateInput.removeAttribute('readonly');
+                dateInput.min = new Date().toISOString().split('T')[0]; // Today's date
+            }
+
+            // Date selection (fallback for manual input)
             document.getElementById('appointmentDate').addEventListener('change', function() {
-                selectedData.date = this.value;
-                if (selectedData.date && selectedData.barbershopId && selectedData.services.length > 0) {
-                    loadAvailableTimes();
+                if (this.value) {
+                    // Try to parse Persian date
+                    const persianDate = window.persianCalendar.parsePersianDate(this.value);
+                    if (persianDate) {
+                        selectedData.date = persianDate.toISOString().split('T')[0];
+                        
+                        // Show selected date
+                        document.getElementById('selectedDateDisplay').style.display = 'block';
+                        document.getElementById('selectedDateText').textContent = this.value;
+                        
+                        if (selectedData.date && selectedData.barbershopId && selectedData.services.length > 0) {
+                            loadAvailableTimes();
+                        }
+                    }
                 }
             });
 
             function loadAvailableTimes() {
                 const serviceIds = selectedData.services.map(s => s.id).join(',');
+                const container = document.getElementById('timeSlots');
+                
+                // Show loading
+                container.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> در حال بارگذاری ساعات...</div>';
                 
                 fetch(`/Booking/GetAvailableTimes?barbershopId=${selectedData.barbershopId}&date=${selectedData.date}&serviceIds=${serviceIds}`)
                     .then(response => response.json())
                     .then(data => {
-                        const container = document.getElementById('timeSlots');
                         container.innerHTML = '';
                         
-                        if (data.length === 0) {
-                            container.innerHTML = '<div class="alert alert-warning">متاسفانه در این تاریخ ساعت خالی وجود ندارد.</div>';
+                        // Check if response has times array (new format) or is direct array (old format)
+                        const times = data.times || data;
+                        const message = data.message || '';
+                        
+                        if (message) {
+                            const messageDiv = document.createElement('div');
+                            messageDiv.className = times.length === 0 ? 'alert alert-warning' : 'alert alert-info';
+                            messageDiv.textContent = message;
+                            container.appendChild(messageDiv);
+                        }
+                        
+                        if (times.length === 0) {
+                            if (!message) {
+                                container.innerHTML = '<div class="alert alert-warning">متاسفانه در این تاریخ ساعت خالی وجود ندارد.</div>';
+                            }
                         } else {
-                            data.forEach(time => {
+                            const timeSlotsGrid = document.createElement('div');
+                            timeSlotsGrid.className = 'time-slots-container';
+                            
+                            times.forEach(time => {
                                 const button = document.createElement('button');
                                 button.type = 'button';
                                 button.className = 'time-slot';
@@ -824,11 +970,20 @@ media (max-width: 768px) {
                                     document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
                                     this.classList.add('selected');
                                     selectedData.time = time;
+                                    
+                                    // Update navigation
+                                    updateNavigation();
                                 });
                                 
-                                container.appendChild(button);
+                                timeSlotsGrid.appendChild(button);
                             });
+                            
+                            container.appendChild(timeSlotsGrid);
                         }
+                    })
+                    .catch(error => {
+                        console.error('Error loading times:', error);
+                        container.innerHTML = '<div class="alert alert-danger">خطا در بارگذاری ساعات. لطفا دوباره تلاش کنید.</div>';
                     });
             }
 
