@@ -30,6 +30,9 @@ function initializeCityPage() {
     // Initialize search
     initializeSearch();
     
+    // Ensure images load properly
+    ensureImagesLoad();
+    
     // Animate cards on load
     animateCards();
 }
@@ -436,3 +439,29 @@ window.CityPage = {
 
 // Make showBarbershopDetails globally available
 window.showBarbershopDetails = showBarbershopDetails;
+
+// Ensure barbershop images load properly
+function ensureImagesLoad() {
+    const barbershopImages = document.querySelectorAll('.barbershop-image img');
+    
+    barbershopImages.forEach((img, index) => {
+        // Add loaded class when image loads
+        img.addEventListener('load', function() {
+            this.classList.add('loaded');
+        });
+        
+        // If image is already loaded
+        if (img.complete) {
+            img.classList.add('loaded');
+        }
+        
+        // Fallback: ensure image is visible after a short delay
+        setTimeout(() => {
+            img.style.opacity = '1';
+            img.style.visibility = 'visible';
+            img.style.display = 'block';
+        }, index * 100);
+    });
+    
+    console.log('Initialized', barbershopImages.length, 'barbershop images');
+}

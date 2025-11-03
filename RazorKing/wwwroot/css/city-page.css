@@ -50,7 +50,7 @@
 }
 
 .breadcrumb-nav {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     font-size: 0.9rem;
 }
 
@@ -72,7 +72,7 @@
 .city-title {
     font-size: 3rem;
     font-weight: 800;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
     background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -180,7 +180,8 @@
 .barbershops-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 30px;
+    gap: 25px;
+    margin-top: 15px;
 }
 
 .barbershop-card {
@@ -200,8 +201,9 @@
 
 .barbershop-image {
     position: relative;
-    height: 200px;
+    height: 220px;
     overflow: hidden;
+    border-radius: 18px 18px 0 0;
 }
 
 .barbershop-image img {
@@ -209,6 +211,7 @@
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
+    display: block;
 }
 
 .barbershop-card:hover .barbershop-image img {
@@ -741,4 +744,75 @@
     to {
         transform: rotate(360deg);
     }
+}/*
+ Responsive improvements for spacing */
+@media (max-width: 768px) {
+    .city-header {
+        padding: 40px 0 30px 0;
+    }
+    
+    .city-title {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+    }
+    
+    .city-stats {
+        gap: 25px;
+        margin-top: 15px;
+    }
+    
+    .filters-section {
+        padding: 10px 0;
+    }
+    
+    .filters-card {
+        padding: 15px;
+    }
+    
+    .barbershops-section {
+        padding: 10px 0;
+    }
+    
+    .barbershops-grid {
+        gap: 20px;
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    .city-header {
+        padding: 30px 0 20px 0;
+    }
+    
+    .city-title {
+        font-size: 1.8rem;
+    }
+    
+    .city-stats {
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 10px;
+    }
+    
+    .barbershops-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
+/* Ensure images load properly */
+.barbershop-image img {
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.barbershop-image img.loaded {
+    opacity: 1;
+}
+
+/* Force image visibility */
+.barbershop-card .barbershop-image img {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
 }
