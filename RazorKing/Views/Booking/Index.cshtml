@@ -40,7 +40,7 @@
                             <div class="step-icon">
                                 <i class="fas fa-calendar"></i>
                             </div>
-                            <span>انتخاب روز</span>
+                            <span>انتخاب زمان</span>
                         </div>
                         <div class="step" data-step="5">
                             <div class="step-icon">
@@ -198,10 +198,6 @@
                                                           placeholder="توضیحات اضافی در مورد نوبت خود..."></textarea>
                                             </div>
                                         </form>
-                                        
-                                        <div id="pricingSummary">
-                                            <!-- Pricing summary will be loaded here -->
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -496,18 +492,6 @@
     transform: translateY(-3px);
 }
 
-.service-card {
-    position: relative;
-}
-
-.service-checkbox {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    width: 20px;
-    height: 20px;
-}
-
 .price-summary {
     background: var(--dark-gray);
     border-radius: 15px;
@@ -538,451 +522,44 @@
     font-weight: 700;
 }
 
-.datetime-selection {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 30px;
-    margin-bottom: 30px;
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
 }
 
-.date-form-group {
-    position: relative;
-}
-
-.persian-date-input {
-    background: var(--medium-gray) !important;
-    border: 2px solid rgba(212, 175, 55, 0.4) !important;
-    color: var(--text-white) !important;
-    border-radius: 15px !important;
-    padding: 18px 50px 18px 20px !important;
-    font-size: 1rem !important;
-    width: 100% !important;
-    cursor: pointer !important;
-}
-
-.persian-date-input:focus {
-    border-color: var(--primary-gold) !important;
-    box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25) !important;
-}
-
-.date-icon {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--primary-gold);
-    font-size: 1.2rem;
-    pointer-events: none;
-}
-
-.time-slots-grid,
-.time-slots-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-}
-
-.time-slot {
-    background: var(--medium-gray);
-    border: 2px solid rgba(212, 175, 55, 0.3);
-    color: var(--text-white);
-    padding: 12px 16px;
-    border-radius: 10px;
+.navigation-btn {
+    padding: 12px 30px;
+    border-radius: 25px;
     font-weight: 600;
     transition: all var(--transition-normal);
 }
 
-.time-slot:hover,
-.time-slot.selected {
+.btn-gold {
     background: var(--primary-gold);
-    border-color: var(--primary-gold);
+    border: 2px solid var(--primary-gold);
     color: var(--primary-black);
 }
 
-.customer-info {
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.form-group {
-    margin-bottom: 25px;
-}
-
-.booking-summary {
-    background: var(--dark-gray);
-    border-radius: 15px;
-    padding: 25px;
-    margin: 30px 0;
-}
-
-.booking-summary h4 {
-    color: var(--primary-gold);
-    margin-bottom: 20px;
-    font-weight: 700;
-}
-
-.summary-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-}
-
-.summary-item:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-
-.summary-item.total,
-.summary-item.deposit {
-    font-weight: 700;
-    font-size: var(--font-size-lg);
-}
-
-.summary-item.total {
-    color: var(--text-white);
-}
-
-.summary-item.deposit {
+.btn-gold:hover {
+    background: transparent;
     color: var(--primary-gold);
 }
 
-.payment-notice {
-    background: rgba(212, 175, 55, 0.1);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    gap: 15px;
-}
-
-.notice-icon {
+.btn-outline-gold {
+    background: transparent;
+    border: 2px solid var(--primary-gold);
     color: var(--primary-gold);
-    font-size: var(--font-size-xl);
 }
 
-.notice-content h5 {
-    color: var(--text-white);
-    margin-bottom: 10px;
-    font-weight: 600;
-}
-
-.notice-content ul {
-    color: var(--text-gray);
-    margin: 0;
-    padding-right: 20px;
-}
-
-.notice-content li {
-    margin-bottom: 5px;
-    font-size: var(--font-size-sm);
-}
-
-/* استایل‌های جدید برای مراحل اضافی */
-.dates-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-bottom: 30px;
-}
-
-.date-card {
-    background: var(--medium-gray);
-    border: 2px solid rgba(212, 175, 55, 0.2);
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all var(--transition-normal);
-}
-
-.date-card:hover,
-.date-card.selected {
-    border-color: var(--primary-gold);
-    background: rgba(212, 175, 55, 0.1);
-    transform: translateY(-3px);
-}
-
-.date-display {
-    font-size: var(--font-size-lg);
-    font-weight: 700;
-    color: var(--text-white);
-    margin-bottom: 5px;
-}
-
-.day-name {
-    color: var(--text-gray);
-    font-size: var(--font-size-sm);
-    margin-bottom: 10px;
-}
-
-.available-slots {
-    color: var(--primary-gold);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-}
-
-.times-container {
-    margin-bottom: 30px;
-}
-
-.time-section {
-    margin-bottom: 30px;
-}
-
-.time-period {
-    color: var(--primary-gold);
-    font-size: var(--font-size-lg);
-    font-weight: 700;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid rgba(212, 175, 55, 0.3);
-}
-
-.times-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
-}
-
-.time-card {
-    background: var(--medium-gray);
-    border: 2px solid rgba(212, 175, 55, 0.3);
-    border-radius: 10px;
-    padding: 15px;
-    text-align: center;
-    cursor: pointer;
-    transition: all var(--transition-normal);
-    position: relative;
-}
-
-.time-card:hover,
-.time-card.selected {
+.btn-outline-gold:hover {
     background: var(--primary-gold);
-    border-color: var(--primary-gold);
     color: var(--primary-black);
-    transform: translateY(-2px);
 }
 
-.time-display {
-    font-weight: 700;
-    font-size: var(--font-size-base);
-}
-
-.peak-label {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #f59e0b;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.7em;
-    font-weight: 600;
-}
-
-.pricing-summary {
-    background: var(--dark-gray);
-    border-radius: 15px;
-    padding: 25px;
-    margin: 30px 0;
-    border: 1px solid rgba(212, 175, 55, 0.2);
-}
-
-.pricing-summary h6 {
-    color: var(--primary-gold);
-    font-weight: 700;
-    margin-bottom: 20px;
-    font-size: var(--font-size-lg);
-}
-
-.price-breakdown {
-    margin-bottom: 25px;
-}
-
-.price-breakdown .price-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-}
-
-.price-breakdown .price-item:last-child {
-    border-bottom: none;
-}
-
-.price-breakdown .price-item.total {
-    border-top: 2px solid var(--primary-gold);
-    margin-top: 15px;
-    padding-top: 15px;
-    font-weight: 700;
-    font-size: var(--font-size-lg);
-    color: var(--text-white);
-}
-
-.price-breakdown .price-item.deposit {
-    background: rgba(212, 175, 55, 0.1);
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 10px;
-    font-weight: 700;
-    color: var(--primary-gold);
-}
-
-.barbershop-info {
-    background: var(--medium-gray);
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 20px;
-}
-
-.barbershop-info h6 {
-    color: var(--primary-gold);
-    margin-bottom: 15px;
-    font-weight: 700;
-}
-
-.barbershop-info p {
-    margin-bottom: 8px;
-    color: var(--text-gray);
-}
-
-.final-summary {
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.payment-section {
-    margin-top: 30px;
-}
-
-.payment-confirmation {
-    background: var(--medium-gray);
-    padding: 20px;
-    border-radius: 12px;
-    margin: 20px 0;
-    text-align: center;
-}
-
-.checkbox-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    cursor: pointer;
-    color: var(--text-white);
-    font-weight: 600;
-}
-
-.checkbox-container input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    accent-color: var(--primary-gold);
-}
-
-.booking-result {
-    margin-top: 30px;
-    text-align: center;
-}
-
-.loading-state,
-.empty-state,
-.error-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-gray);
-}
-
-.loading-state i {
-    color: var(--primary-gold);
-    margin-bottom: 20px;
-}
-
-.empty-state i {
-    color: var(--text-gray);
-    margin-bottom: 20px;
-}
-
-.error-state i {
-    color: #ef4444;
-    margin-bottom: 20px;
-}
-
-.service-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.service-header h6 {
-    color: var(--text-white);
-    font-weight: 700;
-    margin: 0;
-}
-
-.service-header .price {
-    color: var(--primary-gold);
-    font-weight: 700;
-    font-size: var(--font-size-lg);
-}
-
-.service-details {
-    margin-bottom: 15px;
-}
-
-.service-details .description {
-    color: var(--text-gray);
-    font-size: var(--font-size-sm);
-    margin-bottom: 10px;
-}
-
-.service-meta {
-    display: flex;
-    gap: 15px;
-    font-size: var(--font-size-sm);
-    color: var(--text-gray);
-}
-
-.service-meta span {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.service-actions {
-    text-align: center;
-}
-
-.service-checkbox {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--primary-gold);
-    margin-left: 8px;
-}
-
-.selected-services-summary {
-    background: var(--medium-gray);
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    border: 2px solid rgba(212, 175, 55, 0.3);
-}
-
-.selected-services-summary h6 {
-    color: var(--primary-gold);
-    margin-bottom: 10px;
-    font-weight: 700;
-}
-
-.total-price {
-    font-size: var(--font-size-xl);
-    font-weight: 700;
-    color: var(--text-white);
-}
-
-/* Responsive */
 media (max-width: 768px) {
     .wizard-steps {
         flex-wrap: wrap;
@@ -994,19 +571,14 @@ media (max-width: 768px) {
         min-width: 120px;
     }
     
-    .dates-grid,
-    .times-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    }
-    
-    .datetime-selection {
+    .cities-grid,
+    .barbershops-grid,
+    .services-grid {
         grid-template-columns: 1fr;
-        gap: 20px;
     }
 }
-
-
+</style>
 
 @section Scripts {
-    <script src="~/js/booking-complete.js"></script>
+    <script src="~/js/booking.js"></script>
 }

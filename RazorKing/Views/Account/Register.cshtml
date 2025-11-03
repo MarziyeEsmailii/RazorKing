@@ -1,264 +1,104 @@
 @model RazorKing.Models.ViewModels.RegisterViewModel
 @{
-    ViewData["Title"] = "ثبت نام در ریزر کینگ";
+    ViewData["Title"] = "ثبت نام";
     Layout = "_LayoutModern";
 }
 
-<section class="auth-section">
-    <div class="auth-container">
-        <div class="row justify-content-center align-items-center" style="min-height: calc(100vh - 160px);">
-            <div class="col-lg-7 d-none d-lg-block">
-                <div class="auth-image">
-                    <img src="~/img/photo_3_2025-11-01_19-21-48.jpg" alt="آرایشگاه مردانه حرفه‌ای" class="img-fluid">
-                    <div class="auth-overlay">
-                        <div class="auth-content">
-                            <h3>به خانواده ریزر کینگ بپیوندید</h3>
-                            <p>با عضویت در ریزر کینگ، از تمام امکانات و خدمات ویژه ما بهره‌مند شوید</p>
-                            <div class="auth-features">
-                                <div class="feature-item">
-                                    <i class="fas fa-user-plus"></i>
-                                    <span>عضویت رایگان و آسان</span>
-                                </div>
-                                <div class="feature-item">
-                                    <i class="fas fa-calendar-check"></i>
-                                    <span>مدیریت نوبت‌های شما</span>
-                                </div>
-                                <div class="feature-item">
-                                    <i class="fas fa-gift"></i>
-                                    <span>تخفیف‌های ویژه اعضا</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="auth-page">
+    <!-- بخش تصویر -->
+    <div class="auth-visual">
+        <div class="auth-images">
+            <img src="~/img/photo_3_2025-11-01_19-21-48.jpg" alt="" class="auth-img active">
+        </div>
+    </div>
+
+    <!-- بخش فرم -->
+    <div class="auth-content">
+        <div class="auth-box">
+            <!-- لوگو -->
+            <div class="auth-brand">
+                <a href="/">
+                    <img src="~/img/logo.jpg" alt="ریزر کینگ">
+                </a>
             </div>
-            
-            <div class="col-lg-5 col-md-8 col-sm-10">
-                <div class="auth-card">
-                    <div class="auth-header">
-                        <div class="auth-logo">
-                            <img src="~/img/logo.jpg" alt="ریزر کینگ" onerror="this.src='~/img/logo.png'">
-                            <span>ریزر کینگ</span>
-                        </div>
-                        <h2>ثبت نام در ریزر کینگ</h2>
-                        <p>اطلاعات خود را وارد کنید و عضو خانواده ما شوید</p>
-                    </div>
+
+            <!-- تب‌ها -->
+            <div class="auth-switcher">
+                <button type="button" class="auth-switch" onclick="window.location.href='/Account/Login'">ورود</button>
+                <button type="button" class="auth-switch active">ثبت نام</button>
+            </div>
+
+            <!-- فرم ثبت نام -->
+            <div class="auth-form-container">
+                <form asp-action="Register" method="post" class="auth-form">
+                    <div asp-validation-summary="All" class="auth-error"></div>
                     
-                    <form asp-action="Register" method="post" class="auth-form" data-validate="true">
-                        <div asp-validation-summary="All" class="alert alert-danger"></div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="FirstName" class="form-label">
-                                        <i class="fas fa-user"></i>
-                                        نام
-                                    </label>
-                                    <input asp-for="FirstName" class="form-control" placeholder="نام خود را وارد کنید" required />
-                                    <span asp-validation-for="FirstName" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="LastName" class="form-label">
-                                        <i class="fas fa-user"></i>
-                                        نام خانوادگی
-                                    </label>
-                                    <input asp-for="LastName" class="form-control" placeholder="نام خانوادگی خود را وارد کنید" required />
-                                    <span asp-validation-for="LastName" class="text-danger"></span>
-                                </div>
-                            </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <input asp-for="FirstName" type="text" placeholder="نام" required>
+                            <span asp-validation-for="FirstName" class="field-error"></span>
                         </div>
-
-                        <div class="form-group">
-                            <label asp-for="Email" class="form-label">
-                                <i class="fas fa-envelope"></i>
-                                ایمیل
-                            </label>
-                            <input asp-for="Email" class="form-control" placeholder="example@email.com" required />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-
-                        <div class="form-group">
-                            <label asp-for="PhoneNumber" class="form-label">
-                                <i class="fas fa-phone"></i>
-                                شماره موبایل
-                            </label>
-                            <input asp-for="PhoneNumber" class="form-control" placeholder="09123456789" required />
-                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="Password" class="form-label">
-                                        <i class="fas fa-lock"></i>
-                                        رمز عبور
-                                    </label>
-                                    <div class="password-input">
-                                        <input asp-for="Password" type="password" class="form-control" placeholder="رمز عبور خود را وارد کنید" required />
-                                        <button type="button" class="password-toggle">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                    <span asp-validation-for="Password" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="ConfirmPassword" class="form-label">
-                                        <i class="fas fa-lock"></i>
-                                        تکرار رمز عبور
-                                    </label>
-                                    <div class="password-input">
-                                        <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="رمز عبور را تکرار کنید" required />
-                                        <button type="button" class="password-toggle">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-user-tag"></i>
-                                نوع کاربری
-                            </label>
-                            <div class="user-type-selection">
-                                <div class="user-type-option">
-                                    <input type="radio" id="customer" name="UserType" value="Customer" checked />
-                                    <label for="customer" class="user-type-label">
-                                        <div class="user-type-icon">
-                                            <i class="fas fa-user"></i>
-                                        </div>
-                                        <div class="user-type-info">
-                                            <h5>مشتری</h5>
-                                            <p>رزرو نوبت در آرایشگاه‌ها</p>
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="user-type-option">
-                                    <input type="radio" id="barber" name="UserType" value="Barber" />
-                                    <label for="barber" class="user-type-label">
-                                        <div class="user-type-icon">
-                                            <i class="fas fa-cut"></i>
-                                        </div>
-                                        <div class="user-type-info">
-                                            <h5>آرایشگر</h5>
-                                            <p>مدیریت آرایشگاه و نوبت‌ها</p>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="form-check">
-                                <input asp-for="AgreeToTerms" class="form-check-input" type="checkbox" required />
-                                <label asp-for="AgreeToTerms" class="form-check-label">
-                                    با <a href="#" class="auth-link">قوانین و مقررات</a> موافقم
-                                </label>
-                            </div>
-                            <span asp-validation-for="AgreeToTerms" class="text-danger"></span>
-                        </div>
-
-                        <button type="submit" class="btn-auth">
-                            <i class="fas fa-user-plus"></i>
-                            ثبت نام در ریزر کینگ
-                        </button>
-                    </form>
-                    
-                    <div class="auth-footer">
-                        <div class="auth-divider">
-                            <span>یا</span>
-                        </div>
-                        
-                        <div class="auth-links">
-                            <p>قبلاً ثبت نام کرده‌اید؟</p>
-                            <a href="@Url.Action("Login", "Account")" class="auth-link">
-                                وارد شوید
-                            </a>
+                        <div class="input-group">
+                            <input asp-for="LastName" type="text" placeholder="نام خانوادگی" required>
+                            <span asp-validation-for="LastName" class="field-error"></span>
                         </div>
                     </div>
-                </div>
+
+                    <div class="input-group">
+                        <input asp-for="Email" type="email" placeholder="ایمیل" required>
+                        <span asp-validation-for="Email" class="field-error"></span>
+                    </div>
+
+                    <div class="input-group">
+                        <input asp-for="PhoneNumber" type="tel" placeholder="شماره موبایل" required>
+                        <span asp-validation-for="PhoneNumber" class="field-error"></span>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <input asp-for="Password" type="password" placeholder="رمز عبور" required>
+                            <span asp-validation-for="Password" class="field-error"></span>
+                        </div>
+                        <div class="input-group">
+                            <input asp-for="ConfirmPassword" type="password" placeholder="تکرار رمز عبور" required>
+                            <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="user-type">
+                        <label class="type-option">
+                            <input type="radio" name="UserType" value="Customer" checked>
+                            <span class="type-card">
+                                <i class="icon">👤</i>
+                                <span>مشتری</span>
+                            </span>
+                        </label>
+                        <label class="type-option">
+                            <input type="radio" name="UserType" value="Barber">
+                            <span class="type-card">
+                                <i class="icon">✂️</i>
+                                <span>آرایشگر</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <label class="checkbox-label">
+                        <input asp-for="AgreeToTerms" type="checkbox" required>
+                        <span class="checkmark"></span>
+                        با قوانین موافقم
+                    </label>
+
+                    <button type="submit" class="auth-btn">ثبت نام</button>
+                </form>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/auth-fixed.css" asp-append-version="true">
-    <style>
-        .user-type-selection {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 10px;
-        }
-        
-        .user-type-option input[type="radio"] {
-            display: none;
-        }
-        
-        .user-type-label {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 20px;
-            background: rgba(42, 42, 42, 0.6);
-            border: 2px solid rgba(212, 175, 55, 0.3);
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: #ffffff;
-        }
-        
-        .user-type-option input[type="radio"]:checked + .user-type-label {
-            background: rgba(212, 175, 55, 0.2);
-            border-color: #d4af37;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-        }
-        
-        .user-type-icon {
-            width: 50px;
-            height: 50px;
-            background: rgba(212, 175, 55, 0.2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: #d4af37;
-        }
-        
-        .user-type-info h5 {
-            margin: 0 0 5px 0;
-            font-weight: 700;
-            color: #ffffff;
-        }
-        
-        .user-type-info p {
-            margin: 0;
-            font-size: 0.85rem;
-            color: #b0b0b0;
-        }
-        
-        @@media (max-width: 768px) {
-            .user-type-selection {
-                grid-template-columns: 1fr;
-            }
-            
-            .user-type-label {
-                padding: 15px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/auth-minimal.css">
 }
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script src="~/js/auth.js" asp-append-version="true"></script>
 }
