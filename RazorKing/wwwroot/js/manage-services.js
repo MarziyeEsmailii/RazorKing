@@ -39,29 +39,36 @@ function initializeAddServiceForm() {
         }
         
         try {
+            const token = getAntiForgeryToken();
+            console.log('Sending service data:', formData);
+            console.log('CSRF Token:', token);
+            
             const response = await fetch('/Barber/AddService', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'RequestVerificationToken': getAntiForgeryToken()
+                    'RequestVerificationToken': token
                 },
                 body: JSON.stringify(formData)
             });
             
+            console.log('Response status:', response.status);
             const result = await response.json();
+            console.log('Response result:', result);
             
             if (result.success) {
                 showNotification(result.message, 'success');
                 // Close modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById('addServiceModal'));
-                modal.hide();
+                if (modal) modal.hide();
                 // Reset form
                 form.reset();
                 // Reload page to show new service
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
-            } else {\n                showNotification(result.message || 'خطا در اضافه کردن خدمت', 'error');
+            } else {
+                showNotification(result.message || 'خطا در اضافه کردن خدمت', 'error');
             }
         } catch (error) {
             console.error('Error adding service:', error);
@@ -209,8 +216,9 @@ async function deleteService(serviceId) {
 
 // Utility Functions
 function getAntiForgeryToken() {
-    const token = document.querySelector('input[name=\"__RequestVerificationToken\"]');
-    return token ? token.value : '';
+    const token = document.querySelector('input[name="__RequestVerificationToken"]') || 
+                  document.querySelector('meta[name="__RequestVerificationToken"]');
+    return token ? (token.value || token.content) : '';
 }
 
 function showNotification(message, type = 'info') {

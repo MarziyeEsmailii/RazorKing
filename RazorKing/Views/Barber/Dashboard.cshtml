@@ -114,7 +114,7 @@
                                 {
                                     <div class="timeline-item" data-appointment-id="@appointment.Id">
                                         <div class="timeline-time">
-                                            @appointment.AppointmentTime.ToString(@"HH\:mm")
+                                            @appointment.AppointmentTime.ToString(@"hh\:mm")
                                         </div>
                                         <div class="timeline-content">
                                             <div class="appointment-info">
@@ -196,7 +196,7 @@
                         </div>
                         <div class="info-item">
                             <i class="fas fa-clock"></i>
-                            <span>@Model.Barbershop.OpenTime.ToString(@"HH\:mm") - @Model.Barbershop.CloseTime.ToString(@"HH\:mm")</span>
+                            <span>@Model.Barbershop.OpenTime.ToString(@"hh\:mm") - @Model.Barbershop.CloseTime.ToString(@"hh\:mm")</span>
                         </div>
                         <div class="info-item">
                             <i class="fas fa-calendar"></i>
@@ -222,7 +222,7 @@
                                     <div class="upcoming-item">
                                         <div class="upcoming-date">
                                             @appointment.AppointmentDate.ToString("dd/MM")
-                                            <small>@appointment.AppointmentTime.ToString(@"HH\:mm")</small>
+                                            <small>@appointment.AppointmentTime.ToString(@"hh\:mm")</small>
                                         </div>
                                         <div class="upcoming-info">
                                             <h6>@appointment.CustomerName</h6>

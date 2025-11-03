@@ -13,7 +13,7 @@
 /* City Header */
 .city-header {
     position: relative;
-    padding: 100px 0;
+    padding: 60px 0 40px 0;
     overflow: hidden;
 }
 
@@ -88,7 +88,7 @@
     display: flex;
     justify-content: center;
     gap: 40px;
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 .stat-item {
@@ -110,14 +110,15 @@
 
 /* Filters Section */
 .filters-section {
-    padding: 20px 0;
+    padding: 15px 0;
     background: rgba(26, 26, 26, 0.5);
+    margin-top: -10px;
 }
 
 .filters-card {
     background: rgba(42, 42, 42, 0.9);
     border-radius: 20px;
-    padding: 30px;
+    padding: 20px;
     border: 2px solid rgba(212, 175, 55, 0.2);
     backdrop-filter: blur(15px);
 }
@@ -173,7 +174,7 @@
 
 /* Barbershops Section */
 .barbershops-section {
-    padding: 20px 0;
+    padding: 15px 0;
 }
 
 .barbershops-grid {

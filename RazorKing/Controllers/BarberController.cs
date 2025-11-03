@@ -487,7 +487,7 @@ namespace RazorKing.Controllers
                     customerPhone = a.CustomerPhone,
                     serviceName = a.Service.Name,
                     servicePrice = a.Service.Price,
-                    appointmentTime = a.AppointmentTime.ToString(@"HH\:mm"),
+                    appointmentTime = a.AppointmentTime.ToString(@"hh\:mm"),
                     status = a.Status.ToString()
                 })
                 .ToListAsync();
@@ -598,7 +598,7 @@ namespace RazorKing.Controllers
                 {
                     id = a.Id,
                     date = a.AppointmentDate.ToString("yyyy-MM-dd"),
-                    time = a.AppointmentTime.ToString(@"HH\:mm"),
+                    time = a.AppointmentTime.ToString(@"hh\:mm"),
                     customerName = a.CustomerName,
                     customerPhone = a.CustomerPhone,
                     serviceName = a.Service.Name,
@@ -653,7 +653,7 @@ namespace RazorKing.Controllers
             {
                 if (!existingAppointments.Contains(currentTime) && !blockedSlots.Contains(currentTime))
                 {
-                    availableSlots.Add(currentTime.ToString(@"HH\:mm"));
+                    availableSlots.Add(currentTime.ToString(@"hh\:mm"));
                 }
                 currentTime = currentTime.Add(TimeSpan.FromMinutes(15));
             }
@@ -745,8 +745,8 @@ namespace RazorKing.Controllers
                 .Select(ts => new
                 {
                     id = ts.Id,
-                    startTime = ts.StartTime.ToString(@"HH\:mm"),
-                    endTime = ts.EndTime.ToString(@"HH\:mm"),
+                    startTime = ts.StartTime.ToString(@"hh\:mm"),
+                    endTime = ts.EndTime.ToString(@"hh\:mm"),
                     isAvailable = ts.IsAvailable,
                     isBlocked = ts.IsBlocked,
                     slotType = ts.SlotType.ToString(),
@@ -761,7 +761,7 @@ namespace RazorKing.Controllers
                 .Select(a => new
                 {
                     id = a.Id,
-                    time = a.AppointmentTime.ToString(@"HH\:mm"),
+                    time = a.AppointmentTime.ToString(@"hh\:mm"),
                     customerName = a.CustomerName,
                     serviceName = a.Service.Name,
                     status = a.Status.ToString()

@@ -252,7 +252,7 @@
             appointments: @Html.Raw(Json.Serialize(Model.Appointments.Select(a => new {
                 id = a.Id,
                 date = a.AppointmentDate.ToString("yyyy-MM-dd"),
-                time = a.AppointmentTime.ToString(@"HH\:mm"),
+                time = a.AppointmentTime.ToString(@"hh\:mm"),
                 customerName = a.CustomerName,
                 customerPhone = a.CustomerPhone,
                 serviceName = a.Service?.Name,

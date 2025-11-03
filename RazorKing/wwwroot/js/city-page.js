@@ -3,6 +3,22 @@
  * ریزر کینگ - اسکریپت صفحه شهر
  */
 
+// Helper function to get barbershop image based on ID
+function getBarbershopImage(barbershopId) {
+    const barbershopImages = [
+        'unrecognizable-barber-cutting-hair-man',
+        'young-man-barbershop-trimming-hair',
+        'handsome-man-cutting-beard-barber-salon',
+        'great-time-barbershop-cheerful-young-bearded-man-getting-haircut-by-hairdresser-while-sitting-chair-barbershop',
+        'client-doing-hair-cut-barber-shop-salon (1)',
+        'client-doing-hair-cut-barber-shop-salon',
+        'handsome-man-barber-shop-styling-hair'
+    ];
+    
+    const imageIndex = Math.abs(barbershopId) % barbershopImages.length;
+    return `/img/${barbershopImages[imageIndex]}.jpg`;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeCityPage();
 });
@@ -280,9 +296,10 @@ function displayBarbershopDetails(barbershop) {
     content.innerHTML = `
         <div class="barbershop-details">
             <div class="barbershop-header">
-                <img src="${barbershop.imageUrl || '/img/default-barbershop.jpg'}" 
+                <img src="${barbershop.imageUrl || getBarbershopImage(barbershop.id)}" 
                      alt="${barbershop.name}" 
-                     class="barbershop-image-large">
+                     class="barbershop-image-large"
+                     onerror="this.src='/img/background.webp'">
                 <h4 class="barbershop-name-large">${barbershop.name}</h4>
                 ${barbershop.description ? `<p class="barbershop-description">${barbershop.description}</p>` : ''}
             </div>

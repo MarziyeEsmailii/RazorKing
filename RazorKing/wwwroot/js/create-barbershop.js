@@ -31,6 +31,9 @@ function initializeForm() {
     
     // Initialize image upload
     initializeImageUpload();
+    
+    // Initialize city select styling
+    initializeCitySelect();
 }
 
 // Setup event listeners
@@ -523,11 +526,148 @@ $('form').on('submit', function() {
     }
 });
 
+// Initialize city select with better styling
+function initializeCitySelect() {
+    const $citySelect = $('#CityId');
+    
+    // Try to create custom select if native styling fails
+    if (shouldUseCustomSelect()) {
+        createCustomSelect($citySelect);
+    } else {
+        // Fallback to enhanced native select
+        enhanceNativeSelect($citySelect);
+    }
+}
+
+// Check if we should use custom select (for better browser compatibility)
+function shouldUseCustomSelect() {
+    // Use custom select for better control
+    return true;
+}
+
+// Enhance native select
+function enhanceNativeSelect($select) {
+    // Add custom styling on focus
+    $select.on('focus', function() {
+        $(this).addClass('select-focused');
+    });
+    
+    $select.on('blur', function() {
+        $(this).removeClass('select-focused');
+    });
+    
+    // Handle option selection
+    $select.on('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption && selectedOption.value) {
+            $(this).addClass('has-value');
+        } else {
+            $(this).removeClass('has-value');
+        }
+        
+        // Trigger validation
+        validateField($(this));
+    });
+    
+    // Check initial value
+    if ($select.val()) {
+        $select.addClass('has-value');
+    }
+    
+    // Force option styling on interaction
+    $select.on('mousedown touchstart', function() {
+        setTimeout(() => {
+            const options = this.querySelectorAll('option');
+            options.forEach(option => {
+                if (!option.style.backgroundColor) {
+                    option.style.backgroundColor = '#2d2d2d';
+                    option.style.color = '#fff';
+                }
+            });
+        }, 10);
+    });
+}
+
+// Create custom select dropdown
+function createCustomSelect($originalSelect) {
+    const $wrapper = $originalSelect.closest('.city-select-wrapper');
+    const options = Array.from($originalSelect[0].options);
+    
+    // Create custom elements
+    const $customWrapper = $('<div class="custom-select-wrapper"></div>');
+    const $display = $('<div class="custom-select-display">انتخاب شهر</div>');
+    const $optionsContainer = $('<div class="custom-select-options"></div>');
+    
+    // Add options to custom dropdown
+    options.forEach(option => {
+        const $customOption = $('<div class="custom-select-option"></div>');
+        $customOption.text(option.text);
+        $customOption.data('value', option.value);
+        
+        if (!option.value) {
+            $customOption.addClass('placeholder');
+        }
+        
+        if (option.selected) {
+            $customOption.addClass('selected');
+            $display.text(option.text);
+        }
+        
+        $customOption.on('click', function() {
+            const value = $(this).data('value');
+            const text = $(this).text();
+            
+            // Update original select
+            $originalSelect.val(value).trigger('change');
+            
+            // Update display
+            $display.text(text);
+            
+            // Update selected state
+            $optionsContainer.find('.custom-select-option').removeClass('selected');
+            $(this).addClass('selected');
+            
+            // Close dropdown
+            $display.removeClass('open');
+            $optionsContainer.removeClass('show');
+        });
+        
+        $optionsContainer.append($customOption);
+    });
+    
+    // Handle display click
+    $display.on('click', function() {
+        $(this).toggleClass('open');
+        $optionsContainer.toggleClass('show');
+        
+        // Close other dropdowns
+        $('.custom-select-display').not(this).removeClass('open');
+        $('.custom-select-options').not($optionsContainer).removeClass('show');
+    });
+    
+    // Close dropdown when clicking outside
+    $(document).on('click', function(e) {
+        if (!$customWrapper.is(e.target) && $customWrapper.has(e.target).length === 0) {
+            $display.removeClass('open');
+            $optionsContainer.removeClass('show');
+        }
+    });
+    
+    // Build custom select
+    $customWrapper.append($display);
+    $customWrapper.append($optionsContainer);
+    
+    // Hide original select and add custom
+    $originalSelect.addClass('custom-select');
+    $wrapper.append($customWrapper);
+}
+
 // Export functions for potential external use
 window.CreateBarbershopForm = {
     validateForm,
     showLoadingState,
     clearSavedForm,
     autoSaveForm,
-    loadSavedForm
+    loadSavedForm,
+    initializeCitySelect
 };

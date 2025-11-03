@@ -65,19 +65,32 @@ function initializeAnimations() {
 
 // Edit Profile Modal
 function editProfile() {
+    console.log('Opening edit profile modal...');
+    
+    // Remove any existing modals
+    const existingModal = document.querySelector('.profile-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
     const modal = createEditProfileModal();
     document.body.appendChild(modal);
+    
+    console.log('Modal added to DOM:', modal);
     
     // Show modal with animation
     setTimeout(() => {
         modal.classList.add('show');
-    }, 10);
+        console.log('Modal show class added');
+    }, 50);
     
-    // Focus on first input
-    const firstInput = modal.querySelector('input');
-    if (firstInput) {
-        firstInput.focus();
-    }
+    // Focus on first input after animation
+    setTimeout(() => {
+        const firstInput = modal.querySelector('input');
+        if (firstInput) {
+            firstInput.focus();
+        }
+    }, 100);
 }
 
 function createEditProfileModal() {
@@ -95,16 +108,28 @@ function createEditProfileModal() {
             <div class="modal-body">
                 <form id="editProfileForm">
                     <div class="form-group">
-                        <label for="firstName">نام</label>
-                        <input type="text" id="firstName" name="firstName" class="form-control" required>
+                        <label for="firstName">
+                            <i class="fas fa-user"></i>
+                            نام
+                        </label>
+                        <input type="text" id="firstName" name="firstName" class="form-control" 
+                               placeholder="نام خود را وارد کنید" required>
                     </div>
                     <div class="form-group">
-                        <label for="lastName">نام خانوادگی</label>
-                        <input type="text" id="lastName" name="lastName" class="form-control" required>
+                        <label for="lastName">
+                            <i class="fas fa-user"></i>
+                            نام خانوادگی
+                        </label>
+                        <input type="text" id="lastName" name="lastName" class="form-control" 
+                               placeholder="نام خانوادگی خود را وارد کنید" required>
                     </div>
                     <div class="form-group">
-                        <label for="phoneNumber">شماره موبایل</label>
-                        <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control">
+                        <label for="phoneNumber">
+                            <i class="fas fa-phone"></i>
+                            شماره موبایل
+                        </label>
+                        <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control"
+                               placeholder="09xxxxxxxxx">
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn btn-outline-gold" onclick="closeEditProfileModal()">
@@ -132,31 +157,24 @@ function createEditProfileModal() {
 
 function populateEditForm(modal) {
     // Get current values from the page
-    const nameElement = document.querySelector('.profile-name');
-    const emailElement = document.querySelector('.profile-email');
-    const phoneElement = document.querySelector('.detail-item span');
+    const firstNameElement = document.querySelector('#display-firstName');
+    const lastNameElement = document.querySelector('#display-lastName');
+    const phoneElement = document.querySelector('#display-phoneNumber');
     
-    if (nameElement) {
-        const fullName = nameElement.textContent.trim().split(' ');
-        const firstName = fullName[0] || '';
-        const lastName = fullName.slice(1).join(' ') || '';
-        
-        modal.querySelector('#firstName').value = firstName;
-        modal.querySelector('#lastName').value = lastName;
+    if (firstNameElement) {
+        modal.querySelector('#firstName').value = firstNameElement.textContent.trim();
     }
     
-    // Get phone from detail items
-    const detailItems = document.querySelectorAll('.detail-item');
-    detailItems.forEach(item => {
-        const label = item.querySelector('label');
-        const span = item.querySelector('span');
-        if (label && label.textContent.includes('موبایل') && span) {
-            const phone = span.textContent.trim();
-            if (phone !== 'وارد نشده') {
-                modal.querySelector('#phoneNumber').value = phone;
-            }
+    if (lastNameElement) {
+        modal.querySelector('#lastName').value = lastNameElement.textContent.trim();
+    }
+    
+    if (phoneElement) {
+        const phone = phoneElement.textContent.trim();
+        if (phone !== 'وارد نشده') {
+            modal.querySelector('#phoneNumber').value = phone;
         }
-    });
+    }
 }
 
 function closeEditProfileModal() {
@@ -180,37 +198,61 @@ function handleEditProfileSubmit(e) {
         phoneNumber: formData.get('phoneNumber')
     };
     
+    console.log('Submitting profile data:', data);
+    
+    // Validation
+    if (!data.firstName || !data.lastName) {
+        showNotification('نام و نام خانوادگی الزامی است', 'error');
+        return;
+    }
+    
     // Show loading state
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ذخیره...';
     submitBtn.disabled = true;
     
+    // Get CSRF token
+    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || 
+                  document.querySelector('meta[name="__RequestVerificationToken"]')?.content || '';
+    
+    console.log('CSRF Token:', token);
+    
     // Send update request
     fetch('/Profile/UpdateProfile', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            'RequestVerificationToken': token
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(result => {
+        console.log('Response result:', result);
         if (result.success) {
             showNotification('پروفایل با موفقیت بروزرسانی شد', 'success');
+            
+            // Update display values
+            document.querySelector('#display-firstName').textContent = data.firstName;
+            document.querySelector('#display-lastName').textContent = data.lastName;
+            document.querySelector('#display-fullName').textContent = `${data.firstName} ${data.lastName}`;
+            document.querySelector('#display-phoneNumber').textContent = data.phoneNumber || 'وارد نشده';
+            
             closeEditProfileModal();
-            // Refresh page to show updated data
-            setTimeout(() => {
-                location.reload();
-            }, 1000);
         } else {
             showNotification(result.message || 'خطا در بروزرسانی پروفایل', 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        showNotification('خطا در ارتباط با سرور', 'error');
+        showNotification('خطا در ارتباط با سرور: ' + error.message, 'error');
     })
     .finally(() => {
         submitBtn.innerHTML = originalText;
@@ -219,13 +261,13 @@ function handleEditProfileSubmit(e) {
 }
 
 // Cancel Appointment
-function cancelAppointment(appointmentId) {
+function cancelAppointment(appointmentId, buttonElement) {
     if (!confirm('آیا از لغو این نوبت اطمینان دارید؟')) {
         return;
     }
     
     // Show loading state
-    const button = event.target.closest('button');
+    const button = buttonElement || document.querySelector(`button[onclick*="${appointmentId}"]`);
     const originalText = button.innerHTML;
     button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     button.disabled = true;
@@ -322,8 +364,8 @@ function closeAppointmentDetailsModal() {
 }
 
 // Load More Appointments
-function loadMoreAppointments() {
-    const button = event.target;
+function loadMoreAppointments(buttonElement) {
+    const button = buttonElement || document.querySelector('button[onclick*="loadMoreAppointments"]');
     const originalText = button.innerHTML;
     button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال بارگذاری...';
     button.disabled = true;
@@ -378,25 +420,25 @@ function getNotificationIcon(type) {
 
 // Add CSS for modals and notifications
 const additionalStyles = `
-<style>
 .profile-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 10000 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .profile-modal.show {
-    opacity: 1;
-    visibility: visible;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .modal-backdrop {
@@ -410,91 +452,156 @@ const additionalStyles = `
 }
 
 .modal-content {
-    background: #2d2d2d;
-    border-radius: 20px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    z-index: 1001;
-    border: 1px solid rgba(212, 175, 55, 0.2);
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%) !important;
+    border-radius: 20px !important;
+    max-width: 500px !important;
+    width: 90% !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    position: relative !important;
+    z-index: 10001 !important;
+    border: 2px solid rgba(212, 175, 55, 0.3) !important;
     transform: scale(0.9);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
 }
 
 .profile-modal.show .modal-content {
-    transform: scale(1);
+    transform: scale(1) !important;
 }
 
 .modal-header {
-    padding: 25px 30px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    padding: 25px 30px 20px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%) !important;
+    border-radius: 20px 20px 0 0 !important;
 }
 
 .modal-header h3 {
-    color: #d4af37;
-    margin: 0;
-    font-size: 1.5rem;
+    color: #d4af37 !important;
+    margin: 0 !important;
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
 }
 
 .modal-close {
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
+    background: none !important;
+    border: none !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 1.2rem !important;
+    cursor: pointer !important;
+    padding: 8px !important;
+    border-radius: 50% !important;
+    transition: all 0.3s ease !important;
+    width: 36px !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .modal-close:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.1);
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.1) !important;
 }
 
 .modal-body {
-    padding: 30px;
+    padding: 30px !important;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 20px !important;
 }
 
 .form-group label {
-    display: block;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 8px;
-    font-weight: 500;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    color: #d4af37 !important;
+    margin-bottom: 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+}
+
+.form-group label i {
+    width: 16px !important;
+    text-align: center !important;
+    color: #d4af37 !important;
 }
 
 .form-control {
-    width: 100%;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    color: #fff;
-    font-size: 1rem;
-    transition: all 0.3s ease;
+    width: 100% !important;
+    padding: 12px 16px !important;
+    background: rgba(42, 42, 42, 0.8) !important;
+    border: 2px solid rgba(212, 175, 55, 0.2) !important;
+    border-radius: 10px !important;
+    color: #fff !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+    box-sizing: border-box !important;
 }
 
 .form-control:focus {
-    outline: none;
-    border-color: #d4af37;
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    outline: none !important;
+    border-color: #d4af37 !important;
+    background: rgba(42, 42, 42, 1) !important;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2) !important;
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
 }
 
 .form-actions {
-    display: flex;
-    gap: 15px;
-    justify-content: flex-end;
-    margin-top: 30px;
+    display: flex !important;
+    gap: 15px !important;
+    justify-content: flex-end !important;
+    margin-top: 30px !important;
+    padding-top: 20px !important;
+    border-top: 1px solid rgba(212, 175, 55, 0.2) !important;
+}
+
+.btn {
+    padding: 12px 24px !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+    cursor: pointer !important;
+    font-size: 0.9rem !important;
+    min-width: 120px !important;
+    justify-content: center !important;
+}
+
+.btn-gold {
+    background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%) !important;
+    color: #1a1a1a !important;
+    border: 2px solid #d4af37 !important;
+}
+
+.btn-gold:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4) !important;
+    color: #1a1a1a !important;
+}
+
+.btn-outline-gold {
+    background: transparent !important;
+    color: #d4af37 !important;
+    border: 2px solid #d4af37 !important;
+}
+
+.btn-outline-gold:hover {
+    background: #d4af37 !important;
+    color: #1a1a1a !important;
+    transform: translateY(-2px) !important;
 }
 
 .notification {
@@ -589,4 +696,36 @@ const additionalStyles = `
 `;
 
 // Add styles to head
-document.head.insertAdjacentHTML('beforeend', additionalStyles);
+const styleElement = document.createElement('style');
+styleElement.textContent = additionalStyles;
+document.head.appendChild(styleElement);
+
+// Add temporary test button for modal debugging
+if (window.location.hostname === 'localhost') {
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            const testBtn = document.createElement('button');
+            testBtn.textContent = 'تست مودال ویرایش';
+            testBtn.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                z-index: 9999;
+                padding: 10px 15px;
+                background: #d4af37;
+                color: #1a1a1a;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+            `;
+            testBtn.onclick = function() {
+                console.log('Test button clicked');
+                editProfile();
+            };
+            document.body.appendChild(testBtn);
+        }, 1000);
+    });
+}

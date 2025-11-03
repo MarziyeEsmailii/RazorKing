@@ -3,6 +3,22 @@
  * ریزر کینگ - صفحه اصلی
  */
 
+// Helper function to get barbershop image based on ID
+function getBarbershopImage(barbershopId) {
+    const barbershopImages = [
+        'unrecognizable-barber-cutting-hair-man',
+        'young-man-barbershop-trimming-hair',
+        'handsome-man-cutting-beard-barber-salon',
+        'great-time-barbershop-cheerful-young-bearded-man-getting-haircut-by-hairdresser-while-sitting-chair-barbershop',
+        'client-doing-hair-cut-barber-shop-salon (1)',
+        'client-doing-hair-cut-barber-shop-salon',
+        'handsome-man-barber-shop-styling-hair'
+    ];
+    
+    const imageIndex = Math.abs(barbershopId) % barbershopImages.length;
+    return `/img/${barbershopImages[imageIndex]}.jpg`;
+}
+
 // Counter Animation
 function animateCounter(element, target, duration = 2000) {
     const start = 0;
@@ -91,7 +107,7 @@ class CitiesSlider {
         // Count only rows that have visible cities
         this.totalRows = 0;
         rows.forEach(row => {
-            const visibleCities = row.querySelectorAll('.city-slide-item:not([style*="visibility: hidden"])');
+            const visibleCities = row.querySelectorAll('.city-slide-item:not(.city-empty-slot)');
             if (visibleCities.length > 0) {
                 this.totalRows++;
             }
@@ -109,6 +125,14 @@ class CitiesSlider {
             if (this.nextBtn) this.nextBtn.style.display = 'block';
             if (this.dotsContainer) this.dotsContainer.style.display = 'flex';
         }
+        
+        // Ensure all city cards are properly displayed
+        const allCityCards = document.querySelectorAll('.city-card:not(.city-empty-slot .city-card)');
+        allCityCards.forEach(card => {
+            card.style.display = 'flex';
+            card.style.visibility = 'visible';
+            card.style.opacity = '1';
+        });
     }
     
     bindEvents() {
@@ -310,33 +334,31 @@ function displayBarbershops(barbershops) {
 function initializeCityCards() {
     console.log('Initializing city cards...');
     
-    // Add entrance animations to city cards
+    // Ensure all city cards are visible first
     const cityCards = document.querySelectorAll('.city-card');
     console.log('Found', cityCards.length, 'city cards');
     
     cityCards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
+        // Make sure cards are visible
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+        card.style.display = 'flex';
+        card.style.visibility = 'visible';
         
-        setTimeout(() => {
-            card.style.transition = 'all 0.6s ease';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, index * 100);
+        // Add staggered entrance animation
+        card.style.animation = `fadeInUp 0.6s ease forwards ${index * 0.1}s`;
     });
     
-    // Initialize slider after a short delay
-    setTimeout(() => {
-        console.log('Creating CitiesSlider instance...');
-        window.citiesSlider = new CitiesSlider();
-        
-        // Debug: Check if slider was created successfully
-        if (window.citiesSlider) {
-            console.log('CitiesSlider created successfully');
-        } else {
-            console.error('Failed to create CitiesSlider');
-        }
-    }, 1000);
+    // Initialize slider immediately
+    console.log('Creating CitiesSlider instance...');
+    window.citiesSlider = new CitiesSlider();
+    
+    // Debug: Check if slider was created successfully
+    if (window.citiesSlider) {
+        console.log('CitiesSlider created successfully');
+    } else {
+        console.error('Failed to create CitiesSlider');
+    }
 }
 
 // Initialize all functionality

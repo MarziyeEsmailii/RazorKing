@@ -29,27 +29,27 @@
                     </div>
                 </div>
                 <div class="profile-info">
-                    <h1 class="profile-name">@Model.User.FirstName @Model.User.LastName</h1>
+                    <h1 class="profile-name" id="display-fullName">@Model.User.FirstName @Model.User.LastName</h1>
                     <p class="profile-email">@Model.User.Email</p>
-                    <div class="profile-stats">
-                        <div class="stat-item">
-                            <span class="stat-number">@Model.TotalAppointments</span>
-                            <span class="stat-label">نوبت</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">@Model.TotalSpent.ToString("N0")</span>
-                            <span class="stat-label">تومان خرج</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">@Model.UpcomingAppointments.Count</span>
-                            <span class="stat-label">نوبت آینده</span>
-                        </div>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">@Model.TotalAppointments</span>
+                        <span class="stat-label">نوبت</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">@Model.TotalSpent.ToString("N0")</span>
+                        <span class="stat-label">تومان</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">@Model.UpcomingAppointments.Count</span>
+                        <span class="stat-label">آینده</span>
                     </div>
                 </div>
                 <div class="profile-actions">
-                    <button class="btn btn-gold" onclick="editProfile()">
+                    <button class="btn btn-gold btn-sm" onclick="editProfile()">
                         <i class="fas fa-edit"></i>
-                        ویرایش پروفایل
+                        ویرایش
                     </button>
                 </div>
             </div>
@@ -70,11 +70,11 @@
                         <div class="profile-details">
                             <div class="detail-item">
                                 <label>نام:</label>
-                                <span>@Model.User.FirstName</span>
+                                <span id="display-firstName">@Model.User.FirstName</span>
                             </div>
                             <div class="detail-item">
                                 <label>نام خانوادگی:</label>
-                                <span>@Model.User.LastName</span>
+                                <span id="display-lastName">@Model.User.LastName</span>
                             </div>
                             <div class="detail-item">
                                 <label>ایمیل:</label>
@@ -82,7 +82,7 @@
                             </div>
                             <div class="detail-item">
                                 <label>شماره موبایل:</label>
-                                <span>@(Model.User.PhoneNumber ?? "وارد نشده")</span>
+                                <span id="display-phoneNumber">@(Model.User.PhoneNumber ?? "وارد نشده")</span>
                             </div>
                             <div class="detail-item">
                                 <label>تاریخ عضویت:</label>
@@ -99,17 +99,16 @@
                 <!-- Appointments -->
                 <div class="col-lg-8">
                     <!-- Upcoming Appointments -->
-                    <div class="appointments-card">
-                        <h3 class="card-title">
-                            <i class="fas fa-calendar-alt"></i>
-                            نوبت‌های آینده
-                            <span class="badge badge-gold">@Model.UpcomingAppointments.Count</span>
-                        </h3>
-                        
-                        @if (Model.UpcomingAppointments.Any())
-                        {
+                    @if (Model.UpcomingAppointments.Any())
+                    {
+                        <div class="appointments-card">
+                            <h3 class="card-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                نوبت‌های آینده (@Model.UpcomingAppointments.Count)
+                            </h3>
+                            
                             <div class="appointments-list">
-                                @foreach (var appointment in Model.UpcomingAppointments)
+                                @foreach (var appointment in Model.UpcomingAppointments.Take(3))
                                 {
                                     <div class="appointment-item upcoming">
                                         <div class="appointment-date">
@@ -123,62 +122,40 @@
                                                 <i class="fas fa-clock"></i>
                                                 @appointment.AppointmentTime.ToString(@"hh\:mm")
                                             </p>
-                                            <p class="appointment-location">
-                                                <i class="fas fa-map-marker-alt"></i>
-                                                @appointment.Barbershop.City?.Name
-                                            </p>
                                         </div>
                                         <div class="appointment-status">
                                             <span class="status-badge status-@appointment.Status.ToString().ToLower()">
                                                 @GetStatusText(appointment.Status)
                                             </span>
                                             <div class="appointment-price">
-                                                @appointment.TotalPrice.ToString("N0") تومان
+                                                 @appointment.TotalPrice.ToString("N0") تومان
                                             </div>
                                         </div>
                                         <div class="appointment-actions">
                                             @if (appointment.AppointmentDate.Add(appointment.AppointmentTime) > DateTime.Now.AddHours(2))
                                             {
-                                                <button class="btn btn-sm btn-outline-danger" onclick="cancelAppointment(@appointment.Id)">
+                                                <button class="btn btn-sm btn-outline-danger" onclick="cancelAppointment(@appointment.Id, this)">
                                                     <i class="fas fa-times"></i>
-                                                    لغو
                                                 </button>
                                             }
-                                            <button class="btn btn-sm btn-outline-gold" onclick="showAppointmentDetails(@appointment.Id)">
-                                                <i class="fas fa-eye"></i>
-                                                جزئیات
-                                            </button>
                                         </div>
                                     </div>
                                 }
                             </div>
-                        }
-                        else
-                        {
-                            <div class="empty-state">
-                                <i class="fas fa-calendar-times"></i>
-                                <h5>نوبت آینده‌ای ندارید</h5>
-                                <p>برای رزرو نوبت جدید کلیک کنید</p>
-                                <a href="@Url.Action("Index", "Booking")" class="btn btn-gold">
-                                    <i class="fas fa-calendar-plus"></i>
-                                    رزرو نوبت جدید
-                                </a>
-                            </div>
-                        }
-                    </div>
+                        </div>
+                    }
 
                     <!-- Past Appointments -->
-                    <div class="appointments-card mt-4">
-                        <h3 class="card-title">
-                            <i class="fas fa-history"></i>
-                            تاریخچه نوبت‌ها
-                            <span class="badge badge-secondary">@Model.PastAppointments.Count</span>
-                        </h3>
-                        
-                        @if (Model.PastAppointments.Any())
-                        {
+                    @if (Model.PastAppointments.Any())
+                    {
+                        <div class="appointments-card">
+                            <h3 class="card-title">
+                                <i class="fas fa-history"></i>
+                                تاریخچه (@Model.PastAppointments.Count)
+                            </h3>
+                            
                             <div class="appointments-list">
-                                @foreach (var appointment in Model.PastAppointments.Take(5))
+                                @foreach (var appointment in Model.PastAppointments.Take(3))
                                 {
                                     <div class="appointment-item past">
                                         <div class="appointment-date">
@@ -204,26 +181,23 @@
                                     </div>
                                 }
                             </div>
-                            
-                            @if (Model.PastAppointments.Count > 5)
-                            {
-                                <div class="text-center mt-3">
-                                    <button class="btn btn-outline-gold" onclick="loadMoreAppointments()">
-                                        <i class="fas fa-plus"></i>
-                                        نمایش بیشتر (@(Model.PastAppointments.Count - 5) نوبت)
-                                    </button>
-                                </div>
-                            }
-                        }
-                        else
-                        {
+                        </div>
+                    }
+                    
+                    @if (!Model.UpcomingAppointments.Any() && !Model.PastAppointments.Any())
+                    {
+                        <div class="appointments-card">
                             <div class="empty-state">
                                 <i class="fas fa-calendar-times"></i>
-                                <h5>تاریخچه‌ای ندارید</h5>
-                                <p>هنوز نوبتی رزرو نکرده‌اید</p>
+                                <h5>هنوز نوبتی ندارید</h5>
+                                <p>برای رزرو اولین نوبت خود کلیک کنید</p>
+                                <a href="@Url.Action("Index", "Home")" class="btn btn-gold">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    رزرو نوبت
+                                </a>
                             </div>
-                        }
-                    </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -232,8 +206,10 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/profile.css">
+    <link rel="stylesheet" href="~/css/profile-modal.css">
 }
 
 @section Scripts {
+    @Html.AntiForgeryToken()
     <script src="~/js/profile.js"></script>
 }

@@ -99,7 +99,7 @@
     <!-- Barbershops Grid -->
     <section class="barbershops-section">
         <div class="container">
-            <div class="results-header mb-2">
+            <div class="results-header mb-1">
                 <div class="row align-items-center">
                     <div class="col-md-6">
                         <h3 class="results-title">
@@ -126,7 +126,7 @@
                             }
                             else
                             {
-                                <img src="~/img/default-barbershop.jpg" alt="@barbershop.Name" />
+                                <img src="@ImageHelper.GetBarbershopImage(barbershop.Id)" alt="@barbershop.Name" onerror="this.src='~/img/background.webp'" />
                             }
                             <div class="barbershop-overlay">
                                 <button class="btn btn-gold me-2" onclick="showBarbershopDetails(@barbershop.Id)">

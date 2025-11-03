@@ -170,6 +170,270 @@ namespace RazorKing.Controllers
             return Json(services);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableDates(int barbershopId, int serviceId)
+        {
+            Console.WriteLine($"📅 درخواست روزهای خالی برای آرایشگاه {barbershopId} و خدمت {serviceId}");
+            
+            try
+            {
+                var barbershop = await _context.Barbershops
+                    .FirstOrDefaultAsync(b => b.Id == barbershopId);
+                
+                if (barbershop == null)
+                {
+                    Console.WriteLine($"❌ آرایشگاه با ID {barbershopId} یافت نشد");
+                    return Json(new { success = false, message = "آرایشگاه یافت نشد" });
+                }
+
+                var service = await _context.Services
+                    .FirstOrDefaultAsync(s => s.Id == serviceId);
+                
+                if (service == null)
+                {
+                    Console.WriteLine($"❌ خدمت با ID {serviceId} یافت نشد");
+                    return Json(new { success = false, message = "خدمت یافت نشد" });
+                }
+
+                Console.WriteLine($"🏪 آرایشگاه: {barbershop.Name}");
+                Console.WriteLine($"🛠️ خدمت: {service.Name} - مدت: {service.Duration} دقیقه");
+                Console.WriteLine($"⏰ ساعات کاری: {barbershop.OpenTime} تا {barbershop.CloseTime}");
+                Console.WriteLine($"📅 روزهای کاری: {barbershop.WorkingDays}");
+
+                var availableDates = new List<object>();
+                var startDate = DateTime.Today;
+                var endDate = startDate.AddDays(30); // نمایش 30 روز آینده
+
+                // تعریف روزهای کاری پیش‌فرض (شنبه تا پنج‌شنبه)
+                var defaultWorkingDays = new List<int> { 6, 0, 1, 2, 3, 4 }; // Saturday to Thursday
+
+                for (var date = startDate; date <= endDate; date = date.AddDays(1))
+                {
+                    // بررسی روزهای کاری آرایشگاه
+                    var dayOfWeek = (int)date.DayOfWeek;
+                    
+                    // استفاده از روزهای کاری پیش‌فرض اگر تنظیم نشده باشد
+                    var isWorkingDay = defaultWorkingDays.Contains(dayOfWeek);
+                    
+                    // اگر روزهای کاری تنظیم شده، از آن استفاده کن
+                    if (!string.IsNullOrEmpty(barbershop.WorkingDays))
+                    {
+                        var persianDayName = GetPersianDayName(date.DayOfWeek);
+                        isWorkingDay = barbershop.WorkingDays.Contains(persianDayName);
+                    }
+                    
+                    if (!isWorkingDay)
+                        continue;
+
+                    // بررسی تعداد نوبت‌های رزرو شده در این روز
+                    var bookedAppointments = await _context.Appointments
+                        .Where(a => a.BarbershopId == barbershopId && 
+                                   a.AppointmentDate.Date == date.Date &&
+                                   a.Status != AppointmentStatus.Cancelled)
+                        .CountAsync();
+
+                    // محاسبه ظرفیت روزانه (بر اساس ساعات کاری و مدت زمان خدمت)
+                    var openTime = barbershop.OpenTime != TimeSpan.Zero ? barbershop.OpenTime : new TimeSpan(8, 0, 0);
+                    var closeTime = barbershop.CloseTime != TimeSpan.Zero ? barbershop.CloseTime : new TimeSpan(20, 0, 0);
+                    var serviceDuration = service.Duration > 0 ? service.Duration : 30;
+                    
+                    var totalMinutes = (int)(closeTime - openTime).TotalMinutes;
+                    var maxAppointments = Math.Max(1, totalMinutes / serviceDuration);
+
+                    Console.WriteLine($"📊 {date:yyyy-MM-dd}: {bookedAppointments}/{maxAppointments} نوبت رزرو شده");
+
+                    if (bookedAppointments < maxAppointments)
+                    {
+                        availableDates.Add(new
+                        {
+                            date = date.ToString("yyyy-MM-dd"),
+                            displayDate = date.ToString("yyyy/MM/dd"),
+                            dayName = GetPersianDayName(date.DayOfWeek),
+                            availableSlots = maxAppointments - bookedAppointments,
+                            isToday = date.Date == DateTime.Today,
+                            isTomorrow = date.Date == DateTime.Today.AddDays(1)
+                        });
+                    }
+                }
+
+                Console.WriteLine($"📊 {availableDates.Count} روز خالی یافت شد");
+                
+                // اگر هیچ روز خالی یافت نشد، حداقل 7 روز آینده را اضافه کن
+                if (availableDates.Count == 0)
+                {
+                    Console.WriteLine("⚠️ هیچ روز خالی یافت نشد، اضافه کردن روزهای پیش‌فرض...");
+                    
+                    for (var i = 0; i < 7; i++)
+                    {
+                        var date = DateTime.Today.AddDays(i);
+                        var dayOfWeek = (int)date.DayOfWeek;
+                        
+                        // فقط روزهای شنبه تا پنج‌شنبه
+                        if (dayOfWeek != 5) // نه جمعه
+                        {
+                            availableDates.Add(new
+                            {
+                                date = date.ToString("yyyy-MM-dd"),
+                                displayDate = date.ToString("yyyy/MM/dd"),
+                                dayName = GetPersianDayName(date.DayOfWeek),
+                                availableSlots = 10, // ظرفیت پیش‌فرض
+                                isToday = date.Date == DateTime.Today,
+                                isTomorrow = date.Date == DateTime.Today.AddDays(1)
+                            });
+                        }
+                    }
+                }
+
+                return Json(new { success = true, dates = availableDates });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ خطا در دریافت روزهای خالی: {ex.Message}");
+                Console.WriteLine($"❌ Stack Trace: {ex.StackTrace}");
+                return Json(new { success = false, message = "خطا در دریافت روزهای خالی" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableTimes(int barbershopId, int serviceId, string date)
+        {
+            Console.WriteLine($"🕐 درخواست ساعات خالی برای آرایشگاه {barbershopId}، خدمت {serviceId}، تاریخ {date}");
+            
+            try
+            {
+                var selectedDate = DateTime.Parse(date);
+                
+                var barbershop = await _context.Barbershops
+                    .FirstOrDefaultAsync(b => b.Id == barbershopId);
+                
+                if (barbershop == null)
+                {
+                    Console.WriteLine($"❌ آرایشگاه با ID {barbershopId} یافت نشد");
+                    return Json(new { success = false, message = "آرایشگاه یافت نشد" });
+                }
+
+                var service = await _context.Services
+                    .FirstOrDefaultAsync(s => s.Id == serviceId);
+                
+                if (service == null)
+                {
+                    Console.WriteLine($"❌ خدمت با ID {serviceId} یافت نشد");
+                    return Json(new { success = false, message = "خدمت یافت نشد" });
+                }
+
+                Console.WriteLine($"📅 تاریخ انتخاب شده: {selectedDate:yyyy-MM-dd}");
+                Console.WriteLine($"🏪 آرایشگاه: {barbershop.Name}");
+                Console.WriteLine($"🛠️ خدمت: {service.Name} - مدت: {service.Duration} دقیقه");
+
+                // دریافت نوبت‌های رزرو شده در این روز
+                var bookedAppointments = await _context.Appointments
+                    .Where(a => a.BarbershopId == barbershopId && 
+                               a.AppointmentDate.Date == selectedDate.Date &&
+                               a.Status != AppointmentStatus.Cancelled)
+                    .Select(a => a.AppointmentTime)
+                    .ToListAsync();
+
+                Console.WriteLine($"📊 {bookedAppointments.Count} نوبت رزرو شده در این روز");
+
+                var availableTimes = new List<object>();
+                var openTime = barbershop.OpenTime != TimeSpan.Zero ? barbershop.OpenTime : new TimeSpan(8, 0, 0);
+                var closeTime = barbershop.CloseTime != TimeSpan.Zero ? barbershop.CloseTime : new TimeSpan(20, 0, 0);
+                var serviceDuration = service.Duration > 0 ? service.Duration : 30;
+
+                Console.WriteLine($"⏰ ساعات کاری: {openTime} تا {closeTime}");
+
+                // تولید ساعات ممکن
+                var currentTime = openTime;
+                while (currentTime.Add(TimeSpan.FromMinutes(serviceDuration)) <= closeTime)
+                {
+                    // بررسی اینکه این ساعت رزرو نشده باشد
+                    var isBooked = bookedAppointments.Any(bookedTime => 
+                        Math.Abs((bookedTime - currentTime).TotalMinutes) < serviceDuration);
+
+                    // اگر روز امروز است، ساعت‌های گذشته را نمایش نده
+                    var isPastTime = selectedDate.Date == DateTime.Today && 
+                                    DateTime.Now.TimeOfDay > currentTime;
+
+                    if (!isBooked && !isPastTime)
+                    {
+                        availableTimes.Add(new
+                        {
+                            time = currentTime.ToString(@"hh\:mm"),
+                            displayTime = currentTime.ToString(@"HH\:mm"),
+                            isPrime = IsPrimeTime(currentTime), // ساعات اوج
+                            isRecommended = IsRecommendedTime(currentTime) // ساعات پیشنهادی
+                        });
+                    }
+
+                    currentTime = currentTime.Add(TimeSpan.FromMinutes(30)); // فاصله 30 دقیقه‌ای
+                }
+
+                // اگر هیچ ساعت خالی یافت نشد، ساعات پیش‌فرض اضافه کن
+                if (availableTimes.Count == 0)
+                {
+                    Console.WriteLine("⚠️ هیچ ساعت خالی یافت نشد، اضافه کردن ساعات پیش‌فرض...");
+                    
+                    var defaultTimes = new[] { "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00" };
+                    
+                    foreach (var timeStr in defaultTimes)
+                    {
+                        var time = TimeSpan.Parse(timeStr);
+                        
+                        // اگر روز امروز است، ساعت‌های گذشته را نمایش نده
+                        var isPastTime = selectedDate.Date == DateTime.Today && 
+                                        DateTime.Now.TimeOfDay > time;
+                        
+                        if (!isPastTime)
+                        {
+                            availableTimes.Add(new
+                            {
+                                time = time.ToString(@"hh\:mm"),
+                                displayTime = time.ToString(@"HH\:mm"),
+                                isPrime = IsPrimeTime(time),
+                                isRecommended = IsRecommendedTime(time)
+                            });
+                        }
+                    }
+                }
+
+                Console.WriteLine($"📊 {availableTimes.Count} ساعت خالی یافت شد");
+                return Json(new { success = true, times = availableTimes });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ خطا در دریافت ساعات خالی: {ex.Message}");
+                Console.WriteLine($"❌ Stack Trace: {ex.StackTrace}");
+                return Json(new { success = false, message = "خطا در دریافت ساعات خالی" });
+            }
+        }
+
+        private string GetPersianDayName(DayOfWeek dayOfWeek)
+        {
+            return dayOfWeek switch
+            {
+                DayOfWeek.Saturday => "شنبه",
+                DayOfWeek.Sunday => "یکشنبه",
+                DayOfWeek.Monday => "دوشنبه",
+                DayOfWeek.Tuesday => "سه‌شنبه",
+                DayOfWeek.Wednesday => "چهارشنبه",
+                DayOfWeek.Thursday => "پنج‌شنبه",
+                DayOfWeek.Friday => "جمعه",
+                _ => ""
+            };
+        }
+
+        private bool IsPrimeTime(TimeSpan time)
+        {
+            // ساعات اوج: 16:00 تا 20:00
+            return time >= TimeSpan.FromHours(16) && time <= TimeSpan.FromHours(20);
+        }
+
+        private bool IsRecommendedTime(TimeSpan time)
+        {
+            // ساعات پیشنهادی: 10:00 تا 14:00
+            return time >= TimeSpan.FromHours(10) && time <= TimeSpan.FromHours(14);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentRequest request)
         {

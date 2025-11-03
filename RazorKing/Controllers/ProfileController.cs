@@ -51,7 +51,8 @@ namespace RazorKing.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateProfile(ProfileUpdateViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProfile([FromBody] ProfileUpdateViewModel model)
         {
             if (!ModelState.IsValid)
             {

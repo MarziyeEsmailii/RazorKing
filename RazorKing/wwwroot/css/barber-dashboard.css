@@ -7,14 +7,14 @@
 .barber-dashboard {
     background: var(--gradient-primary);
     min-height: 100vh;
-    padding: 120px 0 40px;
+    padding: 80px 0 20px;
 }
 
 .dashboard-header {
     background: rgba(26, 26, 26, 0.95);
-    border-radius: 20px;
-    padding: 30px;
-    margin-bottom: 30px;
+    border-radius: 15px;
+    padding: 20px 25px;
+    margin-bottom: 20px;
     border: 1px solid rgba(212, 175, 55, 0.2);
     box-shadow: var(--shadow-heavy);
 }
@@ -24,17 +24,17 @@
 }
 
 .dashboard-title {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 800;
     color: var(--primary-gold);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
 }
 
 .dashboard-subtitle {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--text-gray);
     margin: 0;
 }
@@ -47,13 +47,13 @@
 
 /* Stats Section */
 .stats-section {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .stat-card {
     background: rgba(26, 26, 26, 0.95);
-    border-radius: 15px;
-    padding: 25px;
+    border-radius: 12px;
+    padding: 18px;
     border: 1px solid rgba(212, 175, 55, 0.2);
     transition: all var(--transition-normal);
     height: 100%;
@@ -83,14 +83,14 @@
 }
 
 .stat-icon {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     background: rgba(212, 175, 55, 0.15);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     border: 2px solid rgba(212, 175, 55, 0.3);
     transition: all var(--transition-normal);
 }
@@ -107,10 +107,10 @@
 }
 
 .stat-number {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 900;
     color: var(--primary-gold);
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -124,16 +124,16 @@
 /* Dashboard Cards */
 .dashboard-card {
     background: rgba(26, 26, 26, 0.95);
-    border-radius: 20px;
+    border-radius: 15px;
     border: 1px solid rgba(212, 175, 55, 0.2);
     box-shadow: var(--shadow-heavy);
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     overflow: hidden;
 }
 
 .card-header {
     background: rgba(42, 42, 42, 0.8);
-    padding: 20px 25px;
+    padding: 15px 20px;
     border-bottom: 1px solid rgba(212, 175, 55, 0.2);
     display: flex;
     justify-content: space-between;
@@ -141,13 +141,13 @@
 }
 
 .card-title {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--text-white);
     margin: 0;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .card-title i {
@@ -156,24 +156,24 @@
 
 .card-actions {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
 .card-body {
-    padding: 25px;
+    padding: 20px;
 }
 
 /* Schedule Timeline */
 .schedule-timeline {
-    max-height: 600px;
+    max-height: 450px;
     overflow-y: auto;
-    padding-right: 10px;
+    padding-right: 8px;
 }
 
 .timeline-item {
     display: flex;
-    gap: 20px;
-    padding: 20px 0;
+    gap: 15px;
+    padding: 15px 0;
     border-bottom: 1px solid rgba(212, 175, 55, 0.1);
     transition: all var(--transition-normal);
 }

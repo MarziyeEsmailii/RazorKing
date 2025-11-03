@@ -73,13 +73,15 @@
                                             <label asp-for="CityId" class="form-label">
                                                 <i class="fas fa-city"></i>شهر
                                             </label>
-                                            <select asp-for="CityId" class="form-select">
-                                                <option value="">انتخاب شهر</option>
-                                                @foreach (var city in Model.Cities)
-                                                {
-                                                    <option value="@city.Id">@city.Name</option>
-                                                }
-                                            </select>
+                                            <div class="city-select-wrapper">
+                                                <select asp-for="CityId" class="form-select">
+                                                    <option value="" style="background-color: #2d2d2d; color: #ccc;">انتخاب شهر</option>
+                                                    @foreach (var city in Model.Cities)
+                                                    {
+                                                        <option value="@city.Id" style="background-color: #2d2d2d; color: #fff;">@city.Name</option>
+                                                    }
+                                                </select>
+                                            </div>
                                             <span asp-validation-for="CityId" class="text-danger"></span>
                                         </div>
                                     </div>
