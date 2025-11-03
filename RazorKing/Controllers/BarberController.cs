@@ -661,6 +661,335 @@ namespace RazorKing.Controllers
             return Json(new { success = true, slots = availableSlots });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> GenerateTimeSlots([FromBody] GenerateTimeSlotsViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var barbershop = await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (barbershop == null)
+            {
+                return Json(new { success = false, message = "آرایشگاه یافت نشد" });
+            }
+
+            try
+            {
+                var startDate = model.StartDate.Date;
+                var endDate = model.EndDate.Date;
+                var slotDuration = model.SlotDuration; // in minutes
+                var breakDuration = model.BreakDuration; // in minutes
+
+                var workingDays = barbershop.WorkingDays?.Split(',').Select(d => d.Trim()).ToList() ?? new List<string>();
+
+                for (var date = startDate; date <= endDate; date = date.AddDays(1))
+                {
+                    var dayName = GetPersianDayName(date.DayOfWeek);
+                    if (!workingDays.Contains(dayName)) continue;
+
+                    // Remove existing time slots for this date
+                    var existingSlots = await _context.TimeSlots
+                        .Where(ts => ts.BarbershopId == barbershop.Id && ts.Date.Date == date.Date)
+                        .ToListAsync();
+                    
+                    _context.TimeSlots.RemoveRange(existingSlots);
+
+                    // Generate new time slots
+                    var currentTime = barbershop.OpenTime;
+                    while (currentTime.Add(TimeSpan.FromMinutes(slotDuration)) <= barbershop.CloseTime)
+                    {
+                        var timeSlot = new TimeSlot
+                        {
+                            BarbershopId = barbershop.Id,
+                            Date = date,
+                            StartTime = currentTime,
+                            EndTime = currentTime.Add(TimeSpan.FromMinutes(slotDuration)),
+                            IsAvailable = true,
+                            SlotType = TimeSlotType.Available
+                        };
+
+                        _context.TimeSlots.Add(timeSlot);
+                        currentTime = currentTime.Add(TimeSpan.FromMinutes(slotDuration + breakDuration));
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "بازه‌های زمانی با موفقیت ایجاد شد" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating time slots for barbershop {BarbershopId}", barbershop.Id);
+                return Json(new { success = false, message = "خطا در ایجاد بازه‌های زمانی" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDayTimeSlots(DateTime date)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var barbershop = await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (barbershop == null)
+            {
+                return Json(new { success = false, message = "آرایشگاه یافت نشد" });
+            }
+
+            var timeSlots = await _context.TimeSlots
+                .Where(ts => ts.BarbershopId == barbershop.Id && ts.Date.Date == date.Date)
+                .OrderBy(ts => ts.StartTime)
+                .Select(ts => new
+                {
+                    id = ts.Id,
+                    startTime = ts.StartTime.ToString(@"HH\:mm"),
+                    endTime = ts.EndTime.ToString(@"HH\:mm"),
+                    isAvailable = ts.IsAvailable,
+                    isBlocked = ts.IsBlocked,
+                    slotType = ts.SlotType.ToString(),
+                    blockReason = ts.BlockReason
+                })
+                .ToListAsync();
+
+            // Get appointments for this date
+            var appointments = await _context.Appointments
+                .Include(a => a.Service)
+                .Where(a => a.BarbershopId == barbershop.Id && a.AppointmentDate.Date == date.Date)
+                .Select(a => new
+                {
+                    id = a.Id,
+                    time = a.AppointmentTime.ToString(@"HH\:mm"),
+                    customerName = a.CustomerName,
+                    serviceName = a.Service.Name,
+                    status = a.Status.ToString()
+                })
+                .ToListAsync();
+
+            return Json(new { 
+                success = true, 
+                timeSlots = timeSlots,
+                appointments = appointments
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateTimeSlotAvailability([FromBody] UpdateTimeSlotViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var timeSlot = await _context.TimeSlots
+                .Include(ts => ts.Barbershop)
+                .FirstOrDefaultAsync(ts => ts.Id == model.TimeSlotId && ts.Barbershop.UserId == user.Id);
+
+            if (timeSlot == null)
+            {
+                return Json(new { success = false, message = "بازه زمانی یافت نشد" });
+            }
+
+            timeSlot.IsAvailable = model.IsAvailable;
+            timeSlot.IsBlocked = model.IsBlocked;
+            timeSlot.BlockReason = model.BlockReason;
+            timeSlot.SlotType = model.SlotType;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "وضعیت بازه زمانی به‌روزرسانی شد" });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ManageTimeSlots(DateTime? date)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            var barbershop = await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (barbershop == null)
+            {
+                return RedirectToAction("CreateBarbershop");
+            }
+
+            var selectedDate = date ?? DateTime.Today;
+
+            var timeSlots = await _context.TimeSlots
+                .Where(ts => ts.BarbershopId == barbershop.Id && ts.Date.Date == selectedDate.Date)
+                .OrderBy(ts => ts.StartTime)
+                .Select(ts => new TimeSlotViewModel
+                {
+                    Id = ts.Id,
+                    StartTime = ts.StartTime,
+                    EndTime = ts.EndTime,
+                    IsAvailable = ts.IsAvailable,
+                    IsBlocked = ts.IsBlocked,
+                    BlockReason = ts.BlockReason,
+                    SlotType = ts.SlotType,
+                    Appointment = ts.Appointment
+                })
+                .ToListAsync();
+
+            var dayAppointments = await _context.Appointments
+                .Include(a => a.Service)
+                .Where(a => a.BarbershopId == barbershop.Id && a.AppointmentDate.Date == selectedDate.Date)
+                .OrderBy(a => a.AppointmentTime)
+                .ToListAsync();
+
+            var viewModel = new TimeSlotManagementViewModel
+            {
+                Barbershop = barbershop,
+                SelectedDate = selectedDate,
+                TimeSlots = timeSlots,
+                DayAppointments = dayAppointments,
+                Settings = new TimeSlotSettingsViewModel()
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddTimeSlot([FromBody] AddTimeSlotViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var barbershop = await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+
+            if (barbershop == null)
+            {
+                return Json(new { success = false, message = "آرایشگاه یافت نشد" });
+            }
+
+            try
+            {
+                var startTime = TimeSpan.Parse(model.StartTime);
+                var endTime = TimeSpan.Parse(model.EndTime);
+
+                // Check for overlapping time slots
+                var overlapping = await _context.TimeSlots
+                    .AnyAsync(ts => ts.BarbershopId == barbershop.Id && 
+                                   ts.Date.Date == model.Date.Date &&
+                                   ((ts.StartTime < endTime && ts.EndTime > startTime)));
+
+                if (overlapping)
+                {
+                    return Json(new { success = false, message = "این بازه زمانی با بازه‌های موجود تداخل دارد" });
+                }
+
+                var timeSlot = new TimeSlot
+                {
+                    BarbershopId = barbershop.Id,
+                    Date = model.Date.Date,
+                    StartTime = startTime,
+                    EndTime = endTime,
+                    IsAvailable = model.IsAvailable,
+                    IsBlocked = model.SlotType == TimeSlotType.Blocked,
+                    SlotType = model.SlotType,
+                    BlockReason = model.BlockReason
+                };
+
+                _context.TimeSlots.Add(timeSlot);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "بازه زمانی با موفقیت اضافه شد" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding time slot for barbershop {BarbershopId}", barbershop.Id);
+                return Json(new { success = false, message = "خطا در افزودن بازه زمانی" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateTimeSlot([FromBody] UpdateTimeSlotRequestViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var timeSlot = await _context.TimeSlots
+                .Include(ts => ts.Barbershop)
+                .FirstOrDefaultAsync(ts => ts.Id == model.Id && ts.Barbershop.UserId == user.Id);
+
+            if (timeSlot == null)
+            {
+                return Json(new { success = false, message = "بازه زمانی یافت نشد" });
+            }
+
+            try
+            {
+                var startTime = TimeSpan.Parse(model.StartTime);
+                var endTime = TimeSpan.Parse(model.EndTime);
+
+                // Check for overlapping time slots (excluding current slot)
+                var overlapping = await _context.TimeSlots
+                    .AnyAsync(ts => ts.BarbershopId == timeSlot.BarbershopId && 
+                                   ts.Id != model.Id &&
+                                   ts.Date.Date == model.Date.Date &&
+                                   ((ts.StartTime < endTime && ts.EndTime > startTime)));
+
+                if (overlapping)
+                {
+                    return Json(new { success = false, message = "این بازه زمانی با بازه‌های موجود تداخل دارد" });
+                }
+
+                timeSlot.StartTime = startTime;
+                timeSlot.EndTime = endTime;
+                timeSlot.IsAvailable = model.IsAvailable;
+                timeSlot.IsBlocked = model.SlotType == TimeSlotType.Blocked;
+                timeSlot.SlotType = model.SlotType;
+                timeSlot.BlockReason = model.BlockReason;
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "بازه زمانی با موفقیت به‌روزرسانی شد" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating time slot {TimeSlotId}", model.Id);
+                return Json(new { success = false, message = "خطا در به‌روزرسانی بازه زمانی" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteTimeSlot(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
+
+            var timeSlot = await _context.TimeSlots
+                .Include(ts => ts.Barbershop)
+                .Include(ts => ts.Appointment)
+                .FirstOrDefaultAsync(ts => ts.Id == id && ts.Barbershop.UserId == user.Id);
+
+            if (timeSlot == null)
+            {
+                return Json(new { success = false, message = "بازه زمانی یافت نشد" });
+            }
+
+            // Check if time slot has an appointment
+            if (timeSlot.Appointment != null)
+            {
+                return Json(new { success = false, message = "این بازه زمانی دارای نوبت است و قابل حذف نیست" });
+            }
+
+            try
+            {
+                _context.TimeSlots.Remove(timeSlot);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "بازه زمانی با موفقیت حذف شد" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting time slot {TimeSlotId}", id);
+                return Json(new { success = false, message = "خطا در حذف بازه زمانی" });
+            }
+        }
+
         private string GetPersianDayName(DayOfWeek dayOfWeek)
         {
             return dayOfWeek switch

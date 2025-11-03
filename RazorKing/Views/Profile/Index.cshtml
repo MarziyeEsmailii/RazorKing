@@ -1,0 +1,239 @@
+@model RazorKing.Models.ViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "پروفایل من";
+    Layout = "_LayoutModern";
+}
+
+@functions {
+    string GetStatusText(AppointmentStatus status)
+    {
+        return status switch
+        {
+            AppointmentStatus.Pending => "در انتظار تایید",
+            AppointmentStatus.Confirmed => "تایید شده",
+            AppointmentStatus.Completed => "انجام شده",
+            AppointmentStatus.Cancelled => "لغو شده",
+            _ => "نامشخص"
+        };
+    }
+}
+
+<div class="profile-page">
+    <!-- Profile Header -->
+    <section class="profile-header">
+        <div class="container">
+            <div class="profile-header-content">
+                <div class="profile-avatar">
+                    <div class="avatar-circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <h1 class="profile-name">@Model.User.FirstName @Model.User.LastName</h1>
+                    <p class="profile-email">@Model.User.Email</p>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">@Model.TotalAppointments</span>
+                            <span class="stat-label">نوبت</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">@Model.TotalSpent.ToString("N0")</span>
+                            <span class="stat-label">تومان خرج</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">@Model.UpcomingAppointments.Count</span>
+                            <span class="stat-label">نوبت آینده</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn btn-gold" onclick="editProfile()">
+                        <i class="fas fa-edit"></i>
+                        ویرایش پروفایل
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Profile Content -->
+    <section class="profile-content">
+        <div class="container">
+            <div class="row">
+                <!-- Profile Info -->
+                <div class="col-lg-4">
+                    <div class="profile-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-user"></i>
+                            اطلاعات شخصی
+                        </h3>
+                        <div class="profile-details">
+                            <div class="detail-item">
+                                <label>نام:</label>
+                                <span>@Model.User.FirstName</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>نام خانوادگی:</label>
+                                <span>@Model.User.LastName</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>ایمیل:</label>
+                                <span>@Model.User.Email</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>شماره موبایل:</label>
+                                <span>@(Model.User.PhoneNumber ?? "وارد نشده")</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>تاریخ عضویت:</label>
+                                <span>@Model.User.CreatedAt.ToString("yyyy/MM/dd")</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-gold w-100 mt-3" onclick="editProfile()">
+                            <i class="fas fa-edit"></i>
+                            ویرایش اطلاعات
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Appointments -->
+                <div class="col-lg-8">
+                    <!-- Upcoming Appointments -->
+                    <div class="appointments-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-calendar-alt"></i>
+                            نوبت‌های آینده
+                            <span class="badge badge-gold">@Model.UpcomingAppointments.Count</span>
+                        </h3>
+                        
+                        @if (Model.UpcomingAppointments.Any())
+                        {
+                            <div class="appointments-list">
+                                @foreach (var appointment in Model.UpcomingAppointments)
+                                {
+                                    <div class="appointment-item upcoming">
+                                        <div class="appointment-date">
+                                            <div class="date-day">@appointment.AppointmentDate.Day</div>
+                                            <div class="date-month">@appointment.AppointmentDate.ToString("MMM")</div>
+                                        </div>
+                                        <div class="appointment-details">
+                                            <h5>@appointment.Barbershop.Name</h5>
+                                            <p class="appointment-service">@appointment.Service?.Name</p>
+                                            <p class="appointment-time">
+                                                <i class="fas fa-clock"></i>
+                                                @appointment.AppointmentTime.ToString(@"hh\:mm")
+                                            </p>
+                                            <p class="appointment-location">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                @appointment.Barbershop.City?.Name
+                                            </p>
+                                        </div>
+                                        <div class="appointment-status">
+                                            <span class="status-badge status-@appointment.Status.ToString().ToLower()">
+                                                @GetStatusText(appointment.Status)
+                                            </span>
+                                            <div class="appointment-price">
+                                                @appointment.TotalPrice.ToString("N0") تومان
+                                            </div>
+                                        </div>
+                                        <div class="appointment-actions">
+                                            @if (appointment.AppointmentDate.Add(appointment.AppointmentTime) > DateTime.Now.AddHours(2))
+                                            {
+                                                <button class="btn btn-sm btn-outline-danger" onclick="cancelAppointment(@appointment.Id)">
+                                                    <i class="fas fa-times"></i>
+                                                    لغو
+                                                </button>
+                                            }
+                                            <button class="btn btn-sm btn-outline-gold" onclick="showAppointmentDetails(@appointment.Id)">
+                                                <i class="fas fa-eye"></i>
+                                                جزئیات
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-times"></i>
+                                <h5>نوبت آینده‌ای ندارید</h5>
+                                <p>برای رزرو نوبت جدید کلیک کنید</p>
+                                <a href="@Url.Action("Index", "Booking")" class="btn btn-gold">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    رزرو نوبت جدید
+                                </a>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Past Appointments -->
+                    <div class="appointments-card mt-4">
+                        <h3 class="card-title">
+                            <i class="fas fa-history"></i>
+                            تاریخچه نوبت‌ها
+                            <span class="badge badge-secondary">@Model.PastAppointments.Count</span>
+                        </h3>
+                        
+                        @if (Model.PastAppointments.Any())
+                        {
+                            <div class="appointments-list">
+                                @foreach (var appointment in Model.PastAppointments.Take(5))
+                                {
+                                    <div class="appointment-item past">
+                                        <div class="appointment-date">
+                                            <div class="date-day">@appointment.AppointmentDate.Day</div>
+                                            <div class="date-month">@appointment.AppointmentDate.ToString("MMM")</div>
+                                        </div>
+                                        <div class="appointment-details">
+                                            <h5>@appointment.Barbershop.Name</h5>
+                                            <p class="appointment-service">@appointment.Service?.Name</p>
+                                            <p class="appointment-time">
+                                                <i class="fas fa-clock"></i>
+                                                @appointment.AppointmentTime.ToString(@"hh\:mm")
+                                            </p>
+                                        </div>
+                                        <div class="appointment-status">
+                                            <span class="status-badge status-@appointment.Status.ToString().ToLower()">
+                                                @GetStatusText(appointment.Status)
+                                            </span>
+                                            <div class="appointment-price">
+                                                @appointment.TotalPrice.ToString("N0") تومان
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            
+                            @if (Model.PastAppointments.Count > 5)
+                            {
+                                <div class="text-center mt-3">
+                                    <button class="btn btn-outline-gold" onclick="loadMoreAppointments()">
+                                        <i class="fas fa-plus"></i>
+                                        نمایش بیشتر (@(Model.PastAppointments.Count - 5) نوبت)
+                                    </button>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-times"></i>
+                                <h5>تاریخچه‌ای ندارید</h5>
+                                <p>هنوز نوبتی رزرو نکرده‌اید</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css">
+}
+
+@section Scripts {
+    <script src="~/js/profile.js"></script>
+}

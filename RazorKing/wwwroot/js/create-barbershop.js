@@ -1,465 +1,533 @@
-// Create Barbershop JavaScript
-document.addEventListener('DOMContentLoaded', function() {
-    let currentStep = 1;
-    const totalSteps = 3;
-    
-    // Initialize
+// Create Barbershop Form JavaScript
+
+$(document).ready(function() {
     initializeForm();
     setupEventListeners();
-    
-    function initializeForm() {
-        updateStepDisplay();
-        setupWorkingDays();
-        setupImageUpload();
-        setupFormValidation();
-    }
-    
-    function setupEventListeners() {
-        // Step navigation
-        document.querySelectorAll('.next-step').forEach(btn => {
-            btn.addEventListener('click', nextStep);
+    setupValidation();
+});
+
+// Initialize form components
+function initializeForm() {
+    // Set default working days if none selected
+    if ($('input[name="WorkingDaysArray"]:checked').length === 0) {
+        // Select Saturday to Thursday by default
+        const defaultDays = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه'];
+        defaultDays.forEach(day => {
+            $(`input[name="WorkingDaysArray"][value="${day}"]`).prop('checked', true);
         });
-        
-        document.querySelectorAll('.prev-step').forEach(btn => {
-            btn.addEventListener('click', prevStep);
-        });
-        
-        // Form submission
-        document.querySelector('.create-form').addEventListener('submit', handleFormSubmit);
-        
-        // Working days checkboxes
-        document.querySelectorAll('input[name="WorkingDaysArray"]').forEach(checkbox => {
-            checkbox.addEventListener('change', updateWorkingDays);
-        });
-        
-        // Time inputs
-        document.querySelectorAll('.time-input').forEach(input => {
-            input.addEventListener('change', validateTimeRange);
-        });
+        updateWorkingDaysHidden();
     }
     
-    function nextStep() {
-        if (validateCurrentStep()) {
-            if (currentStep < totalSteps) {
-                currentStep++;
-                updateStepDisplay();
-                animateStepTransition();
-            }
-        }
+    // Set default working hours if empty
+    if (!$('#OpenTime').val()) {
+        $('#OpenTime').val('09:00');
+    }
+    if (!$('#CloseTime').val()) {
+        $('#CloseTime').val('21:00');
     }
     
-    function prevStep() {
-        if (currentStep > 1) {
-            currentStep--;
-            updateStepDisplay();
-            animateStepTransition();
-        }
-    }
+    // Ensure working days are properly set
+    updateWorkingDaysHidden();
     
-    function updateStepDisplay() {
-        // Update progress steps
-        document.querySelectorAll('.step').forEach((step, index) => {
-            const stepNumber = index + 1;
-            step.classList.remove('active', 'completed');
-            
-            if (stepNumber === currentStep) {
-                step.classList.add('active');
-            } else if (stepNumber < currentStep) {
-                step.classList.add('completed');
-            }
-        });
-        
-        // Update form steps
-        document.querySelectorAll('.form-step').forEach((step, index) => {
-            const stepNumber = index + 1;
-            step.classList.remove('active');
-            
-            if (stepNumber === currentStep) {
-                step.classList.add('active');
-            }
-        });
-    }
+    // Initialize image upload
+    initializeImageUpload();
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    // Working days checkboxes
+    $('input[name="WorkingDaysArray"]').on('change', function() {
+        updateWorkingDaysHidden();
+        validateWorkingDays();
+    });
     
-    function animateStepTransition() {
-        const activeStep = document.querySelector('.form-step.active');
-        if (activeStep) {
-            activeStep.style.opacity = '0';
-            activeStep.style.transform = 'translateY(20px)';
-            
-            setTimeout(() => {
-                activeStep.style.opacity = '1';
-                activeStep.style.transform = 'translateY(0)';
-            }, 100);
-        }
-    }
-    
-    function validateCurrentStep() {
-        const currentStepElement = document.getElementById(`step-${currentStep}`);
-        const inputs = currentStepElement.querySelectorAll('input[required], select[required], textarea[required]');
-        let isValid = true;
-        
-        inputs.forEach(input => {
-            if (!validateInput(input)) {
-                isValid = false;
-            }
-        });
-        
-        // Additional validations per step
-        if (currentStep === 1) {
-            isValid = validateStep1() && isValid;
-        } else if (currentStep === 2) {
-            isValid = validateStep2() && isValid;
-        }
-        
-        return isValid;
-    }
-    
-    function validateStep1() {
-        const name = document.getElementById('Name');
-        const phone = document.getElementById('Phone');
-        const cityId = document.getElementById('CityId');
-        
-        let isValid = true;
-        
-        if (!name.value.trim()) {
-            showFieldError(name, 'نام آرایشگاه الزامی است');
-            isValid = false;
-        } else {
-            clearFieldError(name);
-        }
-        
-        if (!phone.value.trim()) {
-            showFieldError(phone, 'شماره تماس الزامی است');
-            isValid = false;
-        } else if (!isValidPhone(phone.value)) {
-            showFieldError(phone, 'شماره تماس معتبر نیست');
-            isValid = false;
-        } else {
-            clearFieldError(phone);
-        }
-        
-        if (!cityId.value) {
-            showFieldError(cityId, 'انتخاب شهر الزامی است');
-            isValid = false;
-        } else {
-            clearFieldError(cityId);
-        }
-        
-        return isValid;
-    }
-    
-    function validateStep2() {
-        const openTime = document.getElementById('OpenTime');
-        const closeTime = document.getElementById('CloseTime');
-        const workingDays = document.querySelectorAll('input[name="WorkingDaysArray"]:checked');
-        
-        let isValid = true;
-        
-        if (!openTime.value) {
-            showFieldError(openTime, 'ساعت شروع کار الزامی است');
-            isValid = false;
-        } else {
-            clearFieldError(openTime);
-        }
-        
-        if (!closeTime.value) {
-            showFieldError(closeTime, 'ساعت پایان کار الزامی است');
-            isValid = false;
-        } else {
-            clearFieldError(closeTime);
-        }
-        
-        if (openTime.value && closeTime.value) {
-            if (openTime.value >= closeTime.value) {
-                showFieldError(closeTime, 'ساعت پایان کار باید بعد از ساعت شروع باشد');
-                isValid = false;
-            }
-        }
-        
-        if (workingDays.length === 0) {
-            showNotification('حداقل یک روز کاری انتخاب کنید', 'error');
-            isValid = false;
-        }
-        
-        return isValid;
-    }
-    
-    function validateInput(input) {
-        if (input.hasAttribute('required') && !input.value.trim()) {
-            showFieldError(input, 'این فیلد الزامی است');
+    // Form submission
+    $('form').on('submit', function(e) {
+        if (!validateForm()) {
+            e.preventDefault();
             return false;
         }
         
-        clearFieldError(input);
+        // Show loading state
+        showLoadingState();
+    });
+    
+    // Real-time validation
+    $('.form-control, .form-select').on('blur', function() {
+        validateField($(this));
+    });
+    
+    // Phone number formatting
+    $('#Phone').on('input', function() {
+        formatPhoneNumber($(this));
+    });
+    
+    // Time validation
+    $('#OpenTime, #CloseTime').on('change', function() {
+        validateWorkingHours();
+    });
+}
+
+// Setup form validation
+function setupValidation() {
+    // Remove default browser validation
+    $('form').attr('novalidate', true);
+    
+    // Custom validation messages
+    const validationMessages = {
+        'Name': 'نام آرایشگاه الزامی است',
+        'Phone': 'شماره تماس معتبر وارد کنید',
+        'Address': 'آدرس آرایشگاه الزامی است',
+        'CityId': 'انتخاب شهر الزامی است',
+        'OpenTime': 'ساعت شروع کار الزامی است',
+        'CloseTime': 'ساعت پایان کار الزامی است'
+    };
+    
+    // Store validation messages
+    window.validationMessages = validationMessages;
+}
+
+// Update working days hidden field
+function updateWorkingDaysHidden() {
+    const selectedDays = [];
+    $('input[name="WorkingDaysArray"]:checked').each(function() {
+        selectedDays.push($(this).val());
+    });
+    $('#workingDaysHidden').val(selectedDays.join(','));
+}
+
+// Validate individual field
+function validateField($field) {
+    const fieldName = $field.attr('name') || $field.attr('id');
+    const value = $field.val().trim();
+    let isValid = true;
+    let message = '';
+    
+    // Clear previous validation
+    clearFieldValidation($field);
+    
+    switch(fieldName) {
+        case 'Name':
+            if (!value) {
+                isValid = false;
+                message = 'نام آرایشگاه الزامی است';
+            } else if (value.length < 2) {
+                isValid = false;
+                message = 'نام آرایشگاه باید حداقل 2 کاراکتر باشد';
+            }
+            break;
+            
+        case 'Phone':
+            if (!value) {
+                isValid = false;
+                message = 'شماره تماس الزامی است';
+            } else if (!isValidPhoneNumber(value)) {
+                isValid = false;
+                message = 'شماره تماس معتبر وارد کنید (مثال: 09123456789)';
+            }
+            break;
+            
+        case 'Address':
+            if (!value) {
+                isValid = false;
+                message = 'آدرس آرایشگاه الزامی است';
+            } else if (value.length < 10) {
+                isValid = false;
+                message = 'آدرس باید حداقل 10 کاراکتر باشد';
+            }
+            break;
+            
+        case 'CityId':
+            if (!value) {
+                isValid = false;
+                message = 'انتخاب شهر الزامی است';
+            }
+            break;
+            
+        case 'OpenTime':
+        case 'CloseTime':
+            if (!value) {
+                isValid = false;
+                message = fieldName === 'OpenTime' ? 'ساعت شروع کار الزامی است' : 'ساعت پایان کار الزامی است';
+            }
+            break;
+    }
+    
+    if (!isValid) {
+        showFieldError($field, message);
+    } else {
+        showFieldSuccess($field);
+    }
+    
+    return isValid;
+}
+
+// Validate working days
+function validateWorkingDays() {
+    const selectedDays = $('input[name="WorkingDaysArray"]:checked').length;
+    const $container = $('.days-grid').parent();
+    
+    clearContainerValidation($container);
+    
+    if (selectedDays === 0) {
+        showContainerError($container, 'حداقل یک روز کاری انتخاب کنید');
+        return false;
+    } else if (selectedDays > 6) {
+        showContainerError($container, 'حداکثر 6 روز کاری می‌توانید انتخاب کنید');
+        return false;
+    } else {
+        showContainerSuccess($container);
         return true;
     }
+}
+
+// Validate working hours
+function validateWorkingHours() {
+    const openTime = $('#OpenTime').val();
+    const closeTime = $('#CloseTime').val();
     
-    function showFieldError(input, message) {
-        input.classList.add('is-invalid');
-        
-        let errorElement = input.parentNode.querySelector('.text-danger');
-        if (!errorElement) {
-            errorElement = document.createElement('div');
-            errorElement.className = 'text-danger';
-            input.parentNode.appendChild(errorElement);
+    if (!openTime || !closeTime) return true; // Will be caught by individual field validation
+    
+    const openMinutes = timeToMinutes(openTime);
+    const closeMinutes = timeToMinutes(closeTime);
+    
+    const $closeField = $('#CloseTime');
+    clearFieldValidation($closeField);
+    
+    if (closeMinutes <= openMinutes) {
+        showFieldError($closeField, 'ساعت پایان کار باید بعد از ساعت شروع باشد');
+        return false;
+    } else if ((closeMinutes - openMinutes) < 120) { // Less than 2 hours
+        showFieldError($closeField, 'حداقل 2 ساعت کاری در روز لازم است');
+        return false;
+    } else {
+        showFieldSuccess($closeField);
+        return true;
+    }
+}
+
+// Validate entire form
+function validateForm() {
+    let isValid = true;
+    
+    // Validate required fields
+    const requiredFields = ['#Name', '#Phone', '#Address', '#CityId', '#OpenTime', '#CloseTime'];
+    requiredFields.forEach(selector => {
+        const $field = $(selector);
+        if (!validateField($field)) {
+            isValid = false;
         }
-        errorElement.textContent = message;
+    });
+    
+    // Validate working days
+    if (!validateWorkingDays()) {
+        isValid = false;
     }
     
-    function clearFieldError(input) {
-        input.classList.remove('is-invalid');
-        input.classList.add('is-valid');
-        
-        const errorElement = input.parentNode.querySelector('.text-danger');
-        if (errorElement) {
-            errorElement.textContent = '';
-        }
+    // Validate working hours
+    if (!validateWorkingHours()) {
+        isValid = false;
     }
     
-    function isValidPhone(phone) {
-        const phoneRegex = /^[\d\-\s\+\(\)]+$/;
-        return phoneRegex.test(phone) && phone.length >= 10;
-    }
-    
-    function validateTimeRange() {
-        const openTime = document.getElementById('OpenTime');
-        const closeTime = document.getElementById('CloseTime');
-        
-        if (openTime.value && closeTime.value) {
-            if (openTime.value >= closeTime.value) {
-                showFieldError(closeTime, 'ساعت پایان کار باید بعد از ساعت شروع باشد');
-            } else {
-                clearFieldError(closeTime);
-            }
-        }
-    }
-    
-    function setupWorkingDays() {
-        updateWorkingDays();
-    }
-    
-    function updateWorkingDays() {
-        const checkedDays = Array.from(document.querySelectorAll('input[name="WorkingDaysArray"]:checked'))
-            .map(cb => cb.value);
-        
-        document.getElementById('workingDaysHidden').value = checkedDays.join(',');
-    }
-    
-    function setupImageUpload() {
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('imageFile');
-        const uploadContent = uploadArea.querySelector('.upload-content');
-        const uploadPreview = document.getElementById('uploadPreview');
-        const previewImage = document.getElementById('previewImage');
-        const removeButton = document.getElementById('removeImage');
-        
-        // Drag and drop
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
-        
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
-        
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFileSelect(files[0]);
-            }
-        });
-        
-        // File input change
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFileSelect(e.target.files[0]);
-            }
-        });
-        
-        // Remove image
-        removeButton.addEventListener('click', () => {
-            fileInput.value = '';
-            uploadContent.classList.remove('d-none');
-            uploadPreview.classList.add('d-none');
-        });
-        
-        function handleFileSelect(file) {
-            if (!isValidImageFile(file)) {
-                showNotification('فایل انتخاب شده معتبر نیست. لطفاً یک تصویر انتخاب کنید.', 'error');
-                return;
-            }
-            
-            if (file.size > 5 * 1024 * 1024) { // 5MB
-                showNotification('حجم فایل نباید بیشتر از 5 مگابایت باشد.', 'error');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                previewImage.src = e.target.result;
-                uploadContent.classList.add('d-none');
-                uploadPreview.classList.remove('d-none');
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        function isValidImageFile(file) {
-            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-            return validTypes.includes(file.type);
+    // Show summary message
+    if (!isValid) {
+        showValidationSummary();
+        // Scroll to first error
+        const $firstError = $('.is-invalid').first();
+        if ($firstError.length) {
+            $firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            $firstError.focus();
         }
     }
     
-    function setupFormValidation() {
-        // Real-time validation
-        document.querySelectorAll('input, select, textarea').forEach(input => {
-            input.addEventListener('blur', () => validateInput(input));
-            input.addEventListener('input', () => {
-                if (input.classList.contains('is-invalid')) {
-                    validateInput(input);
-                }
-            });
-        });
-    }
+    return isValid;
+}
+
+// Initialize image upload
+function initializeImageUpload() {
+    const $fileInput = $('#imageFile');
+    const $uploadArea = $('.upload-area-compact');
+    const $uploadContent = $('.upload-content-compact');
+    const $uploadPreview = $('#uploadPreview');
+    const $previewImage = $('#previewImage');
+    const $removeBtn = $('#removeImage');
     
-    function handleFormSubmit(e) {
+    // File input change
+    $fileInput.on('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            handleImageUpload(file);
+        }
+    });
+    
+    // Drag and drop
+    $uploadArea.on('dragover', function(e) {
         e.preventDefault();
-        
-        // Validate all steps
-        let allValid = true;
-        for (let step = 1; step <= totalSteps; step++) {
-            currentStep = step;
-            if (!validateCurrentStep()) {
-                allValid = false;
-                break;
-            }
-        }
-        
-        if (!allValid) {
-            currentStep = 1; // Reset to first invalid step
-            updateStepDisplay();
-            showNotification('لطفاً تمام فیلدهای الزامی را تکمیل کنید', 'error');
-            return;
-        }
-        
-        // Show loading state
-        const submitBtn = document.querySelector('.btn-create');
-        submitBtn.classList.add('loading');
-        submitBtn.disabled = true;
-        
-        // Submit form
-        setTimeout(() => {
-            e.target.submit();
-        }, 500);
-    }
+        $(this).addClass('drag-over');
+    });
     
-    function showNotification(message, type = 'info') {
-        // Remove existing notifications
-        const existingNotifications = document.querySelectorAll('.notification');
-        existingNotifications.forEach(n => n.remove());
-        
-        const notification = document.createElement('div');
-        notification.className = `notification alert alert-${type === 'error' ? 'danger' : 'success'} alert-dismissible fade show`;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            min-width: 300px;
-            animation: slideInRight 0.3s ease;
-        `;
-        
-        notification.innerHTML = `
-            <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'} me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.remove();
-            }
-        }, 5000);
-    }
+    $uploadArea.on('dragleave', function(e) {
+        e.preventDefault();
+        $(this).removeClass('drag-over');
+    });
     
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && e.ctrlKey) {
-            if (currentStep < totalSteps) {
-                nextStep();
+    $uploadArea.on('drop', function(e) {
+        e.preventDefault();
+        $(this).removeClass('drag-over');
+        
+        const files = e.originalEvent.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('image/')) {
+                $fileInput[0].files = files;
+                handleImageUpload(file);
             } else {
-                document.querySelector('.btn-create').click();
+                showError('لطفاً فقط فایل تصویری انتخاب کنید');
             }
         }
     });
     
-    // Auto-save to localStorage
-    function autoSave() {
-        const formData = new FormData(document.querySelector('.create-form'));
-        const data = {};
-        
-        for (let [key, value] of formData.entries()) {
-            data[key] = value;
-        }
-        
-        localStorage.setItem('barbershop_draft', JSON.stringify(data));
+    // Remove image
+    $removeBtn.on('click', function(e) {
+        e.stopPropagation();
+        removeImage();
+    });
+}
+
+// Handle image upload
+function handleImageUpload(file) {
+    // Validate file
+    if (!validateImageFile(file)) {
+        return;
     }
     
-    function loadDraft() {
-        const draft = localStorage.getItem('barbershop_draft');
-        if (draft) {
-            try {
-                const data = JSON.parse(draft);
-                Object.keys(data).forEach(key => {
-                    const input = document.querySelector(`[name="${key}"]`);
-                    if (input && input.type !== 'file') {
-                        input.value = data[key];
-                    }
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        $('#previewImage').attr('src', e.target.result);
+        $('.upload-content-compact').addClass('d-none');
+        $('#uploadPreview').removeClass('d-none');
+    };
+    reader.readAsDataURL(file);
+}
+
+// Validate image file
+function validateImageFile(file) {
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    
+    if (!allowedTypes.includes(file.type)) {
+        showError('فرمت فایل مجاز نیست. فقط JPG، PNG و GIF مجاز است');
+        return false;
+    }
+    
+    if (file.size > maxSize) {
+        showError('حجم فایل نباید بیشتر از 5 مگابایت باشد');
+        return false;
+    }
+    
+    return true;
+}
+
+// Remove image
+function removeImage() {
+    $('#imageFile').val('');
+    $('#previewImage').attr('src', '');
+    $('.upload-content-compact').removeClass('d-none');
+    $('#uploadPreview').addClass('d-none');
+}
+
+// Format phone number
+function formatPhoneNumber($field) {
+    let value = $field.val().replace(/\D/g, ''); // Remove non-digits
+    
+    // Limit to 11 digits
+    if (value.length > 11) {
+        value = value.substring(0, 11);
+    }
+    
+    // Format as needed
+    if (value.length > 0 && !value.startsWith('09')) {
+        if (value.startsWith('9')) {
+            value = '0' + value;
+        }
+    }
+    
+    $field.val(value);
+}
+
+// Validate phone number
+function isValidPhoneNumber(phone) {
+    const phoneRegex = /^09[0-9]{9}$/;
+    return phoneRegex.test(phone);
+}
+
+// Convert time to minutes
+function timeToMinutes(timeString) {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    return hours * 60 + minutes;
+}
+
+// Show field error
+function showFieldError($field, message) {
+    $field.addClass('is-invalid').removeClass('is-valid');
+    
+    // Remove existing error message
+    $field.siblings('.invalid-feedback').remove();
+    
+    // Add error message
+    $field.after(`<div class="invalid-feedback">${message}</div>`);
+}
+
+// Show field success
+function showFieldSuccess($field) {
+    $field.addClass('is-valid').removeClass('is-invalid');
+    $field.siblings('.invalid-feedback').remove();
+}
+
+// Clear field validation
+function clearFieldValidation($field) {
+    $field.removeClass('is-valid is-invalid');
+    $field.siblings('.invalid-feedback').remove();
+}
+
+// Show container error
+function showContainerError($container, message) {
+    $container.addClass('has-error');
+    
+    // Remove existing error message
+    $container.find('.error-message').remove();
+    
+    // Add error message
+    $container.append(`<div class="error-message text-danger mt-2">${message}</div>`);
+}
+
+// Show container success
+function showContainerSuccess($container) {
+    $container.removeClass('has-error');
+    $container.find('.error-message').remove();
+}
+
+// Clear container validation
+function clearContainerValidation($container) {
+    $container.removeClass('has-error');
+    $container.find('.error-message').remove();
+}
+
+// Show validation summary
+function showValidationSummary() {
+    const errorCount = $('.is-invalid').length + $('.has-error').length;
+    
+    if (errorCount > 0) {
+        showError(`لطفاً ${errorCount} خطای موجود در فرم را برطرف کنید`);
+    }
+}
+
+// Show loading state
+function showLoadingState() {
+    const $submitBtn = $('.btn-create');
+    const originalText = $submitBtn.html();
+    
+    $submitBtn.prop('disabled', true);
+    $submitBtn.html(`
+        <div class="spinner-border spinner-border-sm me-2" role="status">
+            <span class="visually-hidden">در حال پردازش...</span>
+        </div>
+        در حال ایجاد آرایشگاه...
+    `);
+    
+    // Store original text for potential restoration
+    $submitBtn.data('original-text', originalText);
+}
+
+// Utility functions
+function showError(message) {
+    // You can integrate with toastr or any notification library
+    if (typeof toastr !== 'undefined') {
+        toastr.error(message);
+    } else {
+        alert(message);
+    }
+}
+
+function showSuccess(message) {
+    if (typeof toastr !== 'undefined') {
+        toastr.success(message);
+    } else {
+        alert(message);
+    }
+}
+
+// Auto-save form data to localStorage (optional)
+function autoSaveForm() {
+    const formData = {
+        name: $('#Name').val(),
+        phone: $('#Phone').val(),
+        description: $('#Description').val(),
+        address: $('#Address').val(),
+        cityId: $('#CityId').val(),
+        openTime: $('#OpenTime').val(),
+        closeTime: $('#CloseTime').val(),
+        workingDays: $('#workingDaysHidden').val()
+    };
+    
+    localStorage.setItem('barbershop-form-draft', JSON.stringify(formData));
+}
+
+// Load saved form data (optional)
+function loadSavedForm() {
+    const savedData = localStorage.getItem('barbershop-form-draft');
+    if (savedData) {
+        try {
+            const formData = JSON.parse(savedData);
+            
+            $('#Name').val(formData.name || '');
+            $('#Phone').val(formData.phone || '');
+            $('#Description').val(formData.description || '');
+            $('#Address').val(formData.address || '');
+            $('#CityId').val(formData.cityId || '');
+            $('#OpenTime').val(formData.openTime || '09:00');
+            $('#CloseTime').val(formData.closeTime || '21:00');
+            
+            if (formData.workingDays) {
+                const days = formData.workingDays.split(',');
+                days.forEach(day => {
+                    $(`input[name="WorkingDaysArray"][value="${day.trim()}"]`).prop('checked', true);
                 });
-                updateWorkingDays();
-            } catch (e) {
-                console.log('Could not load draft');
+                updateWorkingDaysHidden();
             }
+        } catch (e) {
+            console.warn('Could not load saved form data:', e);
         }
     }
-    
-    // Load draft on page load
-    loadDraft();
-    
-    // Auto-save every 30 seconds
-    setInterval(autoSave, 30000);
-    
-    // Save on input change
-    document.querySelectorAll('input, select, textarea').forEach(input => {
-        input.addEventListener('change', autoSave);
-    });
-    
-    // Clear draft on successful submission
-    window.addEventListener('beforeunload', () => {
-        if (document.querySelector('.btn-create.loading')) {
-            localStorage.removeItem('barbershop_draft');
-        }
-    });
+}
+
+// Clear saved form data
+function clearSavedForm() {
+    localStorage.removeItem('barbershop-form-draft');
+}
+
+// Auto-save every 30 seconds
+setInterval(autoSaveForm, 30000);
+
+// Load saved data on page load
+$(document).ready(function() {
+    // Uncomment if you want to enable auto-save/load functionality
+    // loadSavedForm();
 });
 
-// CSS Animation for notifications
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInRight {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
+// Clear saved data on successful submission
+$('form').on('submit', function() {
+    if (validateForm()) {
+        clearSavedForm();
     }
-`;
-document.head.appendChild(style);
+});
+
+// Export functions for potential external use
+window.CreateBarbershopForm = {
+    validateForm,
+    showLoadingState,
+    clearSavedForm,
+    autoSaveForm,
+    loadSavedForm
+};

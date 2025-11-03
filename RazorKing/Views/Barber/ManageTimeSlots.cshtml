@@ -1,0 +1,302 @@
+@model RazorKing.Models.ViewModels.TimeSlotManagementViewModel
+@{
+    ViewData["Title"] = "مدیریت بازه‌های زمانی";
+    Layout = "_LayoutBarber";
+}
+
+<section class="manage-time-slots">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="page-title">
+                        <i class="fas fa-clock"></i>
+                        مدیریت بازه‌های زمانی
+                    </h1>
+                    <p class="page-subtitle">بازه‌های زمانی قابل رزرو را مدیریت کنید</p>
+                </div>
+                <div class="col-lg-4 text-end">
+                    <div class="header-actions">
+                        <a href="@Url.Action("Dashboard")" class="btn btn-outline-gold">
+                            <i class="fas fa-arrow-right"></i>
+                            بازگشت
+                        </a>
+                        <button class="btn btn-gold" onclick="openGenerateModal()">
+                            <i class="fas fa-magic"></i>
+                            تولید خودکار
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date Navigation -->
+        <div class="date-navigation">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <div class="date-picker-wrapper">
+                        <label class="form-label">انتخاب تاریخ</label>
+                        <input type="date" id="selectedDate" class="form-control" 
+                               value="@Model.SelectedDate.ToString("yyyy-MM-dd")" 
+                               onchange="loadTimeSlots()" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="quick-dates">
+                        <button class="btn btn-sm btn-outline-gold" onclick="selectToday()">امروز</button>
+                        <button class="btn btn-sm btn-outline-gold" onclick="selectTomorrow()">فردا</button>
+                        <button class="btn btn-sm btn-outline-gold" onclick="selectNextWeek()">هفته آینده</button>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="date-info">
+                        <span class="current-date" id="currentDateDisplay">
+                            @Model.SelectedDate.ToString("dddd، dd MMMM yyyy", new System.Globalization.CultureInfo("fa-IR"))
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Slots Grid -->
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="time-slots-container">
+                    <div class="slots-header">
+                        <h3>بازه‌های زمانی</h3>
+                        <div class="slots-actions">
+                            <button class="btn btn-sm btn-success" onclick="addTimeSlot()">
+                                <i class="fas fa-plus"></i>
+                                افزودن بازه
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="blockSelectedSlots()">
+                                <i class="fas fa-ban"></i>
+                                مسدود کردن
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="unblockSelectedSlots()">
+                                <i class="fas fa-unlock"></i>
+                                رفع مسدودی
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="time-slots-grid" id="timeSlotsGrid">
+                        <!-- Time slots will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-3">
+                <!-- Day Summary -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h4>
+                            <i class="fas fa-chart-pie"></i>
+                            خلاصه روز
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="summary-stats" id="daySummary">
+                            <!-- Stats will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointments -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h4>
+                            <i class="fas fa-calendar-check"></i>
+                            نوبت‌های این روز
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="appointments-list" id="dayAppointments">
+                            <!-- Appointments will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h4>
+                            <i class="fas fa-info-circle"></i>
+                            راهنما
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-color available"></div>
+                                <span>آزاد</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color booked"></div>
+                                <span>رزرو شده</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color blocked"></div>
+                                <span>مسدود</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color break"></div>
+                                <span>استراحت</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Generate Time Slots Modal -->
+<div class="modal fade" id="generateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-magic"></i>
+                    تولید خودکار بازه‌های زمانی
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="generateForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">از تاریخ</label>
+                                <input type="date" class="form-control" id="startDate" 
+                                       value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">تا تاریخ</label>
+                                <input type="date" class="form-control" id="endDate" 
+                                       value="@DateTime.Today.AddDays(30).ToString("yyyy-MM-dd")" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">مدت زمان هر بازه (دقیقه)</label>
+                                <select class="form-select" id="slotDuration">
+                                    <option value="15">15 دقیقه</option>
+                                    <option value="30" selected>30 دقیقه</option>
+                                    <option value="45">45 دقیقه</option>
+                                    <option value="60">60 دقیقه</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">فاصله بین بازه‌ها (دقیقه)</label>
+                                <select class="form-select" id="breakDuration">
+                                    <option value="0">بدون فاصله</option>
+                                    <option value="5">5 دقیقه</option>
+                                    <option value="10">10 دقیقه</option>
+                                    <option value="15" selected>15 دقیقه</option>
+                                    <option value="30">30 دقیقه</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        بازه‌های زمانی بر اساس ساعات کاری و روزهای کاری آرایشگاه شما تولید خواهد شد.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">انصراف</button>
+                <button type="button" class="btn btn-gold" onclick="generateTimeSlots()">تولید بازه‌ها</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Time Slot Modal -->
+<div class="modal fade" id="timeSlotModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="timeSlotModalTitle">
+                    <i class="fas fa-clock"></i>
+                    افزودن بازه زمانی
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="timeSlotForm">
+                    <input type="hidden" id="timeSlotId" />
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">ساعت شروع</label>
+                                <input type="time" class="form-control" id="startTime" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">ساعت پایان</label>
+                                <input type="time" class="form-control" id="endTime" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">نوع بازه</label>
+                        <select class="form-select" id="slotType">
+                            <option value="Available">آزاد</option>
+                            <option value="Break">استراحت</option>
+                            <option value="Blocked">مسدود</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="blockReasonGroup" style="display: none;">
+                        <label class="form-label">دلیل مسدودی</label>
+                        <input type="text" class="form-control" id="blockReason" placeholder="دلیل مسدود کردن این بازه..." />
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="isAvailable" checked />
+                        <label class="form-check-label" for="isAvailable">
+                            قابل رزرو
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">انصراف</button>
+                <button type="button" class="btn btn-gold" onclick="saveTimeSlot()">ذخیره</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/manage-time-slots.css" asp-append-version="true">
+}
+
+@section Scripts {
+    <script src="~/js/manage-time-slots.js" asp-append-version="true"></script>
+    <script>
+        // Initialize with current date
+        window.currentDate = '@Model.SelectedDate.ToString("yyyy-MM-dd")';
+        window.barbershopId = @Model.Barbershop.Id;
+        
+        // Load initial data
+        $(document).ready(function() {
+            loadTimeSlots();
+        });
+    </script>
+}

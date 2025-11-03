@@ -5,293 +5,204 @@
 }
 
 <div class="create-barbershop-container">
-    <div class="container-fluid">
-        <div class="row min-vh-100">
-            <!-- Left Side - Form -->
-            <div class="col-lg-8 col-xl-9 d-flex align-items-center">
-                <div class="create-form-wrapper w-100">
-                    <div class="create-header text-center mb-5">
-                        <div class="icon-wrapper mb-3">
-                            <i class="fas fa-store"></i>
-                        </div>
-                        <h1 class="display-5 fw-bold text-gold mb-3">آرایشگاه خود را راه‌اندازی کنید</h1>
-                        <p class="lead text-light-gray">با تکمیل اطلاعات زیر، آرایشگاه خود را ثبت کرده و شروع به پذیرش مشتری کنید</p>
+    <div class="container-fluid h-100">
+        <div class="row h-100 align-items-center">
+            <!-- Main Form Container -->
+            <div class="col-12">
+                <div class="create-form-card">
+                    <!-- Header -->
+                    <div class="form-header text-center">
+                        <h2 class="header-title">راه‌اندازی آرایشگاه</h2>
+                        <p class="header-subtitle">اطلاعات آرایشگاه خود را تکمیل کنید</p>
                     </div>
 
-                    <form asp-action="CreateBarbershop" method="post" enctype="multipart/form-data" class="create-form">
-                        <div asp-validation-summary="All" class="alert alert-danger mb-4"></div>
+                    <form asp-action="CreateBarbershop" method="post" enctype="multipart/form-data" class="compact-form">
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                        {
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                لطفاً خطاهای موجود در فرم را برطرف کنید
+                            </div>
+                        }
 
-                        <!-- Progress Steps -->
-                        <div class="progress-steps mb-5">
-                            <div class="step active" data-step="1">
-                                <div class="step-number">1</div>
-                                <div class="step-title">اطلاعات پایه</div>
-                            </div>
-                            <div class="step" data-step="2">
-                                <div class="step-number">2</div>
-                                <div class="step-title">ساعات کاری</div>
-                            </div>
-                            <div class="step" data-step="3">
-                                <div class="step-number">3</div>
-                                <div class="step-title">تصویر و تکمیل</div>
-                            </div>
-                        </div>
-
-                        <!-- Step 1: Basic Information -->
-                        <div class="form-step active" id="step-1">
-                            <div class="step-header mb-4">
-                                <h3><i class="fas fa-info-circle text-gold me-2"></i>اطلاعات پایه آرایشگاه</h3>
-                                <p class="text-muted">نام و اطلاعات اصلی آرایشگاه خود را وارد کنید</p>
-                            </div>
-
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <div class="form-floating">
-                                        <input asp-for="Name" class="form-control" placeholder="نام آرایشگاه" />
-                                        <label asp-for="Name">
-                                            <i class="fas fa-store me-2"></i>نام آرایشگاه
-                                        </label>
-                                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <div class="form-grid">
+                            <!-- Left Column -->
+                            <div class="form-column">
+                                <div class="form-section">
+                                    <h5 class="section-title">
+                                        <i class="fas fa-info-circle"></i>
+                                        اطلاعات پایه
+                                    </h5>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label asp-for="Name" class="form-label">
+                                                <i class="fas fa-store"></i>نام آرایشگاه
+                                            </label>
+                                            <input asp-for="Name" class="form-control" placeholder="نام آرایشگاه خود را وارد کنید" />
+                                            <span asp-validation-for="Name" class="text-danger"></span>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label asp-for="Phone" class="form-label">
+                                                <i class="fas fa-phone"></i>شماره تماس
+                                            </label>
+                                            <input asp-for="Phone" class="form-control" placeholder="09123456789" />
+                                            <span asp-validation-for="Phone" class="text-danger"></span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating">
-                                        <input asp-for="Phone" class="form-control" placeholder="شماره تماس" />
-                                        <label asp-for="Phone">
-                                            <i class="fas fa-phone me-2"></i>شماره تماس
+
+                                    <div class="form-group">
+                                        <label asp-for="Description" class="form-label">
+                                            <i class="fas fa-align-left"></i>توضیحات
                                         </label>
-                                        <span asp-validation-for="Phone" class="text-danger"></span>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        <textarea asp-for="Description" class="form-control" style="height: 120px" placeholder="توضیحات"></textarea>
-                                        <label asp-for="Description">
-                                            <i class="fas fa-align-left me-2"></i>توضیحات آرایشگاه
-                                        </label>
+                                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="توضیح کوتاهی از آرایشگاه خود بنویسید..."></textarea>
                                         <span asp-validation-for="Description" class="text-danger"></span>
                                     </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="form-floating">
-                                        <textarea asp-for="Address" class="form-control" style="height: 100px" placeholder="آدرس"></textarea>
-                                        <label asp-for="Address">
-                                            <i class="fas fa-map-marker-alt me-2"></i>آدرس کامل
-                                        </label>
-                                        <span asp-validation-for="Address" class="text-danger"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-floating">
-                                        <select asp-for="CityId" class="form-select">
-                                            <option value="">انتخاب شهر...</option>
-                                            @foreach (var city in Model.Cities)
-                                            {
-                                                <option value="@city.Id">@city.Name</option>
-                                            }
-                                        </select>
-                                        <label asp-for="CityId">
-                                            <i class="fas fa-city me-2"></i>شهر
-                                        </label>
-                                        <span asp-validation-for="CityId" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div class="step-actions mt-5">
-                                <button type="button" class="btn btn-gold btn-lg next-step">
-                                    مرحله بعد <i class="fas fa-arrow-left ms-2"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Step 2: Working Hours -->
-                        <div class="form-step" id="step-2">
-                            <div class="step-header mb-4">
-                                <h3><i class="fas fa-clock text-gold me-2"></i>ساعات و روزهای کاری</h3>
-                                <p class="text-muted">زمان‌بندی کاری آرایشگاه خود را تعیین کنید</p>
-                            </div>
-
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <div class="time-picker-wrapper">
-                                        <label class="form-label">
-                                            <i class="fas fa-sun text-warning me-2"></i>ساعت شروع کار
-                                        </label>
-                                        <input asp-for="OpenTime" type="time" class="form-control time-input" />
-                                        <span asp-validation-for="OpenTime" class="text-danger"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="time-picker-wrapper">
-                                        <label class="form-label">
-                                            <i class="fas fa-moon text-info me-2"></i>ساعت پایان کار
-                                        </label>
-                                        <input asp-for="CloseTime" type="time" class="form-control time-input" />
-                                        <span asp-validation-for="CloseTime" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="working-days-section mt-4">
-                                <label class="form-label mb-3">
-                                    <i class="fas fa-calendar-week text-gold me-2"></i>روزهای کاری
-                                </label>
-                                <div class="working-days-grid">
-                                    @{
-                                        var days = new Dictionary<string, string>
-                                        {
-                                            { "شنبه", "Saturday" },
-                                            { "یکشنبه", "Sunday" },
-                                            { "دوشنبه", "Monday" },
-                                            { "سه‌شنبه", "Tuesday" },
-                                            { "چهارشنبه", "Wednesday" },
-                                            { "پنج‌شنبه", "Thursday" },
-                                            { "جمعه", "Friday" }
-                                        };
-                                        var selectedDays = Model.WorkingDays?.Split(',').Select(d => d.Trim()).ToList() ?? new List<string>();
-                                    }
-                                    @foreach (var day in days)
-                                    {
-                                        <div class="day-card">
-                                            <input type="checkbox" id="day_@day.Value" name="WorkingDaysArray" value="@day.Key" 
-                                                   @(selectedDays.Contains(day.Key) ? "checked" : "") />
-                                            <label for="day_@day.Value">
-                                                <div class="day-name">@day.Key</div>
-                                                <div class="day-status">
-                                                    <i class="fas fa-check"></i>
-                                                </div>
+                                    <div class="form-row">
+                                        <div class="form-group flex-2">
+                                            <label asp-for="Address" class="form-label">
+                                                <i class="fas fa-map-marker-alt"></i>آدرس
                                             </label>
+                                            <textarea asp-for="Address" class="form-control" rows="2" placeholder="آدرس کامل آرایشگاه"></textarea>
+                                            <span asp-validation-for="Address" class="text-danger"></span>
                                         </div>
-                                    }
+                                        
+                                        <div class="form-group flex-1">
+                                            <label asp-for="CityId" class="form-label">
+                                                <i class="fas fa-city"></i>شهر
+                                            </label>
+                                            <select asp-for="CityId" class="form-select">
+                                                <option value="">انتخاب شهر</option>
+                                                @foreach (var city in Model.Cities)
+                                                {
+                                                    <option value="@city.Id">@city.Name</option>
+                                                }
+                                            </select>
+                                            <span asp-validation-for="CityId" class="text-danger"></span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <input asp-for="WorkingDays" type="hidden" id="workingDaysHidden" />
-                                <span asp-validation-for="WorkingDays" class="text-danger"></span>
                             </div>
 
-                            <div class="step-actions mt-5">
-                                <button type="button" class="btn btn-outline-light btn-lg prev-step me-3">
-                                    <i class="fas fa-arrow-right me-2"></i>مرحله قبل
-                                </button>
-                                <button type="button" class="btn btn-gold btn-lg next-step">
-                                    مرحله بعد <i class="fas fa-arrow-left ms-2"></i>
-                                </button>
+                            <!-- Right Column -->
+                            <div class="form-column">
+                                <div class="form-section">
+                                    <h5 class="section-title">
+                                        <i class="fas fa-clock"></i>
+                                        ساعات کاری
+                                    </h5>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label asp-for="OpenTime" class="form-label">
+                                                <i class="fas fa-sun"></i>شروع کار
+                                            </label>
+                                            <input asp-for="OpenTime" type="time" class="form-control" value="@Model.OpenTimeString" />
+                                            <span asp-validation-for="OpenTime" class="text-danger"></span>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label asp-for="CloseTime" class="form-label">
+                                                <i class="fas fa-moon"></i>پایان کار
+                                            </label>
+                                            <input asp-for="CloseTime" type="time" class="form-control" value="@Model.CloseTimeString" />
+                                            <span asp-validation-for="CloseTime" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="fas fa-calendar-week"></i>روزهای کاری
+                                        </label>
+                                        <div class="days-grid">
+                                            @{
+                                                var days = new Dictionary<string, string>
+                                                {
+                                                    { "شنبه", "Saturday" },
+                                                    { "یکشنبه", "Sunday" },
+                                                    { "دوشنبه", "Monday" },
+                                                    { "سه‌شنبه", "Tuesday" },
+                                                    { "چهارشنبه", "Wednesday" },
+                                                    { "پنج‌شنبه", "Thursday" },
+                                                    { "جمعه", "Friday" }
+                                                };
+                                                var selectedDays = Model.WorkingDays?.Split(',').Select(d => d.Trim()).ToList() ?? new List<string>();
+                                            }
+                                            @foreach (var day in days)
+                                            {
+                                                <div class="day-item">
+                                                    <input type="checkbox" id="day_@day.Value" name="WorkingDaysArray" value="@day.Key" 
+                                                           @(selectedDays.Contains(day.Key) ? "checked" : "") />
+                                                    <label for="day_@day.Value">@day.Key</label>
+                                                </div>
+                                            }
+                                        </div>
+                                        <input asp-for="WorkingDays" type="hidden" id="workingDaysHidden" />
+                                        <span asp-validation-for="WorkingDays" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="fas fa-image"></i>تصویر آرایشگاه (اختیاری)
+                                        </label>
+                                        <div class="image-upload-compact">
+                                            <input type="file" name="imageFile" id="imageFile" class="d-none" accept="image/*" />
+                                            <div class="upload-area-compact" onclick="document.getElementById('imageFile').click()">
+                                                <div class="upload-content-compact">
+                                                    <i class="fas fa-cloud-upload-alt"></i>
+                                                    <span>انتخاب تصویر</span>
+                                                </div>
+                                                <div class="upload-preview-compact d-none" id="uploadPreview">
+                                                    <img id="previewImage" src="" alt="پیش‌نمایش" />
+                                                    <button type="button" class="remove-btn" id="removeImage">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <small class="form-text">JPG, PNG, GIF - حداکثر 5MB</small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Step 3: Image and Completion -->
-                        <div class="form-step" id="step-3">
-                            <div class="step-header mb-4">
-                                <h3><i class="fas fa-image text-gold me-2"></i>تصویر آرایشگاه</h3>
-                                <p class="text-muted">تصویری از آرایشگاه خود آپلود کنید (اختیاری)</p>
+                        <!-- Features Preview -->
+                        <div class="features-preview">
+                            <div class="features-title">
+                                <i class="fas fa-star"></i>
+                                امکانات در انتظار شما
                             </div>
-
-                            <div class="image-upload-section">
-                                <div class="upload-area" id="uploadArea">
-                                    <div class="upload-content">
-                                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                                        <h4>تصویر آرایشگاه را آپلود کنید</h4>
-                                        <p>فایل را اینجا بکشید یا کلیک کنید</p>
-                                        <input type="file" name="imageFile" id="imageFile" class="d-none" accept="image/*" />
-                                        <button type="button" class="btn btn-outline-gold" onclick="document.getElementById('imageFile').click()">
-                                            انتخاب فایل
-                                        </button>
-                                    </div>
-                                    <div class="upload-preview d-none" id="uploadPreview">
-                                        <img id="previewImage" src="" alt="پیش‌نمایش" />
-                                        <button type="button" class="btn btn-sm btn-danger remove-image" id="removeImage">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
+                            <div class="features-grid">
+                                <div class="feature-item">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <span>مدیریت نوبت‌ها</span>
                                 </div>
-                                <small class="form-text text-muted mt-2">
-                                    فرمت‌های مجاز: JPG, PNG, GIF - حداکثر 5MB
-                                </small>
-                            </div>
-
-                            <div class="completion-info mt-5">
-                                <div class="info-card">
-                                    <h5><i class="fas fa-lightbulb text-warning me-2"></i>مراحل بعدی</h5>
-                                    <ul class="completion-list">
-                                        <li><i class="fas fa-check-circle text-success me-2"></i>پس از ایجاد آرایشگاه، خدمات خود را اضافه کنید</li>
-                                        <li><i class="fas fa-check-circle text-success me-2"></i>برنامه کاری تفصیلی خود را تنظیم کنید</li>
-                                        <li><i class="fas fa-check-circle text-success me-2"></i>مشتریان می‌توانند نوبت رزرو کنند</li>
-                                        <li><i class="fas fa-check-circle text-success me-2"></i>از پنل مدیریت خود استفاده کنید</li>
-                                    </ul>
+                                <div class="feature-item">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>گزارش‌گیری</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    <span>دسترسی موبایل</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>مدیریت مشتریان</span>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="step-actions mt-5">
-                                <button type="button" class="btn btn-outline-light btn-lg prev-step me-3">
-                                    <i class="fas fa-arrow-right me-2"></i>مرحله قبل
-                                </button>
-                                <button type="submit" class="btn btn-gold btn-lg btn-create">
-                                    <i class="fas fa-plus me-2"></i>ایجاد آرایشگاه
-                                </button>
-                            </div>
+                        <!-- Submit Button -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn-create">
+                                <i class="fas fa-plus"></i>
+                                <span>ایجاد آرایشگاه</span>
+                                <div class="btn-shine"></div>
+                            </button>
                         </div>
                     </form>
-                </div>
-            </div>
-
-            <!-- Right Side - Info Panel -->
-            <div class="col-lg-4 col-xl-3 d-none d-lg-flex">
-                <div class="info-panel">
-                    <div class="info-content">
-                        <div class="info-header">
-                            <h4>مزایای عضویت</h4>
-                        </div>
-                        
-                        <div class="feature-list">
-                            <div class="feature-item">
-                                <div class="feature-icon">
-                                    <i class="fas fa-calendar-check"></i>
-                                </div>
-                                <div class="feature-content">
-                                    <h6>مدیریت نوبت‌ها</h6>
-                                    <p>سیستم پیشرفته رزرو و مدیریت نوبت‌های مشتریان</p>
-                                </div>
-                            </div>
-
-                            <div class="feature-item">
-                                <div class="feature-icon">
-                                    <i class="fas fa-chart-line"></i>
-                                </div>
-                                <div class="feature-content">
-                                    <h6>گزارش‌گیری</h6>
-                                    <p>آمار و گزارش کامل از درآمد و عملکرد آرایشگاه</p>
-                                </div>
-                            </div>
-
-                            <div class="feature-item">
-                                <div class="feature-icon">
-                                    <i class="fas fa-mobile-alt"></i>
-                                </div>
-                                <div class="feature-content">
-                                    <h6>دسترسی موبایل</h6>
-                                    <p>مدیریت آرایشگاه از هر مکان با گوشی هوشمند</p>
-                                </div>
-                            </div>
-
-                            <div class="feature-item">
-                                <div class="feature-icon">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                                <div class="feature-content">
-                                    <h6>مدیریت مشتریان</h6>
-                                    <p>ثبت و پیگیری اطلاعات مشتریان و تاریخچه خدمات</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="support-info">
-                            <div class="support-card">
-                                <i class="fas fa-headset"></i>
-                                <h6>پشتیبانی ۲۴/۷</h6>
-                                <p>تیم پشتیبانی ما همیشه در خدمت شماست</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

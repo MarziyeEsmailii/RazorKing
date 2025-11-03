@@ -152,11 +152,11 @@ namespace RazorKing.Models.ViewModels
         
         [Required(ErrorMessage = "ساعت شروع کار الزامی است")]
         [Display(Name = "ساعت شروع کار")]
-        public TimeSpan OpenTime { get; set; } = new TimeSpan(9, 0, 0);
+        public TimeSpan OpenTime { get; set; } = TimeSpan.FromHours(9);
         
         [Required(ErrorMessage = "ساعت پایان کار الزامی است")]
         [Display(Name = "ساعت پایان کار")]
-        public TimeSpan CloseTime { get; set; } = new TimeSpan(21, 0, 0);
+        public TimeSpan CloseTime { get; set; } = TimeSpan.FromHours(21);
         
         [Required(ErrorMessage = "روزهای کاری الزامی است")]
         [Display(Name = "روزهای کاری")]
@@ -165,6 +165,10 @@ namespace RazorKing.Models.ViewModels
         public List<string> WorkingDaysArray { get; set; } = new();
         
         public List<City> Cities { get; set; } = new();
+        
+        // Helper properties for time display
+        public string OpenTimeString => OpenTime.ToString(@"hh\:mm");
+        public string CloseTimeString => CloseTime.ToString(@"hh\:mm");
     }
 
     public class ChangeAppointmentStatusViewModel
@@ -253,5 +257,96 @@ namespace RazorKing.Models.ViewModels
         public bool IsToday { get; set; }
         public List<AppointmentSlotViewModel> Slots { get; set; } = new();
         public DailyStatsViewModel Stats { get; set; } = new();
+    }
+
+    public class GenerateTimeSlotsViewModel
+    {
+        [Required(ErrorMessage = "تاریخ شروع الزامی است")]
+        public DateTime StartDate { get; set; }
+        
+        [Required(ErrorMessage = "تاریخ پایان الزامی است")]
+        public DateTime EndDate { get; set; }
+        
+        [Range(15, 120, ErrorMessage = "مدت زمان هر بازه باید بین 15 تا 120 دقیقه باشد")]
+        public int SlotDuration { get; set; } = 30;
+        
+        [Range(0, 60, ErrorMessage = "مدت زمان استراحت باید بین 0 تا 60 دقیقه باشد")]
+        public int BreakDuration { get; set; } = 15;
+    }
+
+    public class UpdateTimeSlotViewModel
+    {
+        public int TimeSlotId { get; set; }
+        public bool IsAvailable { get; set; }
+        public bool IsBlocked { get; set; }
+        public string? BlockReason { get; set; }
+        public TimeSlotType SlotType { get; set; }
+    }
+
+    public class TimeSlotManagementViewModel
+    {
+        public Barbershop Barbershop { get; set; } = new();
+        public DateTime SelectedDate { get; set; } = DateTime.Today;
+        public List<TimeSlotViewModel> TimeSlots { get; set; } = new();
+        public List<Appointment> DayAppointments { get; set; } = new();
+        public TimeSlotSettingsViewModel Settings { get; set; } = new();
+    }
+
+    public class TimeSlotViewModel
+    {
+        public int Id { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public bool IsAvailable { get; set; }
+        public bool IsBlocked { get; set; }
+        public string? BlockReason { get; set; }
+        public TimeSlotType SlotType { get; set; }
+        public Appointment? Appointment { get; set; }
+    }
+
+    public class TimeSlotSettingsViewModel
+    {
+        public int DefaultSlotDuration { get; set; } = 30;
+        public int DefaultBreakDuration { get; set; } = 15;
+        public bool AutoGenerateSlots { get; set; } = true;
+        public int DaysInAdvance { get; set; } = 30;
+    }
+
+    public class AddTimeSlotViewModel
+    {
+        [Required(ErrorMessage = "تاریخ الزامی است")]
+        public DateTime Date { get; set; }
+        
+        [Required(ErrorMessage = "ساعت شروع الزامی است")]
+        public string StartTime { get; set; } = string.Empty;
+        
+        [Required(ErrorMessage = "ساعت پایان الزامی است")]
+        public string EndTime { get; set; } = string.Empty;
+        
+        public bool IsAvailable { get; set; } = true;
+        
+        public TimeSlotType SlotType { get; set; } = TimeSlotType.Available;
+        
+        public string? BlockReason { get; set; }
+    }
+
+    public class UpdateTimeSlotRequestViewModel
+    {
+        public int Id { get; set; }
+        
+        [Required(ErrorMessage = "تاریخ الزامی است")]
+        public DateTime Date { get; set; }
+        
+        [Required(ErrorMessage = "ساعت شروع الزامی است")]
+        public string StartTime { get; set; } = string.Empty;
+        
+        [Required(ErrorMessage = "ساعت پایان الزامی است")]
+        public string EndTime { get; set; } = string.Empty;
+        
+        public bool IsAvailable { get; set; } = true;
+        
+        public TimeSlotType SlotType { get; set; } = TimeSlotType.Available;
+        
+        public string? BlockReason { get; set; }
     }
 }

@@ -9,6 +9,7 @@ namespace RazorKing.Models.ViewModels
         public List<Barbershop> FeaturedBarbershops { get; set; } = new List<Barbershop>();
         public List<ServiceSummary> PopularServices { get; set; } = new List<ServiceSummary>();
         public List<Appointment> RecentAppointments { get; set; } = new List<Appointment>();
+        public ProfileViewModel? UserProfile { get; set; }
     }
 
     public class ServiceSummary

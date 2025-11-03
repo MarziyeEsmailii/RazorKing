@@ -2,51 +2,13 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // 🎯 عناصر
-    const switches = document.querySelectorAll('.auth-switch');
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const images = document.querySelectorAll('.auth-img');
     const inputs = document.querySelectorAll('input');
     
-    // 🔄 تعویض بین ورود و ثبت نام
-    switches.forEach(switchBtn => {
-        switchBtn.addEventListener('click', function() {
-            const formType = this.dataset.form;
-            
-            if (!formType) return;
-            
-            // تغییر تب فعال با انیمیشن
-            switches.forEach(s => s.classList.remove('active'));
-            this.classList.add('active');
-            
-            // تغییر فرم با انیمیشن نرم
-            if (formType === 'login') {
-                if (registerForm) registerForm.classList.add('hidden');
-                if (loginForm) {
-                    setTimeout(() => loginForm.classList.remove('hidden'), 150);
-                }
-            } else {
-                if (loginForm) loginForm.classList.add('hidden');
-                if (registerForm) {
-                    setTimeout(() => registerForm.classList.remove('hidden'), 150);
-                }
-            }
-        });
-    });
+    // 🔄 دکمه‌های تب فقط برای نمایش هستن
+    // تعویض با onclick در HTML انجام می‌شه
     
-    // 🖼️ تعویض خودکار تصاویر زیبا
-    if (images.length > 1) {
-        let currentImageIndex = 0;
-        
-        function switchImage() {
-            images[currentImageIndex].classList.remove('active');
-            currentImageIndex = (currentImageIndex + 1) % images.length;
-            images[currentImageIndex].classList.add('active');
-        }
-        
-        // تعویض تصویر هر 6 ثانیه
-        setInterval(switchImage, 6000);
-    }
+    // 🖼️ تصاویر ثابت - بدون تعویض خودکار
+    // عکس‌ها ثابت می‌مونن و تغییر نمی‌کنن
     
     // ✨ افکت‌های زیبا برای ورودی‌ها
     inputs.forEach(input => {
@@ -62,10 +24,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // پاک کردن خطاها
         input.addEventListener('input', function() {
             this.style.borderColor = '';
+            this.style.boxShadow = '';
             const errorSpan = this.parentNode.querySelector('.field-error');
-            if (errorSpan) {
-                errorSpan.style.opacity = '0';
-                setTimeout(() => errorSpan.textContent = '', 300);
+            if (errorSpan && errorSpan.textContent.trim()) {
+                errorSpan.style.animation = 'errorSlide 0.3s ease-out reverse';
+                setTimeout(() => {
+                    errorSpan.textContent = '';
+                    errorSpan.style.display = 'none';
+                }, 300);
             }
         });
     });
@@ -93,10 +59,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isValid) {
                 e.preventDefault();
                 
-                // نمایش پیام خطا با انیمیشن
-                const errorDiv = form.querySelector('.auth-error');
-                if (errorDiv) {
-                    errorDiv.style.animation = 'shake 0.5s ease-in-out';
+                // فوکوس روی اولین input خطادار
+                const firstErrorInput = form.querySelector('input[style*="border-color: #ff6b6b"]');
+                if (firstErrorInput) {
+                    firstErrorInput.focus();
                 }
             }
         });
@@ -129,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Tab برای تعویض بین ورود و ثبت نام
         if (e.key === 'Tab' && e.ctrlKey) {
             e.preventDefault();
-            const activeSwitch = document.querySelector('.auth-switch.active');
             const otherSwitch = document.querySelector('.auth-switch:not(.active)');
             if (otherSwitch) otherSwitch.click();
         }

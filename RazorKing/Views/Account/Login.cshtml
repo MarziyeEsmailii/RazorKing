@@ -5,40 +5,21 @@
 }
 
 <div class="auth-page">
-    <!-- بخش تصویر -->
-    <div class="auth-visual">
-        <div class="auth-images">
-            <img src="~/img/photo_1_2025-11-01_19-21-48.jpg" alt="" class="auth-img active">
-            <img src="~/img/photo_3_2025-11-01_19-21-48.jpg" alt="" class="auth-img">
-        </div>
-        <div class="visual-overlay">
-            <div class="brand-text">
-                <h3>ریزر کینگ</h3>
-                <p>تجربه‌ای متفاوت از آرایشگری</p>
-            </div>
-        </div>
-    </div>
+    <!-- کارت فرم -->
+    <div class="auth-card">
+        <div class="auth-content">
+            <div class="auth-box">
 
-    <!-- بخش فرم -->
-    <div class="auth-content">
-        <div class="auth-box">
-            <!-- لوگو -->
-            <div class="auth-brand">
-                <a href="/">
-                    <img src="~/img/logo.jpg" alt="ریزر کینگ">
-                </a>
-            </div>
 
             <!-- تب‌ها -->
             <div class="auth-switcher">
-                <button type="button" class="auth-switch active" data-form="login">ورود</button>
-                <button type="button" class="auth-switch" data-form="register">ثبت نام</button>
+                <button type="button" class="auth-switch active">ورود</button>
+                <button type="button" class="auth-switch" onclick="window.location.href='/Account/Register'">ثبت نام</button>
             </div>
 
             <!-- فرم ورود -->
             <div class="auth-form-container" id="login-form">
                 <form asp-action="Login" method="post" class="auth-form">
-                    <div asp-validation-summary="All" class="auth-error"></div>
                     
                     <div class="input-group">
                         <input asp-for="Email" type="email" placeholder="ایمیل" required>
@@ -63,61 +44,15 @@
                 </form>
             </div>
 
-            <!-- فرم ثبت نام -->
-            <div class="auth-form-container hidden" id="register-form">
-                <form action="/Account/Register" method="post" class="auth-form">
-                    <div class="input-row">
-                        <div class="input-group">
-                            <input name="FirstName" type="text" placeholder="نام" required>
-                        </div>
-                        <div class="input-group">
-                            <input name="LastName" type="text" placeholder="نام خانوادگی" required>
-                        </div>
-                    </div>
 
-                    <div class="input-group">
-                        <input name="Email" type="email" placeholder="ایمیل" required>
-                    </div>
-
-                    <div class="input-group">
-                        <input name="PhoneNumber" type="tel" placeholder="شماره موبایل" required>
-                    </div>
-
-                    <div class="input-row">
-                        <div class="input-group">
-                            <input name="Password" type="password" placeholder="رمز عبور" required>
-                        </div>
-                        <div class="input-group">
-                            <input name="ConfirmPassword" type="password" placeholder="تکرار رمز عبور" required>
-                        </div>
-                    </div>
-
-                    <div class="user-type">
-                        <label class="type-option">
-                            <input type="radio" name="UserType" value="Customer" checked>
-                            <span class="type-card">
-                                <i class="icon">👤</i>
-                                <span>مشتری</span>
-                            </span>
-                        </label>
-                        <label class="type-option">
-                            <input type="radio" name="UserType" value="Barber">
-                            <span class="type-card">
-                                <i class="icon">✂️</i>
-                                <span>آرایشگر</span>
-                            </span>
-                        </label>
-                    </div>
-
-                    <label class="checkbox-label">
-                        <input name="AgreeToTerms" type="checkbox" required>
-                        <span class="checkmark"></span>
-                        با قوانین موافقم
-                    </label>
-
-                    <button type="submit" class="auth-btn">ثبت نام</button>
-                </form>
             </div>
+        </div>
+    </div>
+    
+    <!-- عکس طبیعی -->
+    <div class="auth-visual">
+        <div class="auth-images">
+            <img src="~/img/photo_1_2025-11-01_19-21-48.jpg" alt="" class="auth-img active">
         </div>
     </div>
 </div>

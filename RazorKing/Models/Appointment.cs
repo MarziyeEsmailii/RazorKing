@@ -23,6 +23,9 @@ namespace RazorKing.Models
         public string CustomerPhone { get; set; } = string.Empty;
         
         [Required]
+        public string CustomerEmail { get; set; } = string.Empty;
+        
+        [Required]
         public DateTime AppointmentDate { get; set; }
         
         [Required]

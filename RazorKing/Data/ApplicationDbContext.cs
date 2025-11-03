@@ -18,6 +18,7 @@ namespace RazorKing.Data
         public DbSet<BarberSchedule> BarberSchedules { get; set; }
         public DbSet<BlockedDate> BlockedDates { get; set; }
         public DbSet<BlockedTimeSlot> BlockedTimeSlots { get; set; }
+        public DbSet<TimeSlot> TimeSlots { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -131,6 +132,20 @@ namespace RazorKing.Data
                 .WithMany()
                 .HasForeignKey(bts => bts.BarbershopId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure TimeSlot relationships
+            modelBuilder.Entity<TimeSlot>()
+                .HasOne(ts => ts.Barbershop)
+                .WithMany()
+                .HasForeignKey(ts => ts.BarbershopId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TimeSlot>()
+                .HasOne(ts => ts.Appointment)
+                .WithOne()
+                .HasForeignKey<TimeSlot>("AppointmentId")
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Seed data for Golestan cities
             modelBuilder.Entity<City>().HasData(

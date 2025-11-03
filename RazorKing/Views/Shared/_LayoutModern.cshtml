@@ -75,8 +75,8 @@
                                 {
                                     <li><a class="dropdown-item" href="@Url.Action("Dashboard", "Barber")"><i class="fas fa-cut"></i> پنل آرایشگر</a></li>
                                 }
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> پروفایل</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-calendar"></i> نوبت‌های من</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Index", "Profile")"><i class="fas fa-user"></i> پروفایل</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Index", "Profile")"><i class="fas fa-calendar"></i> نوبت‌های من</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">

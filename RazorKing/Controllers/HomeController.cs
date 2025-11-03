@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using RazorKing.Data;
 using RazorKing.Models;
 using RazorKing.Models.ViewModels;
@@ -11,11 +12,13 @@ namespace RazorKing.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _context = context;
+            _userManager = userManager;
         }
 
         [ResponseCache(Duration = 300, VaryByHeader = "User-Agent", Location = ResponseCacheLocation.Any)]
@@ -77,6 +80,32 @@ namespace RazorKing.Controllers
                         .Take(5)
                         .ToListAsync()
                 };
+
+                // Add user profile data if authenticated
+                if (User.Identity.IsAuthenticated)
+                {
+                    var user = await _userManager.GetUserAsync(User);
+                    if (user != null)
+                    {
+                        var userAppointments = await _context.Appointments
+                            .Include(a => a.Barbershop)
+                            .ThenInclude(b => b.City)
+                            .Include(a => a.Service)
+                            .Where(a => a.CustomerEmail == user.Email || a.CustomerId == user.Id)
+                            .OrderByDescending(a => a.AppointmentDate)
+                            .ToListAsync();
+
+                        viewModel.UserProfile = new ProfileViewModel
+                        {
+                            User = user,
+                            Appointments = userAppointments,
+                            UpcomingAppointments = userAppointments.Where(a => a.AppointmentDate.Add(a.AppointmentTime) > DateTime.Now).Take(3).ToList(),
+                            PastAppointments = userAppointments.Where(a => a.AppointmentDate.Add(a.AppointmentTime) <= DateTime.Now).Take(3).ToList(),
+                            TotalAppointments = userAppointments.Count,
+                            TotalSpent = userAppointments.Where(a => a.Status == AppointmentStatus.Completed).Sum(a => a.TotalPrice)
+                        };
+                    }
+                }
 
                 return View(viewModel);
             }
