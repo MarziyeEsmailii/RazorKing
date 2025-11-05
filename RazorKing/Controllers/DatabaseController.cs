@@ -17,6 +17,7 @@ namespace RazorKing.Controllers
         {
             try
             {
+
                 var status = new
                 {
                     DatabaseConnected = await _context.Database.CanConnectAsync(),

@@ -791,6 +791,11 @@ function goToStep(stepNumber) {
     // به‌روزرسانی متغیر
     currentStep = stepNumber;
     
+    // نمایش وضعیت مراحل
+    if (window.location.hostname === 'localhost') {
+        showStepStatus();
+    }
+    
     console.log(`✅ رفت به مرحله ${stepNumber}`);
 }
 
@@ -1107,33 +1112,23 @@ function showMessage(text, type = 'info') {
     
     // حذف پیام‌های قبلی
     const existingMessages = document.querySelectorAll('.booking-message');
-    existingMessages.forEach(msg => msg.remove());
+    existingMessages.forEach(msg => {
+        msg.classList.add('slide-out');
+        setTimeout(() => msg.remove(), 300);
+    });
     
     // ایجاد پیام جدید
     const message = document.createElement('div');
-    message.className = 'booking-message';
-    message.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 600;
-        z-index: 9999;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        background: ${getMessageColor(type)};
-        animation: slideIn 0.3s ease-out;
-    `;
+    message.className = `booking-message ${type}`;
     message.textContent = text;
     
     document.body.appendChild(message);
     
     // حذف خودکار
     setTimeout(() => {
-        message.style.animation = 'slideOut 0.3s ease-in';
+        message.classList.add('slide-out');
         setTimeout(() => message.remove(), 300);
-    }, 3000);
+    }, 4000);
 }
 
 function getMessageColor(type) {
@@ -1422,39 +1417,74 @@ if (window.location.hostname === 'localhost') {
     
     const testButtons = [
         {
-            text: 'بررسی وضعیت',
+            text: 'وضعیت سیستم',
             action: () => {
                 const result = validateBookingData();
                 console.log('📊 نتیجه بررسی:', result);
-                alert(`وضعیت: ${result.isValid ? 'کامل' : 'ناقص'}\nموارد ناقص: ${result.missingItems.join('، ')}`);
+                showMessage(`وضعیت: ${result.isValid ? 'کامل ✓' : 'ناقص ✗'}`, result.isValid ? 'success' : 'warning');
+                if (!result.isValid) {
+                    showMessage(`موارد ناقص: ${result.missingItems.join('، ')}`, 'info');
+                }
             }
         },
         {
-            text: 'تست کامل',
+            text: 'پر کردن تست',
             action: () => {
                 selectedData.city = { id: 1, name: 'گرگان' };
                 selectedData.barbershop = { id: 1, name: 'تست آرایشگاه' };
-                selectedData.services = [{ id: 1, name: 'تست خدمت', price: 50000, duration: 30 }];
-                selectedData.date = { date: new Date().toISOString().split('T')[0], displayDate: 'امروز' };
+                selectedData.services = [{ id: 1, name: 'کوتاهی مو', price: 50000, duration: 30 }];
+                selectedData.date = { 
+                    date: new Date().toISOString().split('T')[0], 
+                    displayDate: new Date().toLocaleDateString('fa-IR') 
+                };
                 selectedData.time = { time: '10:00', displayTime: '10:00' };
                 
-                document.getElementById('customerName').value = 'تست کاربر';
-                document.getElementById('customerPhone').value = '09123456789';
+                // پر کردن فیلدهای فرم
+                const nameField = document.getElementById('customerName');
+                const phoneField = document.getElementById('customerPhone');
                 
-                console.log('✅ اطلاعات تست تنظیم شد');
-                showMessage('اطلاعات تست تنظیم شد', 'success');
+                if (nameField) nameField.value = 'کاربر تست';
+                if (phoneField) phoneField.value = '09123456789';
+                
+                console.log('✅ اطلاعات تست تنظیم شد:', selectedData);
+                showMessage('اطلاعات تست تنظیم شد ✓', 'success');
+                showStepStatus();
             }
         },
         {
-            text: 'رفتن به مرحله 7',
+            text: 'مرحله آخر',
             action: () => {
                 goToStep(7);
             }
         },
         {
-            text: 'تست ثبت نوبت',
+            text: 'تست ثبت',
             action: () => {
                 handleFinalSubmit();
+            }
+        },
+        {
+            text: 'پاک کردن',
+            action: () => {
+                selectedData = {
+                    city: null,
+                    barbershop: null,
+                    services: [],
+                    date: null,
+                    time: null,
+                    customer: null
+                };
+                
+                // پاک کردن فیلدها
+                const nameField = document.getElementById('customerName');
+                const phoneField = document.getElementById('customerPhone');
+                
+                if (nameField) nameField.value = '';
+                if (phoneField) phoneField.value = '';
+                
+                showMessage('اطلاعات پاک شد', 'info');
+                showStepStatus();
+                goToStep(1);
             }
         }
     ];
@@ -1493,6 +1523,64 @@ function showBookingStatus() {
     } else {
         console.log('✅ تمام اطلاعات کامل است');
     }
+}
+
+// نمایش وضعیت مراحل در گوشه صفحه
+function showStepStatus() {
+    // حذف وضعیت قبلی
+    const existingStatus = document.querySelector('.step-status');
+    if (existingStatus) {
+        existingStatus.remove();
+    }
+    
+    const validation = validateBookingData();
+    
+    const statusDiv = document.createElement('div');
+    statusDiv.className = 'step-status';
+    statusDiv.innerHTML = `
+        <div class="status-item">
+            <span>مرحله فعلی:</span>
+            <span class="status-value">${currentStep}/7</span>
+        </div>
+        <div class="status-item">
+            <span>شهر:</span>
+            <span class="status-value ${validation.validation.city ? 'complete' : 'incomplete'}">
+                ${validation.validation.city ? '✓' : '✗'}
+            </span>
+        </div>
+        <div class="status-item">
+            <span>آرایشگاه:</span>
+            <span class="status-value ${validation.validation.barbershop ? 'complete' : 'incomplete'}">
+                ${validation.validation.barbershop ? '✓' : '✗'}
+            </span>
+        </div>
+        <div class="status-item">
+            <span>خدمات:</span>
+            <span class="status-value ${validation.validation.services ? 'complete' : 'incomplete'}">
+                ${validation.validation.services ? '✓' : '✗'}
+            </span>
+        </div>
+        <div class="status-item">
+            <span>تاریخ:</span>
+            <span class="status-value ${validation.validation.date ? 'complete' : 'incomplete'}">
+                ${validation.validation.date ? '✓' : '✗'}
+            </span>
+        </div>
+        <div class="status-item">
+            <span>ساعت:</span>
+            <span class="status-value ${validation.validation.time ? 'complete' : 'incomplete'}">
+                ${validation.validation.time ? '✓' : '✗'}
+            </span>
+        </div>
+        <div class="status-item">
+            <span>اطلاعات:</span>
+            <span class="status-value ${validation.validation.customerName && validation.validation.customerPhone ? 'complete' : 'incomplete'}">
+                ${validation.validation.customerName && validation.validation.customerPhone ? '✓' : '✗'}
+            </span>
+        </div>
+    `;
+    
+    document.body.appendChild(statusDiv);
 }
 
 // اضافه کردن تابع به window برای دسترسی از console

@@ -1,0 +1,355 @@
+/* تنظیمات اضافی فونت برای کامپوننت‌های خاص */
+
+/* اولویت بالا برای فونت وزیر - با استثنای ایکون‌ها */
+html, body, *:not(.fa):not(.fas):not(.far):not(.fab):not(.fal):not(.fad):not(.fass):not(.fasr):not(.fasl):not([class*="fa-"]):not(.bi):not([class*="bi-"]):not(.icon):not([class*="icon-"]) {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* حفظ فونت ایکون‌ها */
+.fa, .fas, .far, .fab, .fal, .fad, .fass, .fasr, .fasl, [class*="fa-"],
+.bi, [class*="bi-"],
+.icon, [class*="icon-"] {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", "bootstrap-icons", "Material Icons" !important;
+    font-weight: 900 !important;
+}
+
+/* تنظیمات خاص برای input ها */
+input[type="text"]:not(.fa):not(.fas):not(.far):not(.fab):not([class*="fa-"]):not(.bi):not([class*="bi-"]),
+input[type="email"]:not(.fa):not(.fas):not(.far):not(.fab):not([class*="fa-"]):not(.bi):not([class*="bi-"]),
+input[type="password"]:not(.fa):not(.fas):not(.far):not(.fab):not([class*="fa-"]):not(.bi):not([class*="bi-"]),
+input[type="tel"]:not(.fa):not(.fas):not(.far):not(.fab):not([class*="fa-"]):not(.bi):not([class*="bi-"]),
+input[type="number"]:not(.fa):not(.fas):not(.far):not(.fab):not([class*="fa-"]):not(.bi):not([class*="bi-"]),
+textarea:not(.fa):not(.fas):not(.far):not(.fab):not([class*="fa-"]):not(.bi):not([class*="bi-"]),
+select:not(.fa):not(.fas):not(.far):not(.fab):not([class*="fa-"]):not(.bi):not([class*="bi-"]) {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* تنظیمات خاص برای دکمه‌ها */
+button,
+.btn,
+input[type="button"],
+input[type="submit"] {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-weight: 500;
+}
+
+/* تنظیمات خاص برای لیبل‌ها */
+label,
+.form-label,
+.control-label {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+/* تنظیمات خاص برای پیام‌های خطا */
+.field-validation-error,
+.validation-summary-errors,
+.invalid-feedback {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* تنظیمات خاص برای dropdown ها */
+.dropdown-menu,
+.dropdown-item {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-size: 14px;
+}
+
+/* تنظیمات خاص برای modal ها */
+.modal-title,
+.modal-body,
+.modal-footer {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* تنظیمات خاص برای table ها */
+table,
+th,
+td {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-size: 14px;
+}
+
+/* تنظیمات خاص برای card ها */
+.card-title,
+.card-text,
+.card-header,
+.card-footer {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* تنظیمات خاص برای navbar */
+.navbar-brand,
+.nav-link,
+.navbar-text {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* تنظیمات خاص برای breadcrumb */
+.breadcrumb,
+.breadcrumb-item {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-size: 14px;
+}
+
+/* تنظیمات خاص برای alert ها */
+.alert {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-size: 14px;
+}
+
+/* تنظیمات خاص برای badge ها */
+.badge {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* تنظیمات خاص برای tooltip ها */
+.tooltip-inner {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-size: 12px;
+}
+
+/* تنظیمات خاص برای popover ها */
+.popover-header,
+.popover-body {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-size: 13px;
+}
+
+/* تنظیمات خاص برای pagination */
+.page-link {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-size: 14px;
+}
+
+/* تنظیمات خاص برای list group */
+.list-group-item {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-size: 14px;
+}
+
+/* تنظیمات خاص برای progress bar */
+.progress-bar {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    font-size: 12px;
+}
+
+/* تنظیمات خاص برای spinner ها */
+.spinner-border,
+.spinner-grow {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* تنظیمات خاص برای کامپوننت‌های سفارشی پروژه */
+
+/* صفحه رزرو */
+.booking-wizard,
+.step-title,
+.step-description,
+.city-option,
+.barbershop-card,
+.service-card,
+.date-card,
+.time-slot {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* صفحه اصلی */
+.hero-title,
+.hero-subtitle,
+.section-title,
+.section-subtitle,
+.feature-item,
+.stat-item {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* پنل ادمین */
+.admin-sidebar,
+.sidebar-menu,
+.admin-content,
+.stats-card,
+.data-table {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* پنل آرایشگر */
+.barber-panel,
+.barber-sidebar,
+.barber-content,
+.appointment-card,
+.service-item {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* صفحه پروفایل */
+.profile-section,
+.profile-card,
+.profile-info,
+.appointment-history {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* فوتر */
+.footer,
+.footer-section,
+.footer-links,
+.contact-info {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* تنظیمات خاص برای اعداد فارسی */
+.persian-number,
+.fa-number {
+    font-feature-settings: "ss01" on;
+    direction: rtl;
+}
+
+/* تنظیمات خاص برای اعداد انگلیسی */
+.english-number,
+.en-number,
+.price,
+.amount {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif !important;
+    direction: ltr;
+}
+
+/* تنظیمات خاص برای کد و متن‌های تکنیکال */
+code,
+pre,
+.code-block,
+.technical-text {
+    font-family: 'Fira Code', 'Consolas', 'Monaco', monospace !important;
+    direction: ltr;
+    text-align: left;
+}
+
+/* تنظیمات خاص برای ایمیل و URL */
+input[type="email"],
+input[type="url"],
+.email-text,
+.url-text {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif !important;
+    direction: ltr;
+    text-align: left;
+}
+
+/* تنظیمات خاص برای شماره تلفن */
+input[type="tel"],
+.phone-number {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif !important;
+    direction: ltr;
+    text-align: left;
+}
+
+/* تنظیمات خاص برای تاریخ و زمان */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+.date-picker,
+.time-picker {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* تنظیمات خاص برای placeholder ها */
+::placeholder {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+    opacity: 0.7;
+    font-weight: 400;
+}
+
+/* تنظیمات خاص برای selection */
+::selection {
+    background-color: rgba(212, 175, 55, 0.3);
+    color: inherit;
+}
+
+/* تنظیمات خاص برای focus */
+:focus {
+    outline: 2px solid rgba(212, 175, 55, 0.5);
+    outline-offset: 2px;
+}
+
+/* تنظیمات خاص برای disabled elements */
+:disabled,
+.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* تنظیمات خاص برای loading states */
+.loading,
+.skeleton,
+.placeholder {
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* تنظیمات خاص برای error states */
+.error,
+.danger,
+.invalid {
+    color: #dc3545;
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* تنظیمات خاص برای success states */
+.success,
+.valid {
+    color: #28a745;
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* تنظیمات خاص برای warning states */
+.warning {
+    color: #ffc107;
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* تنظیمات خاص برای info states */
+.info {
+    color: #17a2b8;
+    font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+/* تنظیمات خاص برای responsive */
+@media (max-width: 768px) {
+    * {
+        font-size: 14px !important;
+    }
+    
+    h1 { font-size: 1.75rem !important; }
+    h2 { font-size: 1.5rem !important; }
+    h3 { font-size: 1.25rem !important; }
+    h4 { font-size: 1.1rem !important; }
+    h5 { font-size: 1rem !important; }
+    h6 { font-size: 0.9rem !important; }
+    
+    .btn {
+        font-size: 14px !important;
+        padding: 8px 16px !important;
+    }
+    
+    .form-control {
+        font-size: 14px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    * {
+        font-size: 13px !important;
+    }
+    
+    h1 { font-size: 1.5rem !important; }
+    h2 { font-size: 1.25rem !important; }
+    h3 { font-size: 1.1rem !important; }
+    h4 { font-size: 1rem !important; }
+    h5 { font-size: 0.9rem !important; }
+    h6 { font-size: 0.8rem !important; }
+}

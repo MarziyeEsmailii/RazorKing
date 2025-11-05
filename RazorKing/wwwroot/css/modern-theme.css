@@ -1,5 +1,8 @@
 /* ریزر کینگ - تم مدرن و لوکس */
 
+/* فونت‌ها */
+@import url('./fonts.css');
+
 :root {
     /* Colors */
     --primary-black: #0a0a0a;
@@ -322,6 +325,13 @@ body {
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
+}
+
+.hero-secondary-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 .hero-stats {
@@ -1288,6 +1298,12 @@ section {
     .hero-buttons {
         flex-direction: column;
         align-items: flex-start;
+    }
+    
+    .hero-secondary-buttons {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 10px;
     }
 
     .hero-stats {

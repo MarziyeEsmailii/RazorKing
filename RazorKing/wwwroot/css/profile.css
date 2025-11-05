@@ -13,23 +13,36 @@
 
 /* Profile Header */
 .profile-header {
-    background: rgba(26, 26, 26, 0.95);
-    padding: 40px 0;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-    backdrop-filter: blur(10px);
-    margin-bottom: 30px;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(42, 42, 42, 0.95) 100%);
+    padding: 50px 0;
+    border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+    backdrop-filter: blur(15px);
+    margin-bottom: 40px;
     position: relative;
     z-index: 1;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+}
+
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(212, 175, 55, 0.05) 0%, transparent 50%, rgba(212, 175, 55, 0.05) 100%);
+    pointer-events: none;
 }
 
 .profile-header-content {
     display: flex;
     align-items: center;
-    gap: 25px;
+    gap: 30px;
     position: relative;
-    padding: 0 15px;
-    min-height: 120px;
+    padding: 0 20px;
+    min-height: 140px;
+    z-index: 2;
 }
 
 .profile-avatar {
@@ -37,102 +50,211 @@
 }
 
 .avatar-circle {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+    background: linear-gradient(135deg, #d4af37 0%, #f4d03f 50%, #d4af37 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: 40px;
     color: #1a1a1a;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-    border: 3px solid rgba(212, 175, 55, 0.2);
+    transition: all 0.4s ease;
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4), inset 0 2px 10px rgba(255, 255, 255, 0.2);
+    border: 4px solid rgba(212, 175, 55, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar-circle::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: transform 0.6s ease;
+}
+
+.avatar-circle:hover::before {
+    transform: rotate(45deg) translate(50%, 50%);
+}
+
+.avatar-circle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(212, 175, 55, 0.5), inset 0 2px 10px rgba(255, 255, 255, 0.3);
 }
 
 .profile-info {
     flex: 1;
+    min-width: 0; /* Allow text to wrap properly */
 }
 
 .profile-name {
-    font-size: 1.4rem;
-    font-weight: 600;
+    font-size: 1.8rem;
+    font-weight: 700;
     color: #fff;
-    margin: 0 0 5px;
+    margin: 0 0 8px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    white-space: nowrap; /* حتماً در یک خط نمایش داده شود */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+    background: linear-gradient(135deg, #fff 0%, #d4af37 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .profile-email {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
     margin: 0;
+    font-weight: 500;
+    letter-spacing: 0.5px;
 }
 
 .profile-stats {
     display: flex;
-    gap: 20px;
+    gap: 25px;
     margin-left: auto;
+    flex-shrink: 0;
 }
 
 .stat-item {
     text-align: center;
-    padding: 8px 12px;
-    background: rgba(212, 175, 55, 0.1);
-    border-radius: 8px;
-    border: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 15px 18px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+    border-radius: 15px;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    min-width: 70px;
+}
+
+.stat-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.stat-item:hover::before {
+    left: 100%;
+}
+
+.stat-item:hover {
+    transform: translateY(-3px);
+    border-color: rgba(212, 175, 55, 0.5);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.2);
 }
 
 .stat-number {
     display: block;
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1.4rem;
+    font-weight: 700;
     color: #d4af37;
     line-height: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .stat-label {
     display: block;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-top: 2px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 4px;
+    font-weight: 500;
 }
 
 .profile-actions {
     flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
 }
 
 /* Profile Content */
 .profile-content {
-    padding: 20px 0;
+    padding: 30px 0;
 }
 
 .profile-card,
 .appointments-card {
-    background: rgba(26, 26, 26, 0.95);
-    border-radius: 12px;
-    padding: 20px;
-    border: 1px solid rgba(212, 175, 55, 0.1);
-    margin-bottom: 15px;
-    transition: all 0.3s ease;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(42, 42, 42, 0.95) 100%);
+    border-radius: 20px;
+    padding: 30px;
+    border: 2px solid rgba(212, 175, 55, 0.15);
+    margin-bottom: 25px;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.profile-card::before,
+.appointments-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.02) 0%, transparent 50%, rgba(212, 175, 55, 0.02) 100%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.profile-card:hover::before,
+.appointments-card:hover::before {
+    opacity: 1;
 }
 
 .profile-card:hover,
 .appointments-card:hover {
-    border-color: rgba(212, 175, 55, 0.2);
+    border-color: rgba(212, 175, 55, 0.3);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3), 0 0 25px rgba(212, 175, 55, 0.1);
 }
 
 .card-title {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 1.3rem;
+    font-weight: 700;
     color: #d4af37;
-    margin: 0 0 15px;
+    margin: 0 0 25px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.card-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(90deg, #d4af37, transparent);
+    border-radius: 2px;
 }
 
 .card-title i {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
+    padding: 8px;
+    background: rgba(212, 175, 55, 0.2);
+    border-radius: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
 }
 
 .badge {
@@ -154,30 +276,65 @@
 .profile-details {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
 }
 
 .detail-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 18px 20px;
+    background: rgba(42, 42, 42, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-.detail-item:last-child {
-    border-bottom: none;
+.detail-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #d4af37, transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.detail-item:hover::before {
+    opacity: 1;
+}
+
+.detail-item:hover {
+    background: rgba(42, 42, 42, 0.8);
+    border-color: rgba(212, 175, 55, 0.2);
+    transform: translateX(5px);
 }
 
 .detail-item label {
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.8);
+    color: #d4af37;
     margin: 0;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.detail-item label::before {
+    content: '•';
+    color: #d4af37;
+    font-weight: bold;
 }
 
 .detail-item span {
     color: #fff;
     font-weight: 500;
+    font-size: 0.95rem;
+    text-align: left;
 }
 
 /* Appointments */
@@ -188,16 +345,18 @@
 }
 
 .appointment-item {
-    background: rgba(42, 42, 42, 0.8);
-    border-radius: 12px;
-    padding: 16px;
-    border: 1px solid rgba(212, 175, 55, 0.1);
+    background: linear-gradient(135deg, rgba(42, 42, 42, 0.9) 0%, rgba(26, 26, 26, 0.8) 100%);
+    border-radius: 18px;
+    padding: 20px;
+    border: 2px solid rgba(212, 175, 55, 0.15);
     display: flex;
     align-items: center;
-    gap: 15px;
-    transition: all 0.3s ease;
+    gap: 20px;
+    transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .appointment-item::before {
@@ -206,28 +365,48 @@
     left: 0;
     top: 0;
     bottom: 0;
-    width: 3px;
-    background: #d4af37;
+    width: 5px;
+    background: linear-gradient(180deg, #d4af37, #f4d03f);
+    opacity: 0;
+    transition: all 0.4s ease;
+    border-radius: 0 3px 3px 0;
+}
+
+.appointment-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, transparent 50%, rgba(212, 175, 55, 0.05) 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
 .appointment-item:hover {
-    background: rgba(42, 42, 42, 0.95);
-    border-color: rgba(212, 175, 55, 0.3);
-    transform: translateX(3px);
+    background: linear-gradient(135deg, rgba(42, 42, 42, 1) 0%, rgba(26, 26, 26, 0.95) 100%);
+    border-color: rgba(212, 175, 55, 0.4);
+    transform: translateY(-3px) translateX(5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(212, 175, 55, 0.1);
 }
 
 .appointment-item:hover::before {
     opacity: 1;
+    width: 8px;
+}
+
+.appointment-item:hover::after {
+    opacity: 1;
 }
 
 .appointment-item.upcoming::before {
-    background: #28a745;
+    background: linear-gradient(180deg, #28a745, #20c997);
 }
 
 .appointment-item.past::before {
-    background: #6c757d;
+    background: linear-gradient(180deg, #6c757d, #495057);
 }
 
 .appointment-date {
@@ -363,28 +542,48 @@
 
 /* Buttons */
 .btn {
-    padding: 12px 24px;
-    border-radius: 25px;
+    padding: 14px 28px;
+    border-radius: 30px;
     font-weight: 600;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
+    gap: 10px;
+    transition: all 0.4s ease;
     border: none;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+    left: 100%;
 }
 
 .btn-gold {
-    background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+    background: linear-gradient(135deg, #d4af37 0%, #f4d03f 50%, #d4af37 100%);
     color: #1a1a1a;
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+    border: 2px solid transparent;
 }
 
 .btn-gold:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.5);
     color: #1a1a1a;
     text-decoration: none;
 }
@@ -393,12 +592,15 @@
     background: transparent;
     color: #d4af37;
     border: 2px solid #d4af37;
+    backdrop-filter: blur(10px);
 }
 
 .btn-outline-gold:hover {
     background: #d4af37;
     color: #1a1a1a;
     text-decoration: none;
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
 }
 
 .btn-outline-danger {
@@ -425,20 +627,50 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .profile-header {
+        padding: 40px 0;
+    }
+    
     .profile-header-content {
         flex-direction: column;
         text-align: center;
-        gap: 20px;
+        gap: 25px;
+        padding: 0 15px;
+    }
+    
+    .profile-info {
+        order: 1;
+        width: 100%;
+    }
+    
+    .profile-name {
+        font-size: 1.6rem;
+        white-space: nowrap; /* حتماً در یک خط باقی بماند */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
     }
     
     .profile-stats {
+        order: 2;
         justify-content: center;
+        margin: 0;
+        gap: 15px;
+    }
+    
+    .profile-actions {
+        order: 3;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
     }
     
     .appointment-item {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
+        text-align: center;
         gap: 15px;
+        padding: 20px;
     }
     
     .appointment-date {
@@ -447,75 +679,67 @@
     
     .appointment-actions {
         flex-direction: row;
-        align-self: stretch;
-        justify-content: space-between;
+        justify-content: center;
+        gap: 10px;
     }
     
     .profile-card,
     .appointments-card {
-        padding: 20px;
-    }
-    
-    .profile-name {
-        font-size: 2rem;
+        padding: 25px 20px;
+        margin-bottom: 20px;
     }
 }
 
-@media (max-width: 576px) {
-    .profile-header {
-        padding: 40px 0 30px;
-    }
-    
-    .profile-content {
-        padding: 30px 0;
-    }
-    
-    .avatar-circle {
-        width: 100px;
-        height: 100px;
-        font-size: 40px;
-    }
-    
-    .profile-name {
-        font-size: 1.8rem;
-    }
-    
-    .stat-number {
-        font-size: 1.5rem;
-    }
-    
-    .appointment-actions {
-        flex-direction: column;
-        gap: 8px;
-    }
-}
-
-/* Updated responsive styles */
+/* Enhanced Responsive Design */
 @media (max-width: 768px) {
     .profile-page {
         padding: 110px 0 0;
     }
     
     .profile-header {
-        padding: 30px 0;
+        padding: 35px 0;
     }
     
     .profile-header-content {
         flex-direction: column;
         text-align: center;
-        gap: 20px;
+        gap: 25px;
+        padding: 0 15px;
+    }
+    
+    .profile-info {
+        order: 1;
+        width: 100%;
+    }
+    
+    .profile-name {
+        font-size: 1.6rem;
+        white-space: nowrap; /* حتماً در یک خط باقی بماند */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
     }
     
     .profile-stats {
+        order: 2;
         justify-content: center;
+        margin: 0;
         gap: 15px;
+    }
+    
+    .profile-actions {
+        order: 3;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
     }
     
     .appointment-item {
         flex-direction: column;
+        align-items: center;
         text-align: center;
         gap: 15px;
-        padding: 15px;
+        padding: 20px;
     }
     
     .appointment-actions {
@@ -524,15 +748,10 @@
         gap: 10px;
     }
     
-    .detail-item {
-        padding: 10px 0;
-    }
-    
-    .profile-actions {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
+    .profile-card,
+    .appointments-card {
+        padding: 25px 20px;
+        margin-bottom: 20px;
     }
 }
 
@@ -542,55 +761,103 @@
     }
     
     .profile-header {
-        padding: 25px 0;
+        padding: 30px 0;
     }
     
     .profile-header-content {
         flex-direction: column;
         text-align: center;
         gap: 20px;
+        padding: 0 10px;
+    }
+    
+    .avatar-circle {
+        width: 90px;
+        height: 90px;
+        font-size: 36px;
     }
     
     .profile-name {
         font-size: 1.4rem;
+        white-space: nowrap; /* حتماً در یک خط نمایش داده شود */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: calc(100vw - 40px); /* عرض صفحه منهای padding */
+    }
+    
+    .profile-email {
+        font-size: 0.9rem;
     }
     
     .profile-stats {
-        gap: 10px;
+        gap: 12px;
         justify-content: center;
+        flex-wrap: wrap;
     }
     
     .stat-item {
-        padding: 8px 12px;
+        padding: 12px 15px;
+        min-width: 65px;
     }
     
     .stat-number {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
     }
     
     .stat-label {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
     }
     
     .profile-card,
     .appointments-card {
-        padding: 15px;
-        margin-bottom: 15px;
+        padding: 20px 15px;
+        margin-bottom: 20px;
+        border-radius: 15px;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+        margin-bottom: 20px;
     }
     
     .appointment-date {
-        min-width: 50px;
-        padding: 8px;
+        min-width: 60px;
+        padding: 10px;
     }
     
     .date-day {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
     
     .profile-actions {
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
         width: 100%;
+    }
+    
+    .profile-actions .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .detail-item {
+        padding: 15px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        text-align: right;
+    }
+    
+    .detail-item label {
+        font-size: 0.9rem;
+    }
+    
+    .detail-item span {
+        font-size: 0.95rem;
+        align-self: flex-end;
+    }
     }
     
     .profile-actions .btn {
@@ -816,5 +1083,356 @@
     to {
         transform: translateX(0);
         opacity: 1;
+    }
+}
+/* Deb
+ug Modal Styles */
+.debug-modal .modal-content {
+    max-width: 800px !important;
+}
+
+.debug-content {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.debug-loading {
+    text-align: center;
+    padding: 40px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.debug-loading i {
+    font-size: 2rem;
+    color: #d4af37;
+    margin-bottom: 15px;
+}
+
+.debug-report {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.debug-section {
+    background: rgba(42, 42, 42, 0.6);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.debug-section h4 {
+    color: #d4af37;
+    margin: 0 0 15px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.debug-section h4 i {
+    background: rgba(212, 175, 55, 0.2);
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.debug-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: rgba(26, 26, 26, 0.5);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-item .label {
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.info-item .value {
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.info-item .value.success {
+    color: #28a745;
+}
+
+.info-item .value.error {
+    color: #dc3545;
+}
+
+.debug-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    padding-top: 20px;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    margin-top: 10px;
+}
+
+/* Enhanced Empty State */
+.empty-state {
+    text-align: center;
+    padding: 50px 30px;
+    color: rgba(255, 255, 255, 0.6);
+    background: linear-gradient(135deg, rgba(42, 42, 42, 0.3) 0%, rgba(26, 26, 26, 0.2) 100%);
+    border-radius: 20px;
+    border: 2px dashed rgba(212, 175, 55, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.empty-state::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.empty-icon {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.empty-icon i {
+    font-size: 4rem;
+    color: rgba(212, 175, 55, 0.4);
+    margin-bottom: 15px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+.empty-state h5 {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.empty-state p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.empty-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.empty-actions .btn {
+    min-width: 160px;
+    font-weight: 600;
+}
+
+/* Enhanced Notification Styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, rgba(42, 42, 42, 0.95) 0%, rgba(26, 26, 26, 0.9) 100%);
+    border-radius: 15px;
+    padding: 18px 25px;
+    border-left: 5px solid #d4af37;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(212, 175, 55, 0.2);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    max-width: 400px;
+    transform: translateX(100%);
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    backdrop-filter: blur(10px);
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-success {
+    border-left-color: #28a745;
+}
+
+.notification-error {
+    border-left-color: #dc3545;
+}
+
+.notification-warning {
+    border-left-color: #ffc107;
+}
+
+.notification-info {
+    border-left-color: #17a2b8;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.notification-content i {
+    font-size: 1.3rem;
+    padding: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.notification-success .notification-content i {
+    color: #28a745;
+    background: rgba(40, 167, 69, 0.2);
+}
+
+.notification-error .notification-content i {
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.2);
+}
+
+.notification-warning .notification-content i {
+    color: #ffc107;
+    background: rgba(255, 193, 7, 0.2);
+}
+
+.notification-info .notification-content i {
+    color: #17a2b8;
+    background: rgba(23, 162, 184, 0.2);
+}
+
+.notification-content span {
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.notification-close:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+/* Loading Animation for Appointments */
+.appointments-loading {
+    text-align: center;
+    padding: 40px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.appointments-loading i {
+    font-size: 2.5rem;
+    color: #d4af37;
+    margin-bottom: 20px;
+    animation: spin 1s linear infinite;
+}
+
+.appointments-loading p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Scrollbar Enhancements */
+.debug-content::-webkit-scrollbar,
+.appointments-list-modal::-webkit-scrollbar {
+    width: 10px;
+}
+
+.debug-content::-webkit-scrollbar-track,
+.appointments-list-modal::-webkit-scrollbar-track {
+    background: rgba(42, 42, 42, 0.5);
+    border-radius: 5px;
+}
+
+.debug-content::-webkit-scrollbar-thumb,
+.appointments-list-modal::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #d4af37, #f4d03f);
+    border-radius: 5px;
+    border: 2px solid rgba(42, 42, 42, 0.5);
+}
+
+.debug-content::-webkit-scrollbar-thumb:hover,
+.appointments-list-modal::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #f4d03f, #d4af37);
+}
+
+/* Mobile Enhancements for Debug Modal */
+@media (max-width: 768px) {
+    .debug-modal .modal-content {
+        max-width: 95% !important;
+        margin: 10px;
+    }
+    
+    .debug-actions {
+        flex-direction: column;
+    }
+    
+    .debug-actions .btn {
+        width: 100%;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .info-item .value {
+        align-self: flex-end;
+    }
+    
+    .notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        transform: translateY(-100%);
+    }
+    
+    .notification.show {
+        transform: translateY(0);
     }
 }

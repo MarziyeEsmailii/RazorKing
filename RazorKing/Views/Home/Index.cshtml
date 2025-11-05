@@ -56,13 +56,15 @@
                                 <i class="fas fa-cut"></i>
                                 مشاهده خدمات
                             </a>
-                            <button onclick="loadRealTimeStats()" class="btn btn-outline-gold btn-sm" style="margin-top: 10px;">
+                        </div>
+                        <div class="hero-secondary-buttons animate-fade-in-up delay-1200" style="margin-top: 15px;">
+                            <button onclick="loadRealTimeStats()" class="btn btn-outline-gold btn-sm">
                                 <i class="fas fa-sync-alt"></i>
                                 به‌روزرسانی آمار
                             </button>
                             @if (User.Identity.IsAuthenticated)
                             {
-                                <button onclick="checkUserAppointments()" class="btn btn-outline-light btn-sm" style="margin-top: 10px; margin-right: 10px;">
+                                <button onclick="checkUserAppointments()" class="btn btn-outline-light btn-sm" style="margin-right: 10px;">
                                     <i class="fas fa-calendar-check"></i>
                                     بررسی نوبت‌ها
                                 </button>
@@ -216,6 +218,22 @@
         
         <!-- Cities Slider - 4 Per Row -->
         <div class="cities-slider-wrapper">
+            <!-- Slider Controls -->
+            <div class="slider-controls" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
+                <button class="btn btn-sm btn-outline-gold" onclick="window.enhancedCitiesSlider?.toggleAutoSlide()" title="توقف/شروع اسلایدر خودکار">
+                    <i class="fas fa-play-pause"></i>
+                    <span class="d-none d-md-inline">خودکار</span>
+                </button>
+                <button class="btn btn-sm btn-outline-gold" onclick="window.enhancedCitiesSlider?.goToRow(0)" title="رفتن به ابتدا">
+                    <i class="fas fa-step-backward"></i>
+                    <span class="d-none d-md-inline">ابتدا</span>
+                </button>
+                <button class="btn btn-sm btn-outline-gold" onclick="window.enhancedCitiesSlider?.goToRow(window.enhancedCitiesSlider?.totalRows - 1)" title="رفتن به انتها">
+                    <i class="fas fa-step-forward"></i>
+                    <span class="d-none d-md-inline">انتها</span>
+                </button>
+            </div>
+            
             <div class="cities-slider-container" id="citiesSliderContainer">
                 <div class="cities-slider-track" id="citiesSliderTrack">
                     @{
@@ -515,6 +533,7 @@
 
 @section Scripts {
     <script src="~/js/home.js" asp-append-version="true"></script>
+    <script src="~/js/cities-slider-enhanced.js" asp-append-version="true"></script>
     <script>
         // Debug script to ensure stats are visible
         document.addEventListener('DOMContentLoaded', function() {

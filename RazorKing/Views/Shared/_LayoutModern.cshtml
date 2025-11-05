@@ -11,15 +11,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Persian Font - Vazir -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet">
+    <!-- Persian Font - Vazir (Local) -->
+    <link rel="stylesheet" href="~/css/fonts.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/font-overrides.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/font-compatibility.css" asp-append-version="true">
     
     <!-- CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/icons-fix.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/buttons-unified.css" asp-append-version="true">
     <link rel="stylesheet" href="~/css/modern-theme.css" asp-append-version="true">
     <link rel="stylesheet" href="~/css/cities-section.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/cities-slider-enhanced.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/slider-animations.css" asp-append-version="true">
     <link rel="stylesheet" href="~/css/animations.css" asp-append-version="true">
     <link rel="stylesheet" href="~/css/persian-calendar.css" asp-append-version="true">
     @await RenderSectionAsync("Styles", required: false)

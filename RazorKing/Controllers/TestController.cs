@@ -23,6 +23,16 @@ namespace RazorKing.Controllers
             return View();
         }
 
+        public IActionResult FontTest()
+        {
+            return View();
+        }
+
+        public IActionResult ButtonsAndIcons()
+        {
+            return View();
+        }
+
         [HttpGet]
         public async Task<IActionResult> AdminAccess()
         {

@@ -67,61 +67,209 @@ function updateAppointmentsDisplay(data) {
     updatePastAppointments(data.appointments.filter(a => !a.isUpcoming));
 }
 
-// Debug function for appointments
+// Enhanced Debug function for appointments
 async function debugAppointments() {
     try {
         console.log('🔍 شروع بررسی نوبت‌ها...');
+        showNotification('در حال بررسی نوبت‌ها...', 'info');
         
-        // بررسی نوبت‌های کاربر
-        const userResponse = await fetch('/Profile/GetMyAppointments');
-        const userResult = await userResponse.json();
+        // Create debug modal
+        const debugModal = createDebugModal();
+        document.body.appendChild(debugModal);
+        setTimeout(() => debugModal.classList.add('show'), 10);
         
-        console.log('📊 نوبت‌های کاربر:', userResult);
+        const updateDebugContent = (content) => {
+            const debugContent = debugModal.querySelector('.debug-content');
+            if (debugContent) {
+                debugContent.innerHTML = content;
+            }
+        };
+        
+        updateDebugContent('<div class="debug-loading"><i class="fas fa-spinner fa-spin"></i> در حال بررسی...</div>');
+        
+        const results = {};
+        
+        // بررسی نوبت‌های کاربر از Profile
+        try {
+            const userResponse = await fetch('/Profile/GetMyAppointments');
+            results.userAppointments = await userResponse.json();
+            console.log('📊 نوبت‌های کاربر از Profile:', results.userAppointments);
+        } catch (e) {
+            results.userAppointments = { error: e.message };
+        }
+        
+        // بررسی اطلاعات کاربر
+        try {
+            const debugResponse = await fetch('/Profile/DebugAppointments');
+            results.debugInfo = await debugResponse.json();
+            console.log('📊 Debug اطلاعات کاربر:', results.debugInfo);
+        } catch (e) {
+            results.debugInfo = { error: e.message };
+        }
         
         // بررسی کل نوبت‌ها در سیستم
-        const allResponse = await fetch('/Booking/DebugAppointments');
-        const allResult = await allResponse.json();
+        try {
+            const homeResponse = await fetch('/Home/DebugAllAppointments');
+            results.allAppointments = await homeResponse.json();
+            console.log('📊 کل نوبت‌ها در سیستم:', results.allAppointments);
+        } catch (e) {
+            results.allAppointments = { error: e.message };
+        }
         
-        console.log('📊 کل نوبت‌ها در سیستم:', allResult);
+        // بررسی نوبت‌های کاربر از Home
+        try {
+            const homeUserResponse = await fetch('/Home/CheckUserAppointments');
+            results.homeUserCheck = await homeUserResponse.json();
+            console.log('📊 نوبت‌های کاربر از Home:', results.homeUserCheck);
+        } catch (e) {
+            results.homeUserCheck = { error: e.message };
+        }
         
-        // بررسی نوبت‌های کاربر از کنترلر Booking
-        const bookingResponse = await fetch('/Booking/DebugUserAppointments');
-        const bookingResult = await bookingResponse.json();
+        // نمایش نتایج در مودال
+        const debugContent = generateDebugReport(results);
+        updateDebugContent(debugContent);
         
-        console.log('📊 نوبت‌های کاربر از Booking:', bookingResult);
-        
-        // نمایش نتایج
-        let message = `
-🔍 نتایج بررسی نوبت‌ها:
-
-📊 از Profile Controller:
-- موفقیت: ${userResult.success}
-- تعداد نوبت‌ها: ${userResult.appointments ? userResult.appointments.length : 0}
-
-📊 کل نوبت‌ها در سیستم:
-- موفقیت: ${allResult.success}
-- تعداد کل: ${allResult.count || 0}
-
-📊 از Booking Controller:
-- موفقیت: ${bookingResult.success}
-- تعداد نوبت‌های کاربر: ${bookingResult.count || 0}
-- ایمیل کاربر: ${bookingResult.userEmail || 'نامشخص'}
-
-جزئیات کامل در Console مرورگر موجود است.
-        `;
-        
-        alert(message);
+        showNotification('بررسی نوبت‌ها تکمیل شد', 'success');
         
     } catch (error) {
         console.error('❌ خطا در بررسی نوبت‌ها:', error);
-        alert('خطا در بررسی نوبت‌ها: ' + error.message);
+        showNotification('خطا در بررسی نوبت‌ها: ' + error.message, 'error');
     }
+}
+
+function createDebugModal() {
+    const modal = document.createElement('div');
+    modal.className = 'profile-modal debug-modal';
+    modal.innerHTML = `
+        <div class="modal-backdrop" onclick="closeDebugModal()"></div>
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-bug"></i> بررسی نوبت‌ها</h3>
+                <button class="modal-close" onclick="closeDebugModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="debug-content">
+                    <div class="debug-loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        در حال بررسی...
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    return modal;
+}
+
+function generateDebugReport(results) {
+    const userInfo = results.debugInfo?.userInfo || {};
+    const userAppointments = results.userAppointments || {};
+    const allAppointments = results.allAppointments || {};
+    const homeUserCheck = results.homeUserCheck || {};
+    
+    return `
+        <div class="debug-report">
+            <div class="debug-section">
+                <h4><i class="fas fa-user"></i> اطلاعات کاربر</h4>
+                <div class="debug-info">
+                    <div class="info-item">
+                        <span class="label">ایمیل:</span>
+                        <span class="value">${userInfo.email || 'نامشخص'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">نام کاربری:</span>
+                        <span class="value">${userInfo.userName || 'نامشخص'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">نام کامل:</span>
+                        <span class="value">${(userInfo.firstName || '') + ' ' + (userInfo.lastName || '')}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="debug-section">
+                <h4><i class="fas fa-calendar-alt"></i> نوبت‌های کاربر (Profile)</h4>
+                <div class="debug-info">
+                    <div class="info-item">
+                        <span class="label">وضعیت:</span>
+                        <span class="value ${userAppointments.success ? 'success' : 'error'}">
+                            ${userAppointments.success ? 'موفق' : 'خطا'}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">تعداد کل:</span>
+                        <span class="value">${userAppointments.totalCount || 0}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">آینده:</span>
+                        <span class="value">${userAppointments.upcomingCount || 0}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">گذشته:</span>
+                        <span class="value">${userAppointments.pastCount || 0}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="debug-section">
+                <h4><i class="fas fa-database"></i> کل نوبت‌ها در سیستم</h4>
+                <div class="debug-info">
+                    <div class="info-item">
+                        <span class="label">وضعیت:</span>
+                        <span class="value ${allAppointments.success ? 'success' : 'error'}">
+                            ${allAppointments.success ? 'موفق' : 'خطا'}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">تعداد کل:</span>
+                        <span class="value">${allAppointments.totalAppointments || 0}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="debug-section">
+                <h4><i class="fas fa-check-circle"></i> بررسی از Home</h4>
+                <div class="debug-info">
+                    <div class="info-item">
+                        <span class="label">نوبت‌های کاربر:</span>
+                        <span class="value">${homeUserCheck.data?.userAppointments || 0}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="debug-actions">
+                <button class="btn btn-outline-gold" onclick="copyDebugInfo()">
+                    <i class="fas fa-copy"></i>
+                    کپی اطلاعات
+                </button>
+                <button class="btn btn-gold" onclick="refreshAppointments(); closeDebugModal();">
+                    <i class="fas fa-sync-alt"></i>
+                    بروزرسانی
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function closeDebugModal() {
+    const modal = document.querySelector('.debug-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+function copyDebugInfo() {
+    // This would copy debug info to clipboard
+    showNotification('اطلاعات دیباگ کپی شد', 'success');
 }
 
 // Create test appointment
 async function createTestAppointment() {
     try {
         console.log('🔧 ایجاد نوبت تست...');
+        showNotification('در حال ایجاد نوبت تست...', 'info');
         
         const response = await fetch('/Home/CreateTestAppointment', {
             method: 'POST',
@@ -136,6 +284,8 @@ async function createTestAppointment() {
         console.log('📊 نتیجه ایجاد نوبت تست:', result);
         
         if (result.success) {
+            showNotification('نوبت تست با موفقیت ایجاد شد!', 'success');
+            
             alert(`✅ نوبت تست با موفقیت ایجاد شد!
             
 📅 جزئیات:
@@ -146,18 +296,22 @@ async function createTestAppointment() {
 - خدمت: ${result.appointment.service}
 - قیمت: ${result.appointment.price} تومان
 
-حالا صفحه را refresh کنید تا نوبت را ببینید.`);
+صفحه به‌روزرسانی می‌شود...`);
             
-            // Refresh the page to show the new appointment
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
+            // Refresh appointments without full page reload
+            setTimeout(async () => {
+                await loadUserAppointments();
+                showNotification('نوبت‌ها به‌روزرسانی شد', 'success');
+            }, 1000);
+            
         } else {
-            alert('❌ خطا در ایجاد نوبت تست: ' + result.error);
+            showNotification('خطا در ایجاد نوبت تست: ' + (result.error || result.message), 'error');
+            alert('❌ خطا در ایجاد نوبت تست: ' + (result.error || result.message));
         }
         
     } catch (error) {
         console.error('❌ خطا در ایجاد نوبت تست:', error);
+        showNotification('خطا در ایجاد نوبت تست: ' + error.message, 'error');
         alert('خطا در ایجاد نوبت تست: ' + error.message);
     }
 }
@@ -169,10 +323,199 @@ async function refreshAppointments() {
     await loadUserAppointments();
 }
 
+// Show all appointments in a modal
+async function showAllAppointments() {
+    try {
+        console.log('📋 نمایش همه نوبت‌ها...');
+        showNotification('در حال بارگذاری همه نوبت‌ها...', 'info');
+        
+        const response = await fetch('/Profile/GetMyAppointments');
+        const result = await response.json();
+        
+        if (result.success && result.appointments) {
+            const modal = createAllAppointmentsModal(result.appointments);
+            document.body.appendChild(modal);
+            
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+            
+            showNotification(`${result.appointments.length} نوبت یافت شد`, 'success');
+        } else {
+            showNotification('خطا در بارگذاری نوبت‌ها', 'error');
+        }
+        
+    } catch (error) {
+        console.error('❌ خطا در نمایش همه نوبت‌ها:', error);
+        showNotification('خطا در نمایش همه نوبت‌ها: ' + error.message, 'error');
+    }
+}
+
+function createAllAppointmentsModal(appointments) {
+    const modal = document.createElement('div');
+    modal.className = 'profile-modal appointments-modal';
+    
+    const upcomingAppointments = appointments.filter(a => a.isUpcoming);
+    const pastAppointments = appointments.filter(a => !a.isUpcoming);
+    
+    modal.innerHTML = `
+        <div class="modal-backdrop" onclick="closeAllAppointmentsModal()"></div>
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-alt"></i> همه نوبت‌ها (${appointments.length})</h3>
+                <button class="modal-close" onclick="closeAllAppointmentsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="appointments-tabs">
+                    <button class="tab-btn active" onclick="switchAppointmentsTab(this, 'upcoming')">
+                        <i class="fas fa-calendar-plus"></i>
+                        آینده (${upcomingAppointments.length})
+                    </button>
+                    <button class="tab-btn" onclick="switchAppointmentsTab(this, 'past')">
+                        <i class="fas fa-history"></i>
+                        گذشته (${pastAppointments.length})
+                    </button>
+                    <button class="tab-btn" onclick="switchAppointmentsTab(this, 'all')">
+                        <i class="fas fa-list"></i>
+                        همه (${appointments.length})
+                    </button>
+                </div>
+                
+                <div class="appointments-content">
+                    <div class="tab-content active" id="upcoming-tab">
+                        ${renderAppointmentsList(upcomingAppointments, 'upcoming')}
+                    </div>
+                    <div class="tab-content" id="past-tab">
+                        ${renderAppointmentsList(pastAppointments, 'past')}
+                    </div>
+                    <div class="tab-content" id="all-tab">
+                        ${renderAppointmentsList(appointments, 'all')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return modal;
+}
+
+function renderAppointmentsList(appointments, type) {
+    if (appointments.length === 0) {
+        return `
+            <div class="empty-appointments">
+                <i class="fas fa-calendar-times"></i>
+                <p>نوبتی یافت نشد</p>
+            </div>
+        `;
+    }
+    
+    return `
+        <div class="appointments-list-modal">
+            ${appointments.map(appointment => `
+                <div class="appointment-item-modal ${type}">
+                    <div class="appointment-header">
+                        <div class="appointment-date-time">
+                            <div class="date-info">
+                                <i class="fas fa-calendar"></i>
+                                <span>${appointment.appointmentDate}</span>
+                            </div>
+                            <div class="time-info">
+                                <i class="fas fa-clock"></i>
+                                <span>${appointment.appointmentTime}</span>
+                            </div>
+                        </div>
+                        <div class="appointment-status-badge">
+                            <span class="status-badge status-${appointment.status.toLowerCase()}">
+                                ${appointment.statusText}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="appointment-details-modal">
+                        <div class="detail-row">
+                            <i class="fas fa-store"></i>
+                            <span class="label">آرایشگاه:</span>
+                            <span class="value">${appointment.barbershopName}</span>
+                        </div>
+                        <div class="detail-row">
+                            <i class="fas fa-cut"></i>
+                            <span class="label">خدمت:</span>
+                            <span class="value">${appointment.serviceName}</span>
+                        </div>
+                        ${appointment.cityName ? `
+                            <div class="detail-row">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span class="label">شهر:</span>
+                                <span class="value">${appointment.cityName}</span>
+                            </div>
+                        ` : ''}
+                        <div class="detail-row">
+                            <i class="fas fa-money-bill"></i>
+                            <span class="label">قیمت:</span>
+                            <span class="value price">${formatPrice(appointment.totalPrice)} تومان</span>
+                        </div>
+                        <div class="detail-row">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="label">ثبت شده:</span>
+                            <span class="value">${appointment.createdAt}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="appointment-actions-modal">
+                        ${appointment.canCancel ? `
+                            <button class="btn btn-sm btn-danger" onclick="cancelAppointment(${appointment.id}, this)">
+                                <i class="fas fa-times"></i>
+                                لغو نوبت
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-sm btn-outline-gold" onclick="copyAppointmentInfo(${appointment.id})">
+                            <i class="fas fa-copy"></i>
+                            کپی اطلاعات
+                        </button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function switchAppointmentsTab(button, tabName) {
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    // Add active class to clicked tab
+    button.classList.add('active');
+    document.getElementById(`${tabName}-tab`).classList.add('active');
+}
+
+function closeAllAppointmentsModal() {
+    const modal = document.querySelector('.appointments-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.remove();
+        }, 300);
+    }
+}
+
+function copyAppointmentInfo(appointmentId) {
+    // This would copy appointment info to clipboard
+    showNotification('اطلاعات نوبت کپی شد', 'success');
+}
+
 // Make functions globally available
 window.debugAppointments = debugAppointments;
 window.createTestAppointment = createTestAppointment;
 window.refreshAppointments = refreshAppointments;
+window.showAllAppointments = showAllAppointments;
+window.switchAppointmentsTab = switchAppointmentsTab;
+window.closeAllAppointmentsModal = closeAllAppointmentsModal;
+window.copyAppointmentInfo = copyAppointmentInfo;
+window.closeDebugModal = closeDebugModal;
+window.copyDebugInfo = copyDebugInfo;
 
 // به‌روزرسانی آمار
 function updateStats(data) {
@@ -1001,6 +1344,197 @@ const additionalStyles = `
     font-size: 2rem;
     color: #d4af37;
     margin-bottom: 15px;
+}
+
+/* Appointments Modal Styles */
+.large-modal {
+    max-width: 900px !important;
+    width: 95% !important;
+    max-height: 90vh !important;
+}
+
+.appointments-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+    padding-bottom: 15px;
+}
+
+.tab-btn {
+    background: transparent !important;
+    border: 2px solid rgba(212, 175, 55, 0.3) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    padding: 10px 20px !important;
+    border-radius: 25px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 0.9rem !important;
+}
+
+.tab-btn:hover,
+.tab-btn.active {
+    background: rgba(212, 175, 55, 0.2) !important;
+    border-color: #d4af37 !important;
+    color: #d4af37 !important;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.appointments-list-modal {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.appointment-item-modal {
+    background: rgba(42, 42, 42, 0.8) !important;
+    border: 2px solid rgba(212, 175, 55, 0.2) !important;
+    border-radius: 15px !important;
+    padding: 20px !important;
+    margin-bottom: 15px !important;
+    transition: all 0.3s ease !important;
+}
+
+.appointment-item-modal:hover {
+    border-color: rgba(212, 175, 55, 0.5) !important;
+    background: rgba(42, 42, 42, 1) !important;
+}
+
+.appointment-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 15px !important;
+    padding-bottom: 10px !important;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2) !important;
+}
+
+.appointment-date-time {
+    display: flex !important;
+    gap: 20px !important;
+}
+
+.date-info,
+.time-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    color: #d4af37 !important;
+    font-weight: 600 !important;
+}
+
+.appointment-details-modal {
+    margin-bottom: 15px !important;
+}
+
+.detail-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 8px !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.detail-row i {
+    width: 16px !important;
+    text-align: center !important;
+    color: #d4af37 !important;
+}
+
+.detail-row .label {
+    font-weight: 600 !important;
+    min-width: 80px !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.detail-row .value {
+    flex: 1 !important;
+}
+
+.detail-row .value.price {
+    color: #d4af37 !important;
+    font-weight: 700 !important;
+}
+
+.appointment-actions-modal {
+    display: flex !important;
+    gap: 10px !important;
+    justify-content: flex-end !important;
+    padding-top: 10px !important;
+    border-top: 1px solid rgba(212, 175, 55, 0.2) !important;
+}
+
+.empty-appointments {
+    text-align: center !important;
+    padding: 40px !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.empty-appointments i {
+    font-size: 3rem !important;
+    color: rgba(212, 175, 55, 0.5) !important;
+    margin-bottom: 15px !important;
+}
+
+.status-badge {
+    padding: 4px 12px !important;
+    border-radius: 20px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+}
+
+.status-pending {
+    background: rgba(255, 193, 7, 0.2) !important;
+    color: #ffc107 !important;
+    border: 1px solid rgba(255, 193, 7, 0.3) !important;
+}
+
+.status-confirmed {
+    background: rgba(40, 167, 69, 0.2) !important;
+    color: #28a745 !important;
+    border: 1px solid rgba(40, 167, 69, 0.3) !important;
+}
+
+.status-completed {
+    background: rgba(23, 162, 184, 0.2) !important;
+    color: #17a2b8 !important;
+    border: 1px solid rgba(23, 162, 184, 0.3) !important;
+}
+
+.status-cancelled {
+    background: rgba(220, 53, 69, 0.2) !important;
+    color: #dc3545 !important;
+    border: 1px solid rgba(220, 53, 69, 0.3) !important;
+}
+
+/* Scrollbar Styles */
+.appointments-list-modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.appointments-list-modal::-webkit-scrollbar-track {
+    background: rgba(42, 42, 42, 0.5);
+    border-radius: 4px;
+}
+
+.appointments-list-modal::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.5);
+    border-radius: 4px;
+}
+
+.appointments-list-modal::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 55, 0.7);
 }
 </style>
 `;

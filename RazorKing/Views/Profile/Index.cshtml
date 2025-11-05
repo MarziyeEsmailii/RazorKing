@@ -64,6 +64,10 @@
                         <i class="fas fa-sync-alt"></i>
                         بروزرسانی
                     </button>
+                    <button class="btn btn-warning btn-sm" onclick="showAllAppointments()" style="margin-right: 10px;">
+                        <i class="fas fa-list"></i>
+                        همه نوبت‌ها
+                    </button>
                 </div>
             </div>
         </div>
@@ -200,21 +204,51 @@
                     @if (!Model.UpcomingAppointments.Any() && !Model.PastAppointments.Any())
                     {
                         <div class="appointments-card">
+                            <h3 class="card-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                نوبت‌های آینده (0)
+                            </h3>
                             <div class="empty-state">
                                 <div class="empty-icon">
                                     <i class="fas fa-calendar-times"></i>
                                 </div>
                                 <h5>هنوز نوبتی ندارید</h5>
-                                <p>برای رزرو اولین نوبت خود کلیک کنید</p>
+                                <p>نوبت‌های گذشته شما اینجا نمایش داده می‌شود</p>
                                 <div class="empty-actions">
                                     <a href="@Url.Action("Index", "Booking")" class="btn btn-gold">
                                         <i class="fas fa-calendar-plus"></i>
                                         رزرو نوبت جدید
                                     </a>
-                                    <a href="@Url.Action("Index", "Home")" class="btn btn-outline-gold">
-                                        <i class="fas fa-home"></i>
-                                        صفحه اصلی
+                                    <button class="btn btn-info" onclick="createTestAppointment()">
+                                        <i class="fas fa-plus"></i>
+                                        ایجاد نوبت تست
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (!Model.UpcomingAppointments.Any())
+                    {
+                        <div class="appointments-card">
+                            <h3 class="card-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                نوبت‌های آینده (0)
+                            </h3>
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <i class="fas fa-calendar-plus"></i>
+                                </div>
+                                <h5>نوبت آینده‌ای ندارید</h5>
+                                <p>برای رزرو نوبت جدید کلیک کنید</p>
+                                <div class="empty-actions">
+                                    <a href="@Url.Action("Index", "Booking")" class="btn btn-gold">
+                                        <i class="fas fa-calendar-plus"></i>
+                                        رزرو نوبت جدید
                                     </a>
+                                    <button class="btn btn-info" onclick="createTestAppointment()">
+                                        <i class="fas fa-plus"></i>
+                                        ایجاد نوبت تست
+                                    </button>
                                 </div>
                             </div>
                         </div>

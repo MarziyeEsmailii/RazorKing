@@ -1,3 +1,6 @@
+/* فونت‌ها */
+@import url('./fonts.css');
+
 /* Admin Panel Styles */
 .admin-wrapper {
     display: flex;

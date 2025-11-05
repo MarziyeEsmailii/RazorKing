@@ -1,0 +1,247 @@
+/* اصلاح نمایش ایکون‌ها */
+
+/* حفظ فونت ایکون‌های Font Awesome */
+.fa, .fas, .far, .fab, .fal, .fad, .fass, .fasr, .fasl,
+[class^="fa-"], [class*=" fa-"] {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-transform: none !important;
+    line-height: 1 !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: inline-block;
+    text-rendering: auto;
+}
+
+/* حفظ فونت ایکون‌های Bootstrap */
+.bi, [class^="bi-"], [class*=" bi-"] {
+    font-family: "bootstrap-icons" !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-transform: none !important;
+    line-height: 1 !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: inline-block;
+    text-rendering: auto;
+}
+
+/* حفظ فونت ایکون‌های Material */
+.material-icons, .material-icons-outlined, .material-icons-round, .material-icons-sharp, .material-icons-two-tone {
+    font-family: "Material Icons", "Material Icons Outlined", "Material Icons Round", "Material Icons Sharp", "Material Icons Two Tone" !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    font-size: 24px !important;
+    line-height: 1 !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+    word-wrap: normal !important;
+    direction: ltr !important;
+    -webkit-font-feature-settings: 'liga' !important;
+    -webkit-font-smoothing: antialiased !important;
+}
+
+/* اصلاح ایکون‌های داخل دکمه‌ها */
+.btn i, button i, .button i,
+.nav-link i, .navbar-brand i,
+.dropdown-item i, .list-group-item i,
+.card-header i, .card-title i,
+.alert i, .badge i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", "bootstrap-icons" !important;
+    font-weight: 900 !important;
+    margin-left: 5px;
+    margin-right: 0;
+}
+
+/* اصلاح ایکون‌های داخل فرم‌ها */
+.form-control i, .form-select i, .form-check i,
+.input-group-text i, .form-label i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", "bootstrap-icons" !important;
+    font-weight: 900 !important;
+}
+
+/* اصلاح ایکون‌های داخل جدول‌ها */
+table i, th i, td i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", "bootstrap-icons" !important;
+    font-weight: 900 !important;
+}
+
+/* اصلاح ایکون‌های داخل مودال‌ها */
+.modal i, .modal-header i, .modal-body i, .modal-footer i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", "bootstrap-icons" !important;
+    font-weight: 900 !important;
+}
+
+/* اصلاح ایکون‌های داخل sidebar */
+.sidebar i, .sidebar-menu i, .nav-sidebar i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", "bootstrap-icons" !important;
+    font-weight: 900 !important;
+}
+
+/* اصلاح ایکون‌های خاص پروژه */
+.hero-section i, .feature-item i, .service-card i,
+.city-card i, .barbershop-card i, .stat-item i,
+.step-icon i, .booking-wizard i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", "bootstrap-icons" !important;
+    font-weight: 900 !important;
+}
+
+/* اصلاح ایکون‌های پنل ادمین */
+.admin-sidebar i, .admin-content i, .stats-card i,
+.data-table i, .admin-header i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", "bootstrap-icons" !important;
+    font-weight: 900 !important;
+}
+
+/* اصلاح ایکون‌های پنل آرایشگر */
+.barber-panel i, .barber-sidebar i, .barber-content i,
+.appointment-card i, .service-item i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", "bootstrap-icons" !important;
+    font-weight: 900 !important;
+}
+
+/* اصلاح ایکون‌های فوتر */
+.footer i, .footer-section i, .social-links i,
+.contact-info i, .footer-links i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", "bootstrap-icons" !important;
+    font-weight: 900 !important;
+}
+
+/* اصلاح ایکون‌های نوار ناوبری */
+.navbar i, .navbar-brand i, .nav-link i,
+.navbar-toggler i, .dropdown-toggle i {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", "bootstrap-icons" !important;
+    font-weight: 900 !important;
+}
+
+/* اصلاح اندازه ایکون‌ها */
+.fa-xs { font-size: 0.75em !important; }
+.fa-sm { font-size: 0.875em !important; }
+.fa-lg { font-size: 1.33333em !important; }
+.fa-xl { font-size: 1.5em !important; }
+.fa-2x { font-size: 2em !important; }
+.fa-3x { font-size: 3em !important; }
+.fa-4x { font-size: 4em !important; }
+.fa-5x { font-size: 5em !important; }
+
+/* اصلاح چرخش ایکون‌ها */
+.fa-rotate-90 { transform: rotate(90deg) !important; }
+.fa-rotate-180 { transform: rotate(180deg) !important; }
+.fa-rotate-270 { transform: rotate(270deg) !important; }
+.fa-flip-horizontal { transform: scaleX(-1) !important; }
+.fa-flip-vertical { transform: scaleY(-1) !important; }
+
+/* اصلاح انیمیشن ایکون‌ها */
+.fa-spin {
+    animation: fa-spin 2s infinite linear !important;
+}
+
+.fa-pulse {
+    animation: fa-pulse 1s infinite steps(8) !important;
+}
+
+@keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fa-pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.25; }
+    100% { opacity: 1; }
+}
+
+/* اصلاح ایکون‌های stack */
+.fa-stack {
+    position: relative !important;
+    display: inline-block !important;
+    width: 2em !important;
+    height: 2em !important;
+    line-height: 2em !important;
+    vertical-align: middle !important;
+}
+
+.fa-stack-1x, .fa-stack-2x {
+    position: absolute !important;
+    left: 0 !important;
+    width: 100% !important;
+    text-align: center !important;
+}
+
+.fa-stack-1x { line-height: inherit !important; }
+.fa-stack-2x { font-size: 2em !important; }
+
+/* اصلاح ایکون‌های border */
+.fa-border {
+    padding: 0.2em 0.25em 0.15em !important;
+    border: solid 0.08em #eee !important;
+    border-radius: 0.1em !important;
+}
+
+/* اصلاح ایکون‌های pull */
+.fa-pull-left {
+    float: left !important;
+    margin-right: 0.3em !important;
+}
+
+.fa-pull-right {
+    float: right !important;
+    margin-left: 0.3em !important;
+}
+
+/* تنظیمات خاص برای RTL */
+[dir="rtl"] .fa-pull-left {
+    float: right !important;
+    margin-left: 0.3em !important;
+    margin-right: 0 !important;
+}
+
+[dir="rtl"] .fa-pull-right {
+    float: left !important;
+    margin-right: 0.3em !important;
+    margin-left: 0 !important;
+}
+
+/* اصلاح ایکون‌های داخل لیست */
+.fa-ul {
+    margin-left: 2.14285714em !important;
+    padding-left: 0 !important;
+    list-style-type: none !important;
+}
+
+.fa-ul > li {
+    position: relative !important;
+}
+
+.fa-li {
+    position: absolute !important;
+    left: -2.14285714em !important;
+    width: 2.14285714em !important;
+    top: 0.14285714em !important;
+    text-align: center !important;
+}
+
+/* تنظیمات خاص برای موبایل */
+@media (max-width: 768px) {
+    .fa, .fas, .far, .fab, .fal, .fad {
+        font-size: 16px !important;
+    }
+    
+    .btn i, button i {
+        font-size: 14px !important;
+    }
+}
+
+/* تنظیمات خاص برای چاپ */
+@media print {
+    .fa, .fas, .far, .fab, .fal, .fad,
+    .bi, [class^="bi-"], [class*=" bi-"] {
+        color: black !important;
+        background: none !important;
+    }
+}

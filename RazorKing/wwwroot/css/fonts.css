@@ -1,0 +1,340 @@
+/* فونت‌های فارسی - وزیر */
+
+/* وزیر - نازک */
+@font-face {
+    font-family: 'Vazir';
+    src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir-Thin.woff2') format('woff2'),
+         url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir-Thin.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* وزیر - سبک */
+@font-face {
+    font-family: 'Vazir';
+    src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir-Light.woff2') format('woff2'),
+         url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* وزیر - معمولی */
+@font-face {
+    font-family: 'Vazir';
+    src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir.woff2') format('woff2'),
+         url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* وزیر - متوسط */
+@font-face {
+    font-family: 'Vazir';
+    src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir-Medium.woff2') format('woff2'),
+         url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* وزیر - ضخیم */
+@font-face {
+    font-family: 'Vazir';
+    src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir-Bold.woff2') format('woff2'),
+         url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* وزیر - خیلی ضخیم */
+@font-face {
+    font-family: 'Vazir';
+    src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir-Black.woff2') format('woff2'),
+         url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* تنظیمات کلی فونت */
+:root {
+    --font-family-primary: 'Vazir', 'Tahoma', 'Arial', sans-serif;
+    --font-family-english: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* اعمال فونت به کل صفحه */
+* {
+    font-family: var(--font-family-primary) !important;
+}
+
+html, body {
+    font-family: var(--font-family-primary) !important;
+    direction: rtl;
+    text-align: right;
+}
+
+/* فونت انگلیسی برای عناصر خاص */
+.english-text,
+.en,
+code,
+pre,
+.code,
+input[type="email"],
+input[type="url"],
+.phone-input {
+    font-family: var(--font-family-english) !important;
+    direction: ltr;
+    text-align: left;
+}
+
+/* تنظیمات خاص برای فرم‌ها */
+input, textarea, select, button {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای Bootstrap */
+.btn, .form-control, .form-select, .form-check-label, .nav-link, .dropdown-item {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای جداول */
+table, th, td {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای مودال‌ها */
+.modal, .modal-header, .modal-body, .modal-footer {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای کارت‌ها */
+.card, .card-header, .card-body, .card-footer {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای نوار ناوبری */
+.navbar, .navbar-brand, .navbar-nav, .nav-item, .nav-link {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای فوتر */
+.footer, .footer * {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای پیام‌ها */
+.alert, .toast, .notification, .message {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای لیست‌ها */
+ul, ol, li {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای تیترها */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-primary) !important;
+    font-weight: 700;
+}
+
+/* تنظیمات خاص برای پاراگراف‌ها */
+p, span, div, a {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای لیبل‌ها */
+label, .form-label {
+    font-family: var(--font-family-primary) !important;
+    font-weight: 500;
+}
+
+/* بهبود خوانایی متن فارسی */
+body {
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+}
+
+/* تنظیمات خاص برای اعداد فارسی */
+.persian-numbers {
+    font-feature-settings: "ss01" on;
+}
+
+/* تنظیمات خاص برای متن‌های کوچک */
+small, .small {
+    font-size: 0.875em;
+    line-height: 1.6;
+}
+
+/* تنظیمات خاص برای متن‌های بزرگ */
+.lead {
+    font-size: 1.25em;
+    font-weight: 400;
+    line-height: 1.7;
+}
+
+/* تنظیمات خاص برای کد و متن‌های تکنیکال */
+code, kbd, pre, samp {
+    font-family: 'Fira Code', 'Consolas', 'Monaco', monospace !important;
+    direction: ltr;
+    text-align: left;
+}
+
+/* تنظیمات خاص برای placeholder ها */
+::placeholder {
+    font-family: var(--font-family-primary) !important;
+    opacity: 0.7;
+}
+
+/* تنظیمات خاص برای tooltip ها */
+.tooltip, .popover {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای breadcrumb */
+.breadcrumb, .breadcrumb-item {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای pagination */
+.pagination, .page-link {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای progress bar */
+.progress, .progress-bar {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای badge ها */
+.badge {
+    font-family: var(--font-family-primary) !important;
+    font-weight: 500;
+}
+
+/* تنظیمات خاص برای spinner ها */
+.spinner-border, .spinner-grow {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای accordion */
+.accordion, .accordion-header, .accordion-body {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای offcanvas */
+.offcanvas, .offcanvas-header, .offcanvas-body {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای carousel */
+.carousel, .carousel-caption {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای collapse */
+.collapse {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای dropdown */
+.dropdown, .dropdown-menu, .dropdown-item {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای list group */
+.list-group, .list-group-item {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای tab ها */
+.nav-tabs, .nav-pills, .tab-content, .tab-pane {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای متن‌های خطا */
+.invalid-feedback, .valid-feedback, .form-text {
+    font-family: var(--font-family-primary) !important;
+    font-size: 0.875em;
+}
+
+/* تنظیمات خاص برای loading states */
+.loading, .skeleton {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای empty states */
+.empty-state, .no-data {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای error states */
+.error-state, .error-message {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای success states */
+.success-state, .success-message {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای warning states */
+.warning-state, .warning-message {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای info states */
+.info-state, .info-message {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای custom components */
+.booking-wizard, .step-content, .form-step {
+    font-family: var(--font-family-primary) !important;
+}
+
+.city-card, .barbershop-card, .service-card {
+    font-family: var(--font-family-primary) !important;
+}
+
+.date-card, .time-slot, .price-summary {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای admin panel */
+.admin-panel, .admin-sidebar, .admin-content {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای profile pages */
+.profile-section, .profile-card, .appointment-card {
+    font-family: var(--font-family-primary) !important;
+}
+
+/* تنظیمات خاص برای responsive text */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+    h4 { font-size: 1.1rem; }
+    h5 { font-size: 1rem; }
+    h6 { font-size: 0.9rem; }
+}
+
+/* تنظیمات خاص برای print */
+@media print {
+    * {
+        font-family: var(--font-family-primary) !important;
+        color: black !important;
+        background: white !important;
+    }
+}
