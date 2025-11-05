@@ -25,21 +25,45 @@ namespace RazorKing.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Main entry point for barbers - redirects to appropriate page based on barbershop status
+        /// </summary>
+        public async Task<IActionResult> Index()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            // Check if user has an active barbershop
+            var barbershop = await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.UserId == user.Id && b.IsActive);
+
+            if (barbershop == null)
+            {
+                // No active barbershop - redirect to create barbershop form
+                TempData["InfoMessage"] = "برای شروع کار، ابتدا اطلاعات آرایشگاه خود را ثبت کنید";
+                return RedirectToAction("CreateBarbershop");
+            }
+
+            // Has active barbershop - redirect to dashboard
+            return RedirectToAction("Dashboard");
+        }
+
         public async Task<IActionResult> Dashboard()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "Account");
 
-            // Find barber's barbershop
+            // Find barber's active barbershop
             var barbershop = await _context.Barbershops
                 .Include(b => b.City)
                 .Include(b => b.Services)
                 .Include(b => b.Appointments.Where(a => a.AppointmentDate >= DateTime.Today))
                 .ThenInclude(a => a.Service)
-                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+                .FirstOrDefaultAsync(b => b.UserId == user.Id && b.IsActive);
 
             if (barbershop == null)
             {
+                TempData["InfoMessage"] = "برای دسترسی به پنل مدیریت، ابتدا آرایشگاه خود را ثبت کنید";
                 return RedirectToAction("CreateBarbershop");
             }
 
@@ -75,18 +99,23 @@ namespace RazorKing.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "Account");
 
-            // Check if user already has a barbershop
+            // Check if user already has an active barbershop
             var existingBarbershop = await _context.Barbershops
-                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+                .FirstOrDefaultAsync(b => b.UserId == user.Id && b.IsActive);
 
             if (existingBarbershop != null)
             {
+                TempData["InfoMessage"] = "شما قبلاً آرایشگاه فعالی ثبت کرده‌اید";
                 return RedirectToAction("Dashboard");
             }
 
             var viewModel = new CreateBarbershopViewModel
             {
-                Cities = await _context.Cities.OrderBy(c => c.Name).ToListAsync()
+                Cities = await _context.Cities.OrderBy(c => c.Name).ToListAsync(),
+                // Set default values
+                OpenTime = TimeSpan.FromHours(9),
+                CloseTime = TimeSpan.FromHours(21),
+                WorkingDays = "شنبه,یکشنبه,دوشنبه,سه‌شنبه,چهارشنبه,پنج‌شنبه"
             };
 
             return View(viewModel);
@@ -111,12 +140,13 @@ namespace RazorKing.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "Account");
 
-            // Check if user already has a barbershop
+            // Check if user already has an active barbershop
             var existingBarbershop = await _context.Barbershops
-                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+                .FirstOrDefaultAsync(b => b.UserId == user.Id && b.IsActive);
 
             if (existingBarbershop != null)
             {
+                TempData["InfoMessage"] = "شما قبلاً آرایشگاه فعالی ثبت کرده‌اید";
                 return RedirectToAction("Dashboard");
             }
 
@@ -157,7 +187,7 @@ namespace RazorKing.Controllers
             {
                 _context.Barbershops.Add(barbershop);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "آرایشگاه شما با موفقیت ایجاد شد";
+                TempData["SuccessMessage"] = "🎉 تبریک! آرایشگاه شما با موفقیت ایجاد شد. اکنون می‌توانید از پنل مدیریت استفاده کنید";
                 return RedirectToAction("Dashboard");
             }
             catch (Exception ex)
@@ -178,10 +208,11 @@ namespace RazorKing.Controllers
             var barbershop = await _context.Barbershops
                 .Include(b => b.City)
                 .Include(b => b.Services)
-                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+                .FirstOrDefaultAsync(b => b.UserId == user.Id && b.IsActive);
 
             if (barbershop == null)
             {
+                TempData["InfoMessage"] = "برای ویرایش آرایشگاه، ابتدا آرایشگاه خود را ثبت کنید";
                 return RedirectToAction("CreateBarbershop");
             }
 
@@ -283,10 +314,11 @@ namespace RazorKing.Controllers
 
             var barbershop = await _context.Barbershops
                 .Include(b => b.Services)
-                .FirstOrDefaultAsync(b => b.UserId == user.Id);
+                .FirstOrDefaultAsync(b => b.UserId == user.Id && b.IsActive);
 
             if (barbershop == null)
             {
+                TempData["InfoMessage"] = "برای مدیریت خدمات، ابتدا آرایشگاه خود را ثبت کنید";
                 return RedirectToAction("CreateBarbershop");
             }
 
@@ -487,7 +519,7 @@ namespace RazorKing.Controllers
                     customerPhone = a.CustomerPhone,
                     serviceName = a.Service.Name,
                     servicePrice = a.Service.Price,
-                    appointmentTime = a.AppointmentTime.ToString(@"hh\:mm"),
+                    appointmentTime = a.AppointmentTime.ToString(@"hh\\:mm"),
                     status = a.Status.ToString()
                 })
                 .ToListAsync();
@@ -598,7 +630,7 @@ namespace RazorKing.Controllers
                 {
                     id = a.Id,
                     date = a.AppointmentDate.ToString("yyyy-MM-dd"),
-                    time = a.AppointmentTime.ToString(@"hh\:mm"),
+                    time = a.AppointmentTime.ToString(@"hh\\:mm"),
                     customerName = a.CustomerName,
                     customerPhone = a.CustomerPhone,
                     serviceName = a.Service.Name,
@@ -653,7 +685,7 @@ namespace RazorKing.Controllers
             {
                 if (!existingAppointments.Contains(currentTime) && !blockedSlots.Contains(currentTime))
                 {
-                    availableSlots.Add(currentTime.ToString(@"hh\:mm"));
+                    availableSlots.Add(currentTime.ToString(@"hh\\:mm"));
                 }
                 currentTime = currentTime.Add(TimeSpan.FromMinutes(15));
             }
@@ -745,8 +777,8 @@ namespace RazorKing.Controllers
                 .Select(ts => new
                 {
                     id = ts.Id,
-                    startTime = ts.StartTime.ToString(@"hh\:mm"),
-                    endTime = ts.EndTime.ToString(@"hh\:mm"),
+                    startTime = ts.StartTime.ToString(@"hh\\:mm"),
+                    endTime = ts.EndTime.ToString(@"hh\\:mm"),
                     isAvailable = ts.IsAvailable,
                     isBlocked = ts.IsBlocked,
                     slotType = ts.SlotType.ToString(),
@@ -761,7 +793,7 @@ namespace RazorKing.Controllers
                 .Select(a => new
                 {
                     id = a.Id,
-                    time = a.AppointmentTime.ToString(@"hh\:mm"),
+                    time = a.AppointmentTime.ToString(@"hh\\:mm"),
                     customerName = a.CustomerName,
                     serviceName = a.Service.Name,
                     status = a.Status.ToString()
@@ -988,6 +1020,32 @@ namespace RazorKing.Controllers
                 _logger.LogError(ex, "Error deleting time slot {TimeSlotId}", id);
                 return Json(new { success = false, message = "خطا در حذف بازه زمانی" });
             }
+        }
+
+        /// <summary>
+        /// Helper method to get the current user's active barbershop
+        /// </summary>
+        private async Task<Barbershop?> GetUserActiveBarbershopAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return null;
+
+            return await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.UserId == user.Id && b.IsActive);
+        }
+
+        /// <summary>
+        /// Helper method to check if user has active barbershop and redirect if not
+        /// </summary>
+        private async Task<IActionResult?> CheckBarbershopAccessAsync(string actionMessage = "برای انجام این عمل، ابتدا آرایشگاه خود را ثبت کنید")
+        {
+            var barbershop = await GetUserActiveBarbershopAsync();
+            if (barbershop == null)
+            {
+                TempData["InfoMessage"] = actionMessage;
+                return RedirectToAction("CreateBarbershop");
+            }
+            return null;
         }
 
         private string GetPersianDayName(DayOfWeek dayOfWeek)

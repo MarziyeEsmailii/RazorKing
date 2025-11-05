@@ -1,0 +1,115 @@
+@using RazorKing.Models.ViewModels
+@model AdminUsersViewModel
+@{
+    ViewData["Title"] = "مدیریت کاربران";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="admin-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5><i class="bi bi-people"></i> مدیریت کاربران</h5>
+        <div class="header-actions">
+            <form asp-action="Users" method="get" class="d-flex">
+                <input type="text" name="search" value="@Model.SearchTerm" class="form-control form-control-sm me-2" placeholder="جستجو در کاربران...">
+                <button type="submit" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>نام</th>
+                        <th>ایمیل</th>
+                        <th>تاریخ عضویت</th>
+                        <th>وضعیت</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Users?.Any() == true)
+                    {
+                        @foreach (var user in Model.Users)
+                        {
+                            <tr>
+                            <td>
+                                <div class="user-info">
+                                    <strong>@user.FirstName @user.LastName</strong>
+                                    <small class="text-muted d-block">@user.UserName</small>
+                                </div>
+                            </td>
+                            <td>@user.Email</td>
+                            <td>@user.CreatedAt.ToString("yyyy/MM/dd")</td>
+                            <td>
+                                <span class="badge bg-@(user.IsActive ? "success" : "danger")">
+                                    @(user.IsActive ? "فعال" : "غیرفعال")
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <form asp-action="ToggleUserStatus" method="post" class="d-inline">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        @{
+                                            var userButtonClass = user.IsActive ? "warning" : "success";
+                                            var userConfirmMessage = user.IsActive ? "آیا می‌خواهید این کاربر را غیرفعال کنید؟" : "آیا می‌خواهید این کاربر را فعال کنید؟";
+                                        }
+                                        <button type="submit" class="btn btn-outline-@userButtonClass" 
+                                                onclick="return confirm('@userConfirmMessage')">
+                                            <i class="bi bi-@(user.IsActive ? "pause" : "play")"></i>
+                                            @(user.IsActive ? "غیرفعال" : "فعال")
+                                        </button>
+                                    </form>
+                                    <form asp-action="DeleteUser" method="post" class="d-inline">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <button type="submit" class="btn btn-outline-danger" 
+                                                onclick="return confirm('آیا مطمئن هستید که می‌خواهید این کاربر را حذف کنید؟')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">کاربری موجود نیست</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="صفحه‌بندی کاربران">
+                <ul class="pagination justify-content-center">
+                    @if (Model.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Users" asp-route-page="@(Model.CurrentPage - 1)" asp-route-search="@Model.SearchTerm">قبلی</a>
+                        </li>
+                    }
+
+                    @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Users" asp-route-page="@i" asp-route-search="@Model.SearchTerm">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Users" asp-route-page="@(Model.CurrentPage + 1)" asp-route-search="@Model.SearchTerm">بعدی</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    </div>
+</div>

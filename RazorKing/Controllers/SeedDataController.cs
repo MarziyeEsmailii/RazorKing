@@ -443,6 +443,19 @@ namespace RazorKing.Controllers
 
                 for (int i = 0; i < barbershopCount && barberIndex < barbers.Count; i++)
                 {
+                    // ساعات کاری متنوع برای آرایشگاه‌ها
+                    var workingHours = new[]
+                    {
+                        new { Open = new TimeSpan(8, 0, 0), Close = new TimeSpan(20, 0, 0) },   // 8 صبح تا 8 شب
+                        new { Open = new TimeSpan(9, 0, 0), Close = new TimeSpan(21, 0, 0) },   // 9 صبح تا 9 شب
+                        new { Open = new TimeSpan(7, 30, 0), Close = new TimeSpan(19, 30, 0) }, // 7:30 صبح تا 7:30 شب
+                        new { Open = new TimeSpan(10, 0, 0), Close = new TimeSpan(22, 0, 0) },  // 10 صبح تا 10 شب
+                        new { Open = new TimeSpan(8, 30, 0), Close = new TimeSpan(20, 30, 0) }, // 8:30 صبح تا 8:30 شب
+                        new { Open = new TimeSpan(9, 30, 0), Close = new TimeSpan(21, 30, 0) }  // 9:30 صبح تا 9:30 شب
+                    };
+                    
+                    var selectedHours = workingHours[random.Next(workingHours.Length)];
+
                     var barbershop = new Barbershop
                     {
                         Name = $"{barbershopNames[random.Next(barbershopNames.Length)]} {city.Name}",
@@ -452,8 +465,8 @@ namespace RazorKing.Controllers
                         ImageUrl = ImageHelper.GetRandomBarbershopImage(),
                         CityId = city.Id,
                         UserId = barbers[barberIndex].Id,
-                        OpenTime = new TimeSpan(8, 0, 0),
-                        CloseTime = new TimeSpan(20, 0, 0),
+                        OpenTime = selectedHours.Open,
+                        CloseTime = selectedHours.Close,
                         WorkingDays = "شنبه,یکشنبه,دوشنبه,سه‌شنبه,چهارشنبه,پنج‌شنبه",
                         IsActive = true,
                         CreatedAt = DateTime.Now.AddDays(-random.Next(1, 365)),

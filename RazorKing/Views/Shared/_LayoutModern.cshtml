@@ -11,6 +11,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
+    <!-- Persian Font - Vazir -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet">
+    
     <!-- CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -20,7 +24,7 @@
     <link rel="stylesheet" href="~/css/persian-calendar.css" asp-append-version="true">
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
+<body class="@ViewData["BodyClass"]">
 
 
     <!-- Navigation -->
@@ -67,13 +71,18 @@
                                 <span>@User.Identity.Name</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", "Admin")"><i class="fas fa-cog"></i> پنل مدیریت</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                }
                                 @if (User.IsInRole("BarbershopOwner"))
                                 {
                                     <li><a class="dropdown-item" href="@Url.Action("Dashboard", "Owner")"><i class="fas fa-tachometer-alt"></i> پنل مدیریت</a></li>
                                 }
                                 @if (User.IsInRole("Barber"))
                                 {
-                                    <li><a class="dropdown-item" href="@Url.Action("Dashboard", "Barber")"><i class="fas fa-cut"></i> پنل آرایشگر</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", "Barber")"><i class="fas fa-cut"></i> پنل آرایشگر</a></li>
                                 }
                                 <li><a class="dropdown-item" href="@Url.Action("Index", "Profile")"><i class="fas fa-user"></i> پروفایل</a></li>
                                 <li><a class="dropdown-item" href="@Url.Action("Index", "Profile")"><i class="fas fa-calendar"></i> نوبت‌های من</a></li>
@@ -104,6 +113,8 @@
 
     <!-- Main Content -->
     <main>
+
+        
         @RenderBody()
     </main>
 

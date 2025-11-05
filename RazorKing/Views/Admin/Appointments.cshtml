@@ -1,0 +1,185 @@
+@using RazorKing.Models.ViewModels
+@model AdminAppointmentsViewModel
+@{
+    ViewData["Title"] = "مدیریت نوبت‌ها";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="admin-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5><i class="bi bi-calendar-check"></i> مدیریت نوبت‌ها</h5>
+        <div class="header-actions d-flex">
+            <form asp-action="Appointments" method="get" class="d-flex me-3">
+                <select name="status" class="form-select form-select-sm me-2" onchange="this.form.submit()">
+                    <option value="">همه وضعیت‌ها</option>
+                    <option value="@((int)AppointmentStatus.Pending)" selected="@(Model.SelectedStatus == AppointmentStatus.Pending)">در انتظار</option>
+                    <option value="@((int)AppointmentStatus.Confirmed)" selected="@(Model.SelectedStatus == AppointmentStatus.Confirmed)">تایید شده</option>
+                    <option value="@((int)AppointmentStatus.Completed)" selected="@(Model.SelectedStatus == AppointmentStatus.Completed)">تکمیل شده</option>
+                    <option value="@((int)AppointmentStatus.Cancelled)" selected="@(Model.SelectedStatus == AppointmentStatus.Cancelled)">لغو شده</option>
+                </select>
+                <input type="hidden" name="search" value="@Model.SearchTerm" />
+            </form>
+            <form asp-action="Appointments" method="get" class="d-flex">
+                <input type="text" name="search" value="@Model.SearchTerm" class="form-control form-control-sm me-2" placeholder="جستجو در نوبت‌ها...">
+                <input type="hidden" name="status" value="@Model.SelectedStatus" />
+                <button type="submit" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>مشتری</th>
+                        <th>آرایشگاه</th>
+                        <th>خدمت</th>
+                        <th>تاریخ و زمان</th>
+                        <th>قیمت</th>
+                        <th>وضعیت</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Appointments?.Any() == true)
+                    {
+                        @foreach (var appointment in Model.Appointments)
+                        {
+                            <tr>
+                            <td>
+                                <strong>@appointment.CustomerName</strong>
+                                <small class="text-muted d-block">@appointment.CustomerPhone</small>
+                                <small class="text-muted d-block">@appointment.CustomerEmail</small>
+                            </td>
+                            <td>@appointment.Barbershop.Name</td>
+                            <td>@appointment.Service.Name</td>
+                            <td>
+                                <strong>@appointment.AppointmentDate.ToString("yyyy/MM/dd")</strong>
+                                <small class="text-muted d-block">@appointment.AppointmentTime.ToString(@"hh\:mm")</small>
+                            </td>
+                            <td>
+                                <strong>@appointment.TotalPrice.ToString("N0") تومان</strong>
+                            </td>
+                            <td>
+                                @{
+                                    var appointmentStatusClass = appointment.Status switch 
+                                    {
+                                        AppointmentStatus.Pending => "warning",
+                                        AppointmentStatus.Confirmed => "info",
+                                        AppointmentStatus.Completed => "success",
+                                        AppointmentStatus.Cancelled => "danger",
+                                        _ => "secondary"
+                                    };
+                                    var appointmentStatusText = appointment.Status switch 
+                                    {
+                                        AppointmentStatus.Pending => "در انتظار",
+                                        AppointmentStatus.Confirmed => "تایید شده",
+                                        AppointmentStatus.Completed => "تکمیل شده",
+                                        AppointmentStatus.Cancelled => "لغو شده",
+                                        _ => "نامشخص"
+                                    };
+                                }
+                                <span class="badge bg-@appointmentStatusClass">
+                                    @appointmentStatusText
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            <i class="bi bi-gear"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            @if (appointment.Status != AppointmentStatus.Confirmed)
+                                            {
+                                                <li>
+                                                    <form asp-action="UpdateAppointmentStatus" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@appointment.Id" />
+                                                        <input type="hidden" name="status" value="@AppointmentStatus.Confirmed" />
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="bi bi-check-circle text-info"></i> تایید
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            }
+                                            @if (appointment.Status != AppointmentStatus.Completed)
+                                            {
+                                                <li>
+                                                    <form asp-action="UpdateAppointmentStatus" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@appointment.Id" />
+                                                        <input type="hidden" name="status" value="@AppointmentStatus.Completed" />
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="bi bi-check-square text-success"></i> تکمیل
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            }
+                                            @if (appointment.Status != AppointmentStatus.Cancelled)
+                                            {
+                                                <li>
+                                                    <form asp-action="UpdateAppointmentStatus" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@appointment.Id" />
+                                                        <input type="hidden" name="status" value="@AppointmentStatus.Cancelled" />
+                                                        <button type="submit" class="dropdown-item" onclick="return confirm('آیا می‌خواهید این نوبت را لغو کنید؟')">
+                                                            <i class="bi bi-x-circle text-warning"></i> لغو
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            }
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form asp-action="DeleteAppointment" method="post" class="d-inline">
+                                                    <input type="hidden" name="id" value="@appointment.Id" />
+                                                    <button type="submit" class="dropdown-item text-danger" onclick="return confirm('آیا مطمئن هستید که می‌خواهید این نوبت را حذف کنید؟')">
+                                                        <i class="bi bi-trash"></i> حذف
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">نوبتی موجود نیست</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="صفحه‌بندی نوبت‌ها">
+                <ul class="pagination justify-content-center">
+                    @if (Model.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Appointments" asp-route-page="@(Model.CurrentPage - 1)" asp-route-search="@Model.SearchTerm" asp-route-status="@Model.SelectedStatus">قبلی</a>
+                        </li>
+                    }
+
+                    @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Appointments" asp-route-page="@i" asp-route-search="@Model.SearchTerm" asp-route-status="@Model.SelectedStatus">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Appointments" asp-route-page="@(Model.CurrentPage + 1)" asp-route-search="@Model.SearchTerm" asp-route-status="@Model.SelectedStatus">بعدی</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    </div>
+</div>

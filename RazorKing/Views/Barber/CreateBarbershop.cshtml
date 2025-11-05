@@ -12,8 +12,22 @@
                 <div class="create-form-card">
                     <!-- Header -->
                     <div class="form-header text-center">
-                        <h2 class="header-title">راه‌اندازی آرایشگاه</h2>
-                        <p class="header-subtitle">اطلاعات آرایشگاه خود را تکمیل کنید</p>
+                        <div class="welcome-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <h2 class="header-title">خوش آمدید!</h2>
+                        <p class="header-subtitle">برای شروع کار، ابتدا اطلاعات آرایشگاه خود را ثبت کنید</p>
+                        <div class="progress-indicator">
+                            <div class="step active">
+                                <span class="step-number">1</span>
+                                <span class="step-text">ثبت آرایشگاه</span>
+                            </div>
+                            <div class="step-arrow">→</div>
+                            <div class="step">
+                                <span class="step-number">2</span>
+                                <span class="step-text">پنل مدیریت</span>
+                            </div>
+                        </div>
                     </div>
 
                     <form asp-action="CreateBarbershop" method="post" enctype="multipart/form-data" class="compact-form">

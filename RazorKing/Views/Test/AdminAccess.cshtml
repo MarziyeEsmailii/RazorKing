@@ -1,0 +1,230 @@
+@{
+    ViewData["Title"] = "تست دسترسی Admin";
+    Layout = "_LayoutModern";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>🔧 تست دسترسی Admin</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5>وضعیت فعلی:</h5>
+                        <p><strong>احراز هویت:</strong> @(ViewBag.IsAuthenticated ? "✅ وارد شده" : "❌ وارد نشده")</p>
+                        <p><strong>دسترسی Admin:</strong> @(ViewBag.IsAdmin ? "✅ دارد" : "❌ ندارد")</p>
+                        <p><strong>اطلاعات کاربر:</strong> @ViewBag.UserInfo</p>
+                    </div>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">
+                            <strong>خطا:</strong> @ViewBag.Error
+                        </div>
+                    }
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>🔑 اقدامات Admin</h5>
+                                </div>
+                                <div class="card-body">
+                                    <button class="btn btn-primary mb-2" onclick="createAdminUser()">
+                                        ایجاد کاربر Admin
+                                    </button>
+                                    <br>
+                                    <a href="/Account/Login" class="btn btn-success mb-2">
+                                        ورود به سیستم
+                                    </a>
+                                    <br>
+                                    <a href="/admin" class="btn btn-warning mb-2">
+                                        پنل Admin
+                                    </a>
+                                    <br>
+                                    <button class="btn btn-info mb-2" onclick="checkAppointments()">
+                                        بررسی کل نوبت‌ها
+                                    </button>
+                                    <br>
+                                    <button class="btn btn-secondary mb-2" onclick="checkUserAppointments()">
+                                        بررسی نوبت‌های کاربر
+                                    </button>
+                                    <br>
+                                    <button class="btn btn-success mb-2" onclick="createTestAppointment()">
+                                        ایجاد نوبت تست
+                                    </button>
+                                    <br>
+                                    <button class="btn btn-warning mb-2" onclick="createSimpleTestAppointment()">
+                                        ایجاد نوبت ساده
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>👥 کاربران Admin موجود</h5>
+                                </div>
+                                <div class="card-body">
+                                    @if (ViewBag.AdminUsers != null)
+                                    {
+                                        @foreach (var user in (List<ApplicationUser>)ViewBag.AdminUsers)
+                                        {
+                                            <div class="alert alert-secondary">
+                                                <strong>@user.Email</strong><br>
+                                                نام: @user.FirstName @user.LastName<br>
+                                                فعال: @(user.IsActive ? "✅" : "❌")
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5>📋 راهنمای ورود Admin:</h5>
+                        <div class="alert alert-warning">
+                            <p><strong>ایمیل:</strong> admin@razorking.com</p>
+                            <p><strong>رمز عبور:</strong> Admin123!</p>
+                            <p><strong>مسیر ورود:</strong> <a href="/Account/Login">/Account/Login</a></p>
+                            <p><strong>پنل Admin:</strong> <a href="/admin">/admin</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function createAdminUser() {
+    try {
+        const response = await fetch('/Test/CreateAdminUser', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('✅ ' + result.message);
+            location.reload();
+        } else {
+            alert('❌ ' + result.message);
+        }
+    } catch (error) {
+        alert('خطا: ' + error.message);
+    }
+}
+
+async function checkAppointments() {
+    try {
+        const response = await fetch('/Test/CheckAppointments');
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('📊 کل نوبت‌ها:', result);
+            alert(`📊 تعداد کل نوبت‌ها: ${result.count}\n\nجزئیات در Console مرورگر موجود است.`);
+        } else {
+            alert('❌ خطا: ' + result.error);
+        }
+    } catch (error) {
+        alert('خطا: ' + error.message);
+    }
+}
+
+async function checkUserAppointments() {
+    try {
+        const response = await fetch('/Test/CheckUserAppointments');
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('📊 نوبت‌های کاربر:', result);
+            
+            let message = `📊 نتایج بررسی نوبت‌های کاربر:
+            
+👤 اطلاعات کاربر:
+- ایمیل: ${result.userInfo.email}
+- نام کاربری: ${result.userInfo.userName}
+- نام: ${result.userInfo.firstName} ${result.userInfo.lastName}
+
+📈 آمار نوبت‌ها:
+- کل نوبت‌ها در سیستم: ${result.totalAppointments}
+- نوبت‌های کاربر (بر اساس ایمیل): ${result.userAppointmentsByEmail}
+- نوبت‌های کاربر (بر اساس ID): ${result.userAppointmentsById}
+- نوبت‌های کاربر (بر اساس نام کاربری): ${result.userAppointmentsByUserName}
+
+جزئیات کامل در Console مرورگر موجود است.`;
+            
+            alert(message);
+        } else {
+            alert('❌ خطا: ' + result.error);
+        }
+    } catch (error) {
+        alert('خطا: ' + error.message);
+    }
+}
+
+async function createTestAppointment() {
+    try {
+        const response = await fetch('/Test/CreateTestAppointment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('✅ نوبت تست ایجاد شد:', result);
+            
+            alert(`✅ نوبت تست با موفقیت ایجاد شد!
+            
+📅 جزئیات:
+- شناسه: ${result.appointment.id}
+- تاریخ: ${result.appointment.date}
+- ساعت: ${result.appointment.time}
+- آرایشگاه: ${result.appointment.barbershop}
+- خدمت: ${result.appointment.service}
+- قیمت: ${result.appointment.price} تومان
+
+حالا دوباره "بررسی کل نوبت‌ها" را کلیک کنید.`);
+        } else {
+            console.error('❌ خطا در ایجاد نوبت تست:', result);
+            alert('❌ خطا در ایجاد نوبت تست: ' + result.error);
+        }
+    } catch (error) {
+        alert('خطا: ' + error.message);
+    }
+}
+
+async function createSimpleTestAppointment() {
+    try {
+        const response = await fetch('/Test/CreateSimpleTestAppointment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('✅ نوبت ساده ایجاد شد:', result);
+            alert(`✅ نوبت ساده با موفقیت ایجاد شد! شناسه: ${result.appointmentId}\n\nحالا "بررسی کل نوبت‌ها" را کلیک کنید.`);
+        } else {
+            console.error('❌ خطا در ایجاد نوبت ساده:', result);
+            alert(`❌ خطا در ایجاد نوبت ساده:\n${result.error}\n${result.innerError || ''}`);
+        }
+    } catch (error) {
+        alert('خطا: ' + error.message);
+    }
+}
+</script>

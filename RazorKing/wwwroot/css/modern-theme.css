@@ -25,7 +25,7 @@
     --shadow-gold: 0 4px 20px rgba(212, 175, 55, 0.3);
 
     /* Spacing */
-    --section-padding: 100px 0;
+    --section-padding: 10px 0;
     --container-padding: 0 20px;
 
     /* Typography */
@@ -73,13 +73,13 @@ body {
     background: rgba(10, 10, 10, 0.95);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-    padding: 15px 0;
+    padding: 8px 0;
     transition: all var(--transition-normal);
 }
 
 .navbar.scrolled {
     background: rgba(10, 10, 10, 0.98);
-    padding: 10px 0;
+    padding: 5px 0;
     box-shadow: var(--shadow-medium);
 }
 
@@ -248,7 +248,7 @@ body {
     display: flex;
     align-items: center;
     overflow: hidden;
-    padding-top: 80px;
+    padding-top: 20px;
 }
 
 .hero-background {
@@ -471,7 +471,7 @@ section {
 }
 
 .section-header {
-    margin-bottom: 80px;
+    margin-bottom: 20px;
 }
 
 .section-badge {
@@ -504,7 +504,7 @@ section {
 /* Quick Booking Bar */
 .quick-booking-bar {
     position: relative;
-    padding: 60px 0;
+    padding: 30px 0;
     overflow: hidden;
 }
 
@@ -1070,7 +1070,7 @@ section {
 }
 
 .footer-content {
-    padding: 80px 0 40px;
+    padding: 40px 0 20px;
 }
 
 .footer-section {
@@ -1277,12 +1277,12 @@ section {
 /* Responsive Design */
 @media (max-width: 768px) {
     :root {
-        --section-padding: 60px 0;
+        --section-padding: 10px 0;
     }
 
     .hero-section {
         min-height: 70vh;
-        padding-top: 60px;
+        padding-top: 20px;
     }
 
     .hero-buttons {
@@ -1623,7 +1623,7 @@ section:nth-child(3) {
 /* Enhanced Mobile Experience */
 @media (max-width: 576px) {
     .quick-booking-bar {
-        padding: 40px 0;
+        padding: 20px 0;
     }
 
     .quick-booking-text h3 {
@@ -2290,5 +2290,57 @@ ced Services Grid - Always 4 in a row */
     .service-price {
         font-size: 0.75rem !important;
         margin-top: auto;
+    }
+}/*
+ Global spacing optimizations */
+main {
+    padding-top: 20px;
+}
+
+/* Reduce spacing for all page containers */
+.container {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+/* Minimal spacing for page headers */
+.page-header,
+.section-header {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+/* Compact form sections */
+.form-section {
+    margin-bottom: 20px;
+}
+
+/* Minimal card spacing */
+.card {
+    margin-bottom: 15px;
+}
+
+/* Responsive main padding */
+@media (max-width: 768px) {
+    main {
+        padding-top: 20px;
+    }
+    
+    .section-header,
+    .page-header {
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+    }
+}
+
+@media (max-width: 576px) {
+    main {
+        padding-top: 40px;
+    }
+    
+    .section-header,
+    .page-header {
+        margin-bottom: 10px;
+        padding-bottom: 5px;
     }
 }

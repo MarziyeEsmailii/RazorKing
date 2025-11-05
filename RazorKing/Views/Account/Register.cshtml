@@ -2,91 +2,89 @@
 @{
     ViewData["Title"] = "ثبت نام";
     Layout = "_LayoutModern";
+    ViewData["BodyClass"] = "register-page-body";
 }
 
 <div class="auth-page register-page">
-    <!-- کارت فرم -->
+    <!-- کارت فرم - سمت چپ -->
     <div class="auth-card">
         <div class="auth-content">
             <div class="auth-box">
+                <!-- تب‌ها -->
+                <div class="auth-switcher">
+                    <button type="button" class="auth-switch" onclick="window.location.href='/Account/Login'">ورود</button>
+                    <button type="button" class="auth-switch active">ثبت نام</button>
+                </div>
 
-
-            <!-- تب‌ها -->
-            <div class="auth-switcher">
-                <button type="button" class="auth-switch" onclick="window.location.href='/Account/Login'">ورود</button>
-                <button type="button" class="auth-switch active">ثبت نام</button>
-            </div>
-
-            <!-- فرم ثبت نام -->
-            <div class="auth-form-container">
-                <form asp-action="Register" method="post" class="auth-form">
-                    
-                    <div class="input-row">
-                        <div class="input-group">
-                            <input asp-for="FirstName" type="text" placeholder="نام" required>
-                            <span asp-validation-for="FirstName" class="field-error"></span>
+                <!-- فرم ثبت نام -->
+                <div class="auth-form-container">
+                    <form asp-action="Register" method="post" class="auth-form">
+                        <div class="input-row">
+                            <div class="input-group">
+                                <input asp-for="FirstName" type="text" placeholder="نام" required>
+                                <span asp-validation-for="FirstName" class="field-error"></span>
+                            </div>
+                            <div class="input-group">
+                                <input asp-for="LastName" type="text" placeholder="نام خانوادگی" required>
+                                <span asp-validation-for="LastName" class="field-error"></span>
+                            </div>
                         </div>
+
                         <div class="input-group">
-                            <input asp-for="LastName" type="text" placeholder="نام خانوادگی" required>
-                            <span asp-validation-for="LastName" class="field-error"></span>
+                            <input asp-for="Email" type="email" placeholder="ایمیل" required>
+                            <span asp-validation-for="Email" class="field-error"></span>
                         </div>
-                    </div>
 
-                    <div class="input-group">
-                        <input asp-for="Email" type="email" placeholder="ایمیل" required>
-                        <span asp-validation-for="Email" class="field-error"></span>
-                    </div>
-
-                    <div class="input-group">
-                        <input asp-for="PhoneNumber" type="tel" placeholder="شماره موبایل" required>
-                        <span asp-validation-for="PhoneNumber" class="field-error"></span>
-                    </div>
-
-                    <div class="input-row">
                         <div class="input-group">
-                            <input asp-for="Password" type="password" placeholder="رمز عبور" required>
-                            <span asp-validation-for="Password" class="field-error"></span>
+                            <input asp-for="PhoneNumber" type="tel" placeholder="شماره موبایل" required>
+                            <span asp-validation-for="PhoneNumber" class="field-error"></span>
                         </div>
-                        <div class="input-group">
-                            <input asp-for="ConfirmPassword" type="password" placeholder="تکرار رمز عبور" required>
-                            <span asp-validation-for="ConfirmPassword" class="field-error"></span>
-                        </div>
-                    </div>
 
-                    <div class="user-type">
-                        <label class="type-option">
-                            <input type="radio" name="UserType" value="Customer" checked>
-                            <span class="type-card">
-                                <i class="icon">👤</i>
-                                <span>مشتری</span>
-                            </span>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <input asp-for="Password" type="password" placeholder="رمز عبور" required>
+                                <span asp-validation-for="Password" class="field-error"></span>
+                            </div>
+                            <div class="input-group">
+                                <input asp-for="ConfirmPassword" type="password" placeholder="تکرار رمز عبور" required>
+                                <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+                            </div>
+                        </div>
+
+                        <div class="user-type">
+                            <label class="type-option">
+                                <input type="radio" name="UserType" value="Customer" checked>
+                                <span class="type-card">
+                                    <i class="icon">👤</i>
+                                    <span>مشتری</span>
+                                </span>
+                            </label>
+                            <label class="type-option">
+                                <input type="radio" name="UserType" value="Barber">
+                                <span class="type-card">
+                                    <i class="icon">✂️</i>
+                                    <span>آرایشگر</span>
+                                </span>
+                            </label>
+                        </div>
+
+                        <label class="checkbox-label">
+                            <input asp-for="AgreeToTerms" type="checkbox" required>
+                            <span class="checkmark"></span>
+                            با قوانین موافقم
                         </label>
-                        <label class="type-option">
-                            <input type="radio" name="UserType" value="Barber">
-                            <span class="type-card">
-                                <i class="icon">✂️</i>
-                                <span>آرایشگر</span>
-                            </span>
-                        </label>
-                    </div>
 
-                    <label class="checkbox-label">
-                        <input asp-for="AgreeToTerms" type="checkbox" required>
-                        <span class="checkmark"></span>
-                        با قوانین موافقم
-                    </label>
-
-                    <button type="submit" class="auth-btn">ثبت نام</button>
-                </form>
-            </div>
+                        <button type="submit" class="auth-btn">ثبت نام</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
     
-    <!-- عکس طبیعی -->
+    <!-- عکس طبیعی - سمت راست -->
     <div class="auth-visual">
         <div class="auth-images">
-            <img src="~/img/photo_3_2025-11-01_19-21-48.jpg" alt="" class="auth-img active">
+            <img src="~/img/photo_3_2025-11-01_19-21-48.jpg" alt="ریزر کینگ" class="auth-img">
         </div>
     </div>
 </div>
@@ -97,4 +95,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/auth-minimal.js"></script>
 }

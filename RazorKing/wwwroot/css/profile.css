@@ -1,23 +1,35 @@
+/* Profile Body */
+.profile-body {
+    padding-top: 0 !important;
+}
+
 /* Profile Page Styles */
 .profile-page {
     background: #0a0a0a;
     min-height: 100vh;
-    padding: 80px 0 0;
+    padding: 120px 0 0;
+    margin-top: 0;
 }
 
 /* Profile Header */
 .profile-header {
     background: rgba(26, 26, 26, 0.95);
-    padding: 25px 0;
+    padding: 40px 0;
     border-bottom: 1px solid rgba(212, 175, 55, 0.1);
     backdrop-filter: blur(10px);
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .profile-header-content {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 25px;
     position: relative;
+    padding: 0 15px;
+    min-height: 120px;
 }
 
 .profile-avatar {
@@ -25,16 +37,18 @@
 }
 
 .avatar-circle {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 32px;
     color: #1a1a1a;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    border: 3px solid rgba(212, 175, 55, 0.2);
 }
 
 .profile-info {
@@ -478,10 +492,18 @@
 
 /* Updated responsive styles */
 @media (max-width: 768px) {
+    .profile-page {
+        padding: 110px 0 0;
+    }
+    
+    .profile-header {
+        padding: 30px 0;
+    }
+    
     .profile-header-content {
         flex-direction: column;
         text-align: center;
-        gap: 15px;
+        gap: 20px;
     }
     
     .profile-stats {
@@ -492,53 +514,68 @@
     .appointment-item {
         flex-direction: column;
         text-align: center;
-        gap: 12px;
-        padding: 12px;
+        gap: 15px;
+        padding: 15px;
     }
     
     .appointment-actions {
         flex-direction: row;
         justify-content: center;
+        gap: 10px;
     }
     
     .detail-item {
-        padding: 8px 0;
+        padding: 10px 0;
+    }
+    
+    .profile-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
     }
 }
 
 @media (max-width: 576px) {
     .profile-page {
-        padding: 70px 0 0;
+        padding: 100px 0 0;
     }
     
     .profile-header {
-        padding: 20px 0;
+        padding: 25px 0;
+    }
+    
+    .profile-header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
     }
     
     .profile-name {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
     }
     
     .profile-stats {
         gap: 10px;
+        justify-content: center;
     }
     
     .stat-item {
-        padding: 6px 8px;
+        padding: 8px 12px;
     }
     
     .stat-number {
-        font-size: 1rem;
+        font-size: 1.1rem;
     }
     
     .stat-label {
-        font-size: 0.65rem;
+        font-size: 0.7rem;
     }
     
     .profile-card,
     .appointments-card {
         padding: 15px;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
     }
     
     .appointment-date {
@@ -548,5 +585,236 @@
     
     .date-day {
         font-size: 1.2rem;
+    }
+    
+    .profile-actions {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .profile-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}/* بهبود
+ نمایش نوبت‌ها */
+.appointment-city {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 2px 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.appointment-city i {
+    color: var(--primary-gold);
+    font-size: 0.7rem;
+}
+
+/* بهبود empty state */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-muted);
+}
+
+.empty-icon {
+    margin-bottom: 1.5rem;
+}
+
+.empty-icon i {
+    font-size: 4rem;
+    color: rgba(212, 175, 55, 0.3);
+    margin-bottom: 1rem;
+}
+
+.empty-state h5 {
+    color: var(--text-white);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+}
+
+.empty-state p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+}
+
+.empty-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.empty-actions .btn {
+    min-width: 150px;
+}
+
+/* بهبود status badges */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.status-pending {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.status-badge.status-confirmed {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-badge.status-completed {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.status-badge.status-cancelled {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* بهبود appointment actions */
+.appointment-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.appointment-actions .btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.appointment-actions .btn:hover {
+    transform: scale(1.1);
+}
+
+.appointment-actions .btn-outline-danger:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+.appointment-actions .btn-outline-gold:hover {
+    background: var(--primary-gold);
+    color: #1a1a1a;
+    border-color: var(--primary-gold);
+}
+
+/* انیمیشن برای نوبت‌های جدید */
+.appointment-item.new-appointment {
+    animation: newAppointmentPulse 2s ease-in-out;
+    border: 2px solid var(--primary-gold);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+@keyframes newAppointmentPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+    }
+}
+
+/* بهبود responsive */
+@media (max-width: 768px) {
+    .empty-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .empty-actions .btn {
+        width: 100%;
+        max-width: 250px;
+    }
+    
+    .appointment-actions {
+        flex-direction: row;
+        gap: 0.3rem;
+    }
+    
+    .appointment-actions .btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+}
+
+/* بهبود loading state */
+.appointments-loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}
+
+.appointments-loading i {
+    font-size: 2rem;
+    color: var(--primary-gold);
+    margin-bottom: 1rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* بهبود notification برای نوبت جدید */
+.new-appointment-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, var(--primary-gold), #f4d03f);
+    color: #1a1a1a;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    animation: slideInRight 0.5s ease-out;
+}
+
+.new-appointment-notification i {
+    font-size: 1.2rem;
+    color: #1a1a1a;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
     }
 }

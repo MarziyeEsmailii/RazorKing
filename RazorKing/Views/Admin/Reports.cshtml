@@ -1,0 +1,226 @@
+@using RazorKing.Models.ViewModels
+@model AdminReportsViewModel
+@{
+    ViewData["Title"] = "گزارشات";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5><i class="bi bi-calendar-week"></i> نوبت‌های روزانه (30 روز گذشته)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="dailyAppointmentsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5><i class="bi bi-currency-dollar"></i> درآمد ماهانه (12 ماه گذشته)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="monthlyRevenueChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5><i class="bi bi-shop"></i> برترین آرایشگاه‌ها</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>آرایشگاه</th>
+                                <th>تعداد نوبت</th>
+                                <th>درآمد</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.TopBarbershops?.Any() == true)
+                            {
+                                @foreach (var barbershop in Model.TopBarbershops)
+                                {
+                                    <tr>
+                                        <td>@barbershop.Name</td>
+                                        <td><span class="badge bg-info">@barbershop.AppointmentsCount</span></td>
+                                        <td><strong>@barbershop.Revenue.ToString("N0") تومان</strong></td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">داده‌ای موجود نیست</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5><i class="bi bi-scissors"></i> محبوب‌ترین خدمات</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>خدمت</th>
+                                <th>آرایشگاه</th>
+                                <th>تعداد رزرو</th>
+                                <th>درآمد</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.TopServices?.Any() == true)
+                            {
+                                @foreach (var service in Model.TopServices)
+                                {
+                                    <tr>
+                                        <td>@service.Name</td>
+                                        <td><small class="text-muted">@service.BarbershopName</small></td>
+                                        <td><span class="badge bg-success">@service.BookingsCount</span></td>
+                                        <td><strong>@service.Revenue.ToString("N0") تومان</strong></td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">داده‌ای موجود نیست</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5><i class="bi bi-person-plus"></i> ثبت‌نام کاربران (12 ماه گذشته)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="userRegistrationsChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Daily Appointments Chart
+        const dailyAppointmentsCtx = document.getElementById('dailyAppointmentsChart').getContext('2d');
+        const dailyAppointmentsChart = new Chart(dailyAppointmentsCtx, {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.DailyAppointments?.Select(d => d.Date.ToString("MM/dd")) ?? new List<string>())),
+                datasets: [{
+                    label: 'تعداد نوبت',
+                    data: @Html.Raw(Json.Serialize(Model.DailyAppointments?.Select(d => d.Count) ?? new List<int>())),
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Monthly Revenue Chart
+        const monthlyRevenueCtx = document.getElementById('monthlyRevenueChart').getContext('2d');
+        const monthlyRevenueChart = new Chart(monthlyRevenueCtx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.MonthlyRevenue?.Select(r => r.MonthName) ?? new List<string>())),
+                datasets: [{
+                    label: 'درآمد (تومان)',
+                    data: @Html.Raw(Json.Serialize(Model.MonthlyRevenue?.Select(r => r.Revenue) ?? new List<decimal>())),
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString() + ' تومان';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // User Registrations Chart
+        const userRegistrationsCtx = document.getElementById('userRegistrationsChart').getContext('2d');
+        const userRegistrationsChart = new Chart(userRegistrationsCtx, {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.UserRegistrations?.Select(u => u.MonthName) ?? new List<string>())),
+                datasets: [{
+                    label: 'تعداد کاربر جدید',
+                    data: @Html.Raw(Json.Serialize(Model.UserRegistrations?.Select(u => u.Count) ?? new List<int>())),
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+}

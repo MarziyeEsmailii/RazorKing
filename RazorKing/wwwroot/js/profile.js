@@ -1,6 +1,9 @@
 // Profile Page JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     initializeProfile();
+    
+    // بررسی نوبت‌های جدید
+    checkForNewAppointments();
 });
 
 function initializeProfile() {
@@ -12,6 +15,313 @@ function initializeProfile() {
     
     // Initialize animations
     initializeAnimations();
+    
+    // بارگذاری نوبت‌های کاربر
+    loadUserAppointments();
+}
+
+// بارگذاری نوبت‌های کاربر
+async function loadUserAppointments() {
+    try {
+        console.log('🔄 بارگذاری نوبت‌های کاربر...');
+        
+        const response = await fetch('/Profile/RefreshAppointments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('✅ نوبت‌های کاربر بارگذاری شد:', result);
+            updateAppointmentsDisplay(result);
+            
+            // نمایش پیام اگر نوبت جدیدی اضافه شده
+            if (result.totalAppointments > 0) {
+                console.log(`📊 تعداد کل نوبت‌ها: ${result.totalAppointments}`);
+                console.log(`📅 نوبت‌های آینده: ${result.upcomingCount}`);
+                console.log(`📜 تاریخچه: ${result.pastCount}`);
+            }
+        } else {
+            console.error('❌ خطا در دریافت نوبت‌ها:', result.message);
+            showNotification('خطا در بارگذاری نوبت‌ها: ' + result.message, 'error');
+        }
+    } catch (error) {
+        console.error('❌ خطا در ارتباط با سرور:', error);
+        showNotification('خطا در ارتباط با سرور', 'error');
+    }
+}
+
+// به‌روزرسانی نمایش نوبت‌ها
+function updateAppointmentsDisplay(data) {
+    // به‌روزرسانی آمار
+    updateStats(data);
+    
+    // به‌روزرسانی لیست نوبت‌های آینده
+    updateUpcomingAppointments(data.appointments.filter(a => a.isUpcoming));
+    
+    // به‌روزرسانی تاریخچه
+    updatePastAppointments(data.appointments.filter(a => !a.isUpcoming));
+}
+
+// Debug function for appointments
+async function debugAppointments() {
+    try {
+        console.log('🔍 شروع بررسی نوبت‌ها...');
+        
+        // بررسی نوبت‌های کاربر
+        const userResponse = await fetch('/Profile/GetMyAppointments');
+        const userResult = await userResponse.json();
+        
+        console.log('📊 نوبت‌های کاربر:', userResult);
+        
+        // بررسی کل نوبت‌ها در سیستم
+        const allResponse = await fetch('/Booking/DebugAppointments');
+        const allResult = await allResponse.json();
+        
+        console.log('📊 کل نوبت‌ها در سیستم:', allResult);
+        
+        // بررسی نوبت‌های کاربر از کنترلر Booking
+        const bookingResponse = await fetch('/Booking/DebugUserAppointments');
+        const bookingResult = await bookingResponse.json();
+        
+        console.log('📊 نوبت‌های کاربر از Booking:', bookingResult);
+        
+        // نمایش نتایج
+        let message = `
+🔍 نتایج بررسی نوبت‌ها:
+
+📊 از Profile Controller:
+- موفقیت: ${userResult.success}
+- تعداد نوبت‌ها: ${userResult.appointments ? userResult.appointments.length : 0}
+
+📊 کل نوبت‌ها در سیستم:
+- موفقیت: ${allResult.success}
+- تعداد کل: ${allResult.count || 0}
+
+📊 از Booking Controller:
+- موفقیت: ${bookingResult.success}
+- تعداد نوبت‌های کاربر: ${bookingResult.count || 0}
+- ایمیل کاربر: ${bookingResult.userEmail || 'نامشخص'}
+
+جزئیات کامل در Console مرورگر موجود است.
+        `;
+        
+        alert(message);
+        
+    } catch (error) {
+        console.error('❌ خطا در بررسی نوبت‌ها:', error);
+        alert('خطا در بررسی نوبت‌ها: ' + error.message);
+    }
+}
+
+// Create test appointment
+async function createTestAppointment() {
+    try {
+        console.log('🔧 ایجاد نوبت تست...');
+        
+        const response = await fetch('/Home/CreateTestAppointment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            }
+        });
+        
+        const result = await response.json();
+        
+        console.log('📊 نتیجه ایجاد نوبت تست:', result);
+        
+        if (result.success) {
+            alert(`✅ نوبت تست با موفقیت ایجاد شد!
+            
+📅 جزئیات:
+- شناسه: ${result.appointment.id}
+- تاریخ: ${result.appointment.date}
+- ساعت: ${result.appointment.time}
+- آرایشگاه: ${result.appointment.barbershop}
+- خدمت: ${result.appointment.service}
+- قیمت: ${result.appointment.price} تومان
+
+حالا صفحه را refresh کنید تا نوبت را ببینید.`);
+            
+            // Refresh the page to show the new appointment
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            alert('❌ خطا در ایجاد نوبت تست: ' + result.error);
+        }
+        
+    } catch (error) {
+        console.error('❌ خطا در ایجاد نوبت تست:', error);
+        alert('خطا در ایجاد نوبت تست: ' + error.message);
+    }
+}
+
+// Refresh appointments manually
+async function refreshAppointments() {
+    console.log('🔄 بروزرسانی دستی نوبت‌ها...');
+    showNotification('در حال بروزرسانی نوبت‌ها...', 'info');
+    await loadUserAppointments();
+}
+
+// Make functions globally available
+window.debugAppointments = debugAppointments;
+window.createTestAppointment = createTestAppointment;
+window.refreshAppointments = refreshAppointments;
+
+// به‌روزرسانی آمار
+function updateStats(data) {
+    const totalElement = document.querySelector('.stat-item:nth-child(1) .stat-number');
+    const upcomingElement = document.querySelector('.stat-item:nth-child(3) .stat-number');
+    
+    if (totalElement) {
+        totalElement.textContent = data.totalCount;
+    }
+    
+    if (upcomingElement) {
+        upcomingElement.textContent = data.upcomingCount;
+    }
+}
+
+// به‌روزرسانی نوبت‌های آینده
+function updateUpcomingAppointments(appointments) {
+    const container = document.querySelector('.appointments-card .appointments-list');
+    if (!container) return;
+    
+    if (appointments.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <h5>نوبت آینده‌ای ندارید</h5>
+                <p>برای رزرو نوبت جدید کلیک کنید</p>
+                <a href="/Booking" class="btn btn-gold">
+                    <i class="fas fa-calendar-plus"></i>
+                    رزرو نوبت
+                </a>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = appointments.slice(0, 3).map(appointment => `
+        <div class="appointment-item upcoming" data-appointment-id="${appointment.id}">
+            <div class="appointment-date">
+                <div class="date-day">${new Date(appointment.appointmentDate).getDate()}</div>
+                <div class="date-month">${getMonthName(new Date(appointment.appointmentDate).getMonth())}</div>
+            </div>
+            <div class="appointment-details">
+                <h5>${appointment.barbershopName}</h5>
+                <p class="appointment-service">${appointment.serviceName}</p>
+                <p class="appointment-time">
+                    <i class="fas fa-clock"></i>
+                    ${appointment.appointmentTime}
+                </p>
+                ${appointment.cityName ? `<p class="appointment-city"><i class="fas fa-map-marker-alt"></i> ${appointment.cityName}</p>` : ''}
+            </div>
+            <div class="appointment-status">
+                <span class="status-badge status-${appointment.status.toLowerCase()}">
+                    ${appointment.statusText}
+                </span>
+                <div class="appointment-price">
+                    ${formatPrice(appointment.totalPrice)} تومان
+                </div>
+            </div>
+            <div class="appointment-actions">
+                ${appointment.canCancel ? `
+                    <button class="btn btn-sm btn-outline-danger" onclick="cancelAppointment(${appointment.id}, this)" title="لغو نوبت">
+                        <i class="fas fa-times"></i>
+                    </button>
+                ` : ''}
+                <button class="btn btn-sm btn-outline-gold" onclick="showAppointmentDetails(${appointment.id})" title="جزئیات">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// به‌روزرسانی تاریخچه
+function updatePastAppointments(appointments) {
+    const container = document.querySelector('.appointments-card:last-child .appointments-list');
+    if (!container) return;
+    
+    if (appointments.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-history"></i>
+                <h5>تاریخچه‌ای ندارید</h5>
+                <p>نوبت‌های گذشته شما اینجا نمایش داده می‌شود</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = appointments.slice(0, 5).map(appointment => `
+        <div class="appointment-item past" data-appointment-id="${appointment.id}">
+            <div class="appointment-date">
+                <div class="date-day">${new Date(appointment.appointmentDate).getDate()}</div>
+                <div class="date-month">${getMonthName(new Date(appointment.appointmentDate).getMonth())}</div>
+            </div>
+            <div class="appointment-details">
+                <h5>${appointment.barbershopName}</h5>
+                <p class="appointment-service">${appointment.serviceName}</p>
+                <p class="appointment-time">
+                    <i class="fas fa-clock"></i>
+                    ${appointment.appointmentTime}
+                </p>
+                ${appointment.cityName ? `<p class="appointment-city"><i class="fas fa-map-marker-alt"></i> ${appointment.cityName}</p>` : ''}
+            </div>
+            <div class="appointment-status">
+                <span class="status-badge status-${appointment.status.toLowerCase()}">
+                    ${appointment.statusText}
+                </span>
+                <div class="appointment-price">
+                    ${formatPrice(appointment.totalPrice)} تومان
+                </div>
+            </div>
+            <div class="appointment-actions">
+                <button class="btn btn-sm btn-outline-gold" onclick="showAppointmentDetails(${appointment.id})" title="جزئیات">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// بررسی نوبت‌های جدید
+function checkForNewAppointments() {
+    // بررسی localStorage برای نوبت‌های جدید
+    const newAppointmentId = localStorage.getItem('newAppointmentId');
+    if (newAppointmentId) {
+        // نمایش پیام موفقیت
+        showNotification('نوبت شما با موفقیت ثبت شد!', 'success');
+        
+        // حذف از localStorage
+        localStorage.removeItem('newAppointmentId');
+        
+        // بارگذاری مجدد نوبت‌ها
+        setTimeout(() => {
+            loadUserAppointments();
+        }, 1000);
+    }
+}
+
+// توابع کمکی
+function getMonthName(monthIndex) {
+    const months = [
+        'ژانویه', 'فوریه', 'مارس', 'آوریل', 'می', 'ژوئن',
+        'ژوئیه', 'آگوست', 'سپتامبر', 'اکتبر', 'نوامبر', 'دسامبر'
+    ];
+    return months[monthIndex];
+}
+
+function formatPrice(price) {
+    return new Intl.NumberFormat('fa-IR').format(price);
 }
 
 function initializeTooltips() {

@@ -167,8 +167,25 @@ namespace RazorKing.Models.ViewModels
         public List<City> Cities { get; set; } = new();
         
         // Helper properties for time display
-        public string OpenTimeString => OpenTime.ToString(@"hh\:mm");
-        public string CloseTimeString => CloseTime.ToString(@"hh\:mm");
+        public string OpenTimeString 
+        { 
+            get => OpenTime.ToString(@"hh\:mm");
+            set 
+            {
+                if (TimeSpan.TryParse(value, out var time))
+                    OpenTime = time;
+            }
+        }
+        
+        public string CloseTimeString 
+        { 
+            get => CloseTime.ToString(@"hh\:mm");
+            set 
+            {
+                if (TimeSpan.TryParse(value, out var time))
+                    CloseTime = time;
+            }
+        }
     }
 
     public class ChangeAppointmentStatusViewModel

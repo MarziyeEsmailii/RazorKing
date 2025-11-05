@@ -6,7 +6,7 @@
 .manage-services {
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
     min-height: 100vh;
-    padding: 120px 0 40px;
+    padding: 20px 0 40px;
 }
 
 /* Header */
@@ -348,7 +348,7 @@
 /* Responsive */
 @media (max-width: 768px) {
     .manage-services {
-        padding: 100px 0 20px;
+        padding: 20px 0 20px;
     }
     
     .services-header {

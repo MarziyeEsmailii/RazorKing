@@ -11,6 +11,14 @@ let selectedData = {
     customer: null
 };
 
+// متغیرهای global برای ثبت نوبت
+let selectedCity = null;
+let selectedBarbershop = null;
+let selectedServices = [];
+let selectedDate = null;
+let selectedTime = null;
+let totalPrice = 0;
+
 // شروع سیستم
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 DOM آماده شد');
@@ -242,6 +250,7 @@ function selectBarbershop(barbershopElement, barbershopData) {
     
     // ذخیره اطلاعات
     selectedData.barbershop = barbershopData;
+    selectedBarbershop = barbershopData;
     
     console.log('✅ آرایشگاه انتخاب شد:', barbershopData);
     
@@ -369,6 +378,39 @@ function updateSelectedServices() {
     if (depositAmountEl) {
         depositAmountEl.textContent = `${formatPrice(depositAmount)} تومان`;
     }
+}
+
+// تابع بررسی کامل بودن اطلاعات
+function validateBookingData() {
+    console.log('🔍 بررسی کامل بودن اطلاعات رزرو...');
+    console.log('📊 وضعیت فعلی selectedData:', selectedData);
+    
+    const validation = {
+        city: !!selectedData.city,
+        barbershop: !!selectedData.barbershop,
+        services: selectedData.services && selectedData.services.length > 0,
+        date: !!selectedData.date,
+        time: !!selectedData.time,
+        customerName: !!(document.getElementById('customerName')?.value),
+        customerPhone: !!(document.getElementById('customerPhone')?.value)
+    };
+    
+    console.log('📋 نتایج اعتبارسنجی:', validation);
+    
+    const missingItems = [];
+    if (!validation.city) missingItems.push('شهر');
+    if (!validation.barbershop) missingItems.push('آرایشگاه');
+    if (!validation.services) missingItems.push('خدمات');
+    if (!validation.date) missingItems.push('تاریخ');
+    if (!validation.time) missingItems.push('ساعت');
+    if (!validation.customerName) missingItems.push('نام مشتری');
+    if (!validation.customerPhone) missingItems.push('شماره تلفن');
+    
+    return {
+        isValid: missingItems.length === 0,
+        missingItems: missingItems,
+        validation: validation
+    };
 }
 
 // بارگذاری روزهای خالی
@@ -765,7 +807,7 @@ function handleStepSpecificActions(stepNumber) {
             }
             break;
         case 6: // اطلاعات شخصی
-            // می‌توان اطلاعات کاربر لاگین شده را بارگذاری کرد
+            loadUserInfo();
             break;
         case 7: // تایید نهایی
             updateFinalSummary();
@@ -773,7 +815,44 @@ function handleStepSpecificActions(stepNumber) {
     }
 }
 
+// بارگذاری اطلاعات کاربر لاگین شده
+async function loadUserInfo() {
+    try {
+        const response = await fetch('/Booking/CheckAuthStatus');
+        const result = await response.json();
+        
+        if (result.success && result.isAuthenticated && result.user) {
+            console.log('👤 اطلاعات کاربر دریافت شد:', result.user);
+            
+            // پر کردن فیلدها با اطلاعات کاربر
+            const customerNameField = document.getElementById('customerName');
+            const customerPhoneField = document.getElementById('customerPhone');
+            const customerEmailField = document.getElementById('customerEmail');
+            
+            if (customerNameField && result.user.fullName) {
+                customerNameField.value = result.user.fullName;
+            }
+            
+            if (customerPhoneField && result.user.phoneNumber) {
+                customerPhoneField.value = result.user.phoneNumber;
+            }
+            
+            if (customerEmailField && result.user.email) {
+                customerEmailField.value = result.user.email;
+            }
+            
+            showMessage('اطلاعات شما بارگذاری شد', 'success');
+        } else {
+            console.log('⚠️ کاربر وارد نشده است');
+        }
+    } catch (error) {
+        console.error('❌ خطا در بارگذاری اطلاعات کاربر:', error);
+    }
+}
+
 function updateFinalSummary() {
+    console.log('📋 به‌روزرسانی خلاصه نهایی با داده‌های:', selectedData);
+    
     // به‌روزرسانی خلاصه نهایی
     const elements = {
         city: document.getElementById('finalSummaryCity'),
@@ -781,28 +860,41 @@ function updateFinalSummary() {
         services: document.getElementById('finalSummaryServices'),
         date: document.getElementById('finalSummaryDate'),
         time: document.getElementById('finalSummaryTime'),
+        customer: document.getElementById('finalSummaryCustomer'),
         total: document.getElementById('finalSummaryTotal'),
         deposit: document.getElementById('finalSummaryDeposit')
     };
     
     if (elements.city && selectedData.city) {
         elements.city.textContent = selectedData.city.name;
+        console.log('✅ شهر به‌روزرسانی شد:', selectedData.city.name);
     }
     
     if (elements.barbershop && selectedData.barbershop) {
         elements.barbershop.textContent = selectedData.barbershop.name;
+        console.log('✅ آرایشگاه به‌روزرسانی شد:', selectedData.barbershop.name);
     }
     
     if (elements.services && selectedData.services.length > 0) {
         elements.services.textContent = selectedData.services.map(s => s.name).join('، ');
+        console.log('✅ خدمات به‌روزرسانی شد:', selectedData.services.map(s => s.name));
     }
     
     if (elements.date && selectedData.date) {
-        elements.date.textContent = selectedData.date.displayDate;
+        elements.date.textContent = selectedData.date.displayDate || selectedData.date.date;
+        console.log('✅ تاریخ به‌روزرسانی شد:', selectedData.date.displayDate);
     }
     
     if (elements.time && selectedData.time) {
-        elements.time.textContent = selectedData.time.displayTime;
+        elements.time.textContent = selectedData.time.displayTime || selectedData.time.time;
+        console.log('✅ ساعت به‌روزرسانی شد:', selectedData.time.displayTime);
+    }
+    
+    // به‌روزرسانی نام مشتری
+    const customerName = document.getElementById('customerName')?.value || '';
+    if (elements.customer && customerName) {
+        elements.customer.textContent = customerName;
+        console.log('✅ نام مشتری به‌روزرسانی شد:', customerName);
     }
     
     const totalPrice = selectedData.services.reduce((sum, service) => sum + service.price, 0);
@@ -810,10 +902,12 @@ function updateFinalSummary() {
     
     if (elements.total) {
         elements.total.textContent = `${formatPrice(totalPrice)} تومان`;
+        console.log('✅ قیمت کل به‌روزرسانی شد:', totalPrice);
     }
     
     if (elements.deposit) {
         elements.deposit.textContent = `${formatPrice(depositAmount)} تومان`;
+        console.log('✅ بیعانه به‌روزرسانی شد:', depositAmount);
     }
 }
 
@@ -871,17 +965,109 @@ function disableNextButton() {
     }
 }
 
-function handleFinalSubmit() {
+async function handleFinalSubmit() {
     console.log('💳 شروع فرآیند تایید نهایی...');
     showMessage('در حال ثبت نوبت...', 'info');
     
-    // شبیه‌سازی ثبت نوبت
-    setTimeout(() => {
-        showMessage('نوبت با موفقیت ثبت شد!', 'success');
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 2000);
-    }, 2000);
+    try {
+        // استفاده از selectedData به جای متغیرهای جداگانه
+        const bookingData = {
+            BarbershopId: parseInt(selectedData.barbershop?.id || 0),
+            ServiceIds: selectedData.services.map(s => parseInt(s.id)),
+            Date: selectedData.date?.date || '',
+            Time: selectedData.time?.time || selectedData.time?.displayTime || '',
+            CustomerName: document.getElementById('customerName')?.value || '',
+            CustomerPhone: document.getElementById('customerPhone')?.value || '',
+            CustomerEmail: document.getElementById('customerEmail')?.value || '',
+            TotalPrice: parseFloat(selectedData.services.reduce((sum, service) => sum + service.price, 0)),
+            PaidAmount: 0,
+            Notes: document.getElementById('customerNotes')?.value || ''
+        };
+
+        console.log('📋 اطلاعات نوبت:', bookingData);
+        console.log('📋 selectedData کامل:', selectedData);
+
+        // بررسی اعتبار داده‌ها
+        console.log('🔍 بررسی اعتبار داده‌ها:');
+        console.log('- BarbershopId:', bookingData.BarbershopId);
+        console.log('- ServiceIds:', bookingData.ServiceIds);
+        console.log('- Date:', bookingData.Date);
+        console.log('- Time:', bookingData.Time);
+        console.log('- CustomerName:', bookingData.CustomerName);
+        console.log('- CustomerPhone:', bookingData.CustomerPhone);
+        
+        // استفاده از تابع اعتبارسنجی جدید
+        const validationResult = validateBookingData();
+        
+        if (!validationResult.isValid) {
+            console.error('❌ اطلاعات ناقص:', validationResult);
+            showMessage(`لطفاً ابتدا ${validationResult.missingItems.join('، ')} را تکمیل کنید.`, 'error');
+            
+            // هدایت کاربر به اولین مرحله ناقص
+            if (!validationResult.validation.city) {
+                goToStep(1);
+            } else if (!validationResult.validation.barbershop) {
+                goToStep(2);
+            } else if (!validationResult.validation.services) {
+                goToStep(3);
+            } else if (!validationResult.validation.date) {
+                goToStep(4);
+            } else if (!validationResult.validation.time) {
+                goToStep(5);
+            } else if (!validationResult.validation.customerName || !validationResult.validation.customerPhone) {
+                goToStep(6);
+            }
+            
+            return;
+        }
+
+        if (!bookingData.CustomerName || !bookingData.CustomerPhone) {
+            showMessage('نام و شماره تلفن الزامی است.', 'error');
+            return;
+        }
+
+        // دریافت CSRF token
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || 
+                     document.querySelector('meta[name="__RequestVerificationToken"]')?.content || '';
+
+        // ارسال درخواست به سرور
+        const response = await fetch('/Booking/CreateAppointment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify(bookingData)
+        });
+
+        const result = await response.json();
+        console.log('📊 پاسخ سرور:', result);
+
+        if (result.success) {
+            showMessage('نوبت با موفقیت ثبت شد!', 'success');
+            
+            // ذخیره ID نوبت جدید در localStorage برای نمایش در صفحات دیگر
+            localStorage.setItem('newAppointmentId', result.appointmentId);
+            
+            setTimeout(() => {
+                if (result.appointmentId) {
+                    window.location.href = `/Booking/Confirmation/${result.appointmentId}`;
+                } else {
+                    window.location.href = '/Profile';
+                }
+            }, 2000);
+        } else if (result.requiresLogin) {
+            showMessage(result.message || 'برای تکمیل رزرو باید وارد حساب کاربری خود شوید', 'warning');
+            setTimeout(() => {
+                window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+            }, 3000);
+        } else {
+            showMessage(result.message || 'خطا در ثبت نوبت', 'error');
+        }
+    } catch (error) {
+        console.error('❌ خطا در ثبت نوبت:', error);
+        showMessage('خطا در ارتباط با سرور. لطفاً مجدداً تلاش کنید.', 'error');
+    }
 }
 
 // Utility functions
@@ -1236,37 +1422,39 @@ if (window.location.hostname === 'localhost') {
     
     const testButtons = [
         {
-            text: 'تست روزهای خالی',
+            text: 'بررسی وضعیت',
             action: () => {
-                selectedData.barbershop = { id: 1, name: 'تست آرایشگاه' };
-                selectedData.services = [{ id: 1, name: 'تست خدمت', price: 50000, duration: 30 }];
-                loadAvailableDates();
+                const result = validateBookingData();
+                console.log('📊 نتیجه بررسی:', result);
+                alert(`وضعیت: ${result.isValid ? 'کامل' : 'ناقص'}\nموارد ناقص: ${result.missingItems.join('، ')}`);
             }
         },
         {
-            text: 'رفتن به مرحله 4',
+            text: 'تست کامل',
             action: () => {
+                selectedData.city = { id: 1, name: 'گرگان' };
                 selectedData.barbershop = { id: 1, name: 'تست آرایشگاه' };
                 selectedData.services = [{ id: 1, name: 'تست خدمت', price: 50000, duration: 30 }];
-                goToStep(4);
+                selectedData.date = { date: new Date().toISOString().split('T')[0], displayDate: 'امروز' };
+                selectedData.time = { time: '10:00', displayTime: '10:00' };
+                
+                document.getElementById('customerName').value = 'تست کاربر';
+                document.getElementById('customerPhone').value = '09123456789';
+                
+                console.log('✅ اطلاعات تست تنظیم شد');
+                showMessage('اطلاعات تست تنظیم شد', 'success');
             }
         },
         {
-            text: 'تست ساعات خالی',
+            text: 'رفتن به مرحله 7',
             action: () => {
-                selectedData.barbershop = { id: 1, name: 'تست آرایشگاه' };
-                selectedData.services = [{ id: 1, name: 'تست خدمت', price: 50000, duration: 30 }];
-                selectedData.date = { date: new Date().toISOString().split('T')[0] };
-                loadAvailableTimes(selectedData.date.date);
+                goToStep(7);
             }
         },
         {
-            text: 'رفتن به مرحله 5',
+            text: 'تست ثبت نوبت',
             action: () => {
-                selectedData.barbershop = { id: 1, name: 'تست آرایشگاه' };
-                selectedData.services = [{ id: 1, name: 'تست خدمت', price: 50000, duration: 30 }];
-                selectedData.date = { date: new Date().toISOString().split('T')[0] };
-                goToStep(5);
+                handleFinalSubmit();
             }
         }
     ];
@@ -1291,4 +1479,28 @@ if (window.location.hostname === 'localhost') {
     document.body.appendChild(debugContainer);
 }
 
+// تابع نمایش وضعیت کامل سیستم
+function showBookingStatus() {
+    console.log('📊 وضعیت کامل سیستم رزرو:');
+    console.log('- مرحله فعلی:', currentStep);
+    console.log('- اطلاعات انتخاب شده:', selectedData);
+    
+    const validation = validateBookingData();
+    console.log('- نتیجه اعتبارسنجی:', validation);
+    
+    if (!validation.isValid) {
+        console.log('⚠️ موارد ناقص:', validation.missingItems);
+    } else {
+        console.log('✅ تمام اطلاعات کامل است');
+    }
+}
+
+// اضافه کردن تابع به window برای دسترسی از console
+window.showBookingStatus = showBookingStatus;
+window.selectedData = selectedData;
+window.validateBookingData = validateBookingData;
+
 console.log('✅ سیستم رزرو کامل آماده است');
+console.log('💡 برای بررسی وضعیت: showBookingStatus()');
+console.log('💡 برای مشاهده داده‌ها: selectedData');
+console.log('💡 برای اعتبارسنجی: validateBookingData()');

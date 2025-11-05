@@ -1,0 +1,133 @@
+@using RazorKing.Models.ViewModels
+@model AdminBarbershopsViewModel
+@{
+    ViewData["Title"] = "مدیریت آرایشگاه‌ها";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="admin-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5><i class="bi bi-shop"></i> مدیریت آرایشگاه‌ها</h5>
+        <div class="header-actions">
+            <form asp-action="Barbershops" method="get" class="d-flex">
+                <input type="text" name="search" value="@Model.SearchTerm" class="form-control form-control-sm me-2" placeholder="جستجو در آرایشگاه‌ها...">
+                <button type="submit" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>نام آرایشگاه</th>
+                        <th>مالک</th>
+                        <th>شهر</th>
+                        <th>تلفن</th>
+                        <th>تاریخ ایجاد</th>
+                        <th>وضعیت</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Barbershops?.Any() == true)
+                    {
+                        @foreach (var barbershop in Model.Barbershops)
+                        {
+                            <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    @if (!string.IsNullOrEmpty(barbershop.ImageUrl))
+                                    {
+                                        <img src="@barbershop.ImageUrl" alt="@barbershop.Name" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-secondary rounded me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-shop text-white"></i>
+                                        </div>
+                                    }
+                                    <div>
+                                        <strong>@barbershop.Name</strong>
+                                        <small class="text-muted d-block">@barbershop.Address</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <strong>@barbershop.Owner.FirstName @barbershop.Owner.LastName</strong>
+                                <small class="text-muted d-block">@barbershop.Owner.Email</small>
+                            </td>
+                            <td>@barbershop.City.Name</td>
+                            <td>@barbershop.Phone</td>
+                            <td>@barbershop.CreatedAt.ToString("yyyy/MM/dd")</td>
+                            <td>
+                                <span class="badge bg-@(barbershop.IsActive ? "success" : "danger")">
+                                    @(barbershop.IsActive ? "فعال" : "غیرفعال")
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <form asp-action="ToggleBarbershopStatus" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@barbershop.Id" />
+                                        @{
+                                            var barbershopButtonClass = barbershop.IsActive ? "warning" : "success";
+                                            var barbershopConfirmMessage = barbershop.IsActive ? "آیا می‌خواهید این آرایشگاه را غیرفعال کنید؟" : "آیا می‌خواهید این آرایشگاه را فعال کنید؟";
+                                        }
+                                        <button type="submit" class="btn btn-outline-@barbershopButtonClass" 
+                                                onclick="return confirm('@barbershopConfirmMessage')">
+                                            <i class="bi bi-@(barbershop.IsActive ? "pause" : "play")"></i>
+                                        </button>
+                                    </form>
+                                    <form asp-action="DeleteBarbershop" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@barbershop.Id" />
+                                        <button type="submit" class="btn btn-outline-danger" 
+                                                onclick="return confirm('آیا مطمئن هستید که می‌خواهید این آرایشگاه را حذف کنید؟')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">آرایشگاهی موجود نیست</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="صفحه‌بندی آرایشگاه‌ها">
+                <ul class="pagination justify-content-center">
+                    @if (Model.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Barbershops" asp-route-page="@(Model.CurrentPage - 1)" asp-route-search="@Model.SearchTerm">قبلی</a>
+                        </li>
+                    }
+
+                    @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Barbershops" asp-route-page="@i" asp-route-search="@Model.SearchTerm">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Barbershops" asp-route-page="@(Model.CurrentPage + 1)" asp-route-search="@Model.SearchTerm">بعدی</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    </div>
+</div>

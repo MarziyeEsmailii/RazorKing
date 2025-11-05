@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "پروفایل من";
     Layout = "_LayoutModern";
+    ViewData["BodyClass"] = "profile-body";
 }
 
 @functions {
@@ -50,6 +51,18 @@
                     <button class="btn btn-gold btn-sm" onclick="editProfile()">
                         <i class="fas fa-edit"></i>
                         ویرایش
+                    </button>
+                    <button class="btn btn-outline-light btn-sm" onclick="debugAppointments()" style="margin-right: 10px;">
+                        <i class="fas fa-bug"></i>
+                        بررسی نوبت‌ها
+                    </button>
+                    <button class="btn btn-success btn-sm" onclick="createTestAppointment()" style="margin-right: 10px;">
+                        <i class="fas fa-plus"></i>
+                        ایجاد نوبت تست
+                    </button>
+                    <button class="btn btn-info btn-sm" onclick="refreshAppointments()" style="margin-right: 10px;">
+                        <i class="fas fa-sync-alt"></i>
+                        بروزرسانی
                     </button>
                 </div>
             </div>
@@ -188,13 +201,21 @@
                     {
                         <div class="appointments-card">
                             <div class="empty-state">
-                                <i class="fas fa-calendar-times"></i>
+                                <div class="empty-icon">
+                                    <i class="fas fa-calendar-times"></i>
+                                </div>
                                 <h5>هنوز نوبتی ندارید</h5>
                                 <p>برای رزرو اولین نوبت خود کلیک کنید</p>
-                                <a href="@Url.Action("Index", "Home")" class="btn btn-gold">
-                                    <i class="fas fa-calendar-plus"></i>
-                                    رزرو نوبت
-                                </a>
+                                <div class="empty-actions">
+                                    <a href="@Url.Action("Index", "Booking")" class="btn btn-gold">
+                                        <i class="fas fa-calendar-plus"></i>
+                                        رزرو نوبت جدید
+                                    </a>
+                                    <a href="@Url.Action("Index", "Home")" class="btn btn-outline-gold">
+                                        <i class="fas fa-home"></i>
+                                        صفحه اصلی
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     }

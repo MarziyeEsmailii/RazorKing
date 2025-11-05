@@ -5,54 +5,49 @@
 }
 
 <div class="auth-page">
-    <!-- کارت فرم -->
+    <!-- کارت فرم - سمت چپ -->
     <div class="auth-card">
         <div class="auth-content">
             <div class="auth-box">
+                <!-- تب‌ها -->
+                <div class="auth-switcher">
+                    <button type="button" class="auth-switch active">ورود</button>
+                    <button type="button" class="auth-switch" onclick="window.location.href='/Account/Register'">ثبت نام</button>
+                </div>
 
+                <!-- فرم ورود -->
+                <div class="auth-form-container">
+                    <form asp-action="Login" method="post" class="auth-form">
+                        <div class="input-group">
+                            <input asp-for="Email" type="email" placeholder="ایمیل" required>
+                            <span asp-validation-for="Email" class="field-error"></span>
+                        </div>
 
-            <!-- تب‌ها -->
-            <div class="auth-switcher">
-                <button type="button" class="auth-switch active">ورود</button>
-                <button type="button" class="auth-switch" onclick="window.location.href='/Account/Register'">ثبت نام</button>
-            </div>
+                        <div class="input-group">
+                            <input asp-for="Password" type="password" placeholder="رمز عبور" required>
+                            <span asp-validation-for="Password" class="field-error"></span>
+                        </div>
 
-            <!-- فرم ورود -->
-            <div class="auth-form-container" id="login-form">
-                <form asp-action="Login" method="post" class="auth-form">
-                    
-                    <div class="input-group">
-                        <input asp-for="Email" type="email" placeholder="ایمیل" required>
-                        <span asp-validation-for="Email" class="field-error"></span>
-                    </div>
+                        <div class="auth-options">
+                            <label class="checkbox-label">
+                                <input asp-for="RememberMe" type="checkbox">
+                                <span class="checkmark"></span>
+                                مرا به خاطر بسپار
+                            </label>
+                            <a href="/Account/ForgotPassword" class="forgot-link">فراموشی رمز؟</a>
+                        </div>
 
-                    <div class="input-group">
-                        <input asp-for="Password" type="password" placeholder="رمز عبور" required>
-                        <span asp-validation-for="Password" class="field-error"></span>
-                    </div>
-
-                    <div class="auth-options">
-                        <label class="checkbox-label">
-                            <input asp-for="RememberMe" type="checkbox">
-                            <span class="checkmark"></span>
-                            مرا به خاطر بسپار
-                        </label>
-                        <a href="/Account/ForgotPassword" class="forgot-link">فراموشی رمز؟</a>
-                    </div>
-
-                    <button type="submit" class="auth-btn">ورود</button>
-                </form>
-            </div>
-
-
+                        <button type="submit" class="auth-btn">ورود</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
     
-    <!-- عکس طبیعی -->
+    <!-- عکس طبیعی - سمت راست -->
     <div class="auth-visual">
         <div class="auth-images">
-            <img src="~/img/photo_1_2025-11-01_19-21-48.jpg" alt="" class="auth-img active">
+            <img src="~/img/photo_1_2025-11-01_19-21-48.jpg" alt="ریزر کینگ" class="auth-img">
         </div>
     </div>
 </div>

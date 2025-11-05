@@ -6,40 +6,31 @@
 .city-page {
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
     min-height: 100vh;
-    padding-top: 0;
-    margin-top: -20px;
+    padding-top: 80px;
+    margin-top: 0;
 }
 
 /* City Header */
 .city-header {
     position: relative;
-    padding: 60px 0 40px 0;
+    padding: 30px 0 20px 0;
     overflow: hidden;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    background: rgba(26, 26, 26, 0.5);
 }
 
 .city-header-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
+    display: none;
 }
 
 .city-header-bg img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    display: none;
 }
 
 .city-header-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(10, 10, 10, 0.8), rgba(26, 26, 26, 0.6));
-    z-index: 2;
+    display: none;
 }
 
 .city-header-content {
@@ -47,6 +38,8 @@
     z-index: 3;
     text-align: center;
     color: #ffffff;
+    width: 100%;
+    padding: 20px 0;
 }
 
 .breadcrumb-nav {
@@ -72,11 +65,13 @@
 .city-title {
     font-size: 3rem;
     font-weight: 800;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
+    margin-top: 10px;
     background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    line-height: 1.2;
 }
 
 .city-title i {
@@ -110,9 +105,9 @@
 
 /* Filters Section */
 .filters-section {
-    padding: 15px 0;
+    padding: 10px 0;
     background: rgba(26, 26, 26, 0.5);
-    margin-top: -10px;
+    margin-top: 0;
 }
 
 .filters-card {
@@ -174,14 +169,14 @@
 
 /* Barbershops Section */
 .barbershops-section {
-    padding: 15px 0;
+    padding: 10px 0;
 }
 
 .barbershops-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 25px;
-    margin-top: 15px;
+    gap: 20px;
+    margin-top: 10px;
 }
 
 .barbershop-card {
@@ -331,7 +326,7 @@
 /* Empty State */
 .empty-state {
     text-align: center;
-    padding: 80px 20px;
+    padding: 20px 20px;
     color: #b0b0b0;
 }
 
@@ -375,15 +370,18 @@
 /* Responsive */
 @media (max-width: 768px) {
     .city-page {
-        padding-top: 60px;
+        padding-top: 90px;
     }
     
     .city-header {
-        padding: 60px 0;
+        padding: 30px 0;
+        min-height: 280px;
     }
     
     .city-title {
-        font-size: 2rem;
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+        margin-top: 15px;
     }
     
     .city-stats {
@@ -413,6 +411,22 @@
 }
 
 @media (max-width: 576px) {
+    .city-page {
+        padding-top: 85px;
+    }
+    
+    .city-header {
+        padding: 40px 0;
+        min-height: 300px;
+    }
+    
+    .city-title {
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+        margin-top: 20px;
+        line-height: 1.3;
+    }
+    
     .barbershop-content {
         padding: 20px;
     }
@@ -661,9 +675,10 @@
  Results Header */
 .results-header {
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
-    padding: 1rem;
+    border-radius: 12px;
+    padding: 0.75rem;
     border: 1px solid rgba(212, 175, 55, 0.2);
+    margin-bottom: 10px;
 }
 
 .results-title {
@@ -748,50 +763,51 @@
  Responsive improvements for spacing */
 @media (max-width: 768px) {
     .city-header {
-        padding: 40px 0 30px 0;
+        padding: 30px 0 30px 0;
     }
     
     .city-title {
         font-size: 2.2rem;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
     }
     
     .city-stats {
         gap: 25px;
-        margin-top: 15px;
+        margin-top: 20px;
     }
     
     .filters-section {
-        padding: 10px 0;
+        padding: 15px 0;
     }
     
     .filters-card {
-        padding: 15px;
+        padding: 20px;
     }
     
     .barbershops-section {
-        padding: 10px 0;
+        padding: 15px 0;
     }
     
     .barbershops-grid {
         gap: 20px;
-        margin-top: 10px;
+        margin-top: 15px;
     }
 }
 
 @media (max-width: 576px) {
     .city-header {
-        padding: 30px 0 20px 0;
+        padding: 35px 0 25px 0;
     }
     
     .city-title {
-        font-size: 1.8rem;
+        font-size: 1.9rem;
+        margin-bottom: 20px;
     }
     
     .city-stats {
         flex-direction: column;
         gap: 15px;
-        margin-top: 10px;
+        margin-top: 15px;
     }
     
     .barbershops-grid {

@@ -1,0 +1,32 @@
+@{
+    ViewData["Title"] = "دسترسی مجاز نیست";
+    Layout = "_LayoutModern";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-lock fa-4x text-warning"></i>
+                    </div>
+                    <h2 class="card-title text-danger">دسترسی مجاز نیست</h2>
+                    <p class="card-text">
+                        شما اجازه دسترسی به این بخش را ندارید.
+                    </p>
+                    <div class="mt-4">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary">
+                            <i class="fas fa-home"></i>
+                            بازگشت به صفحه اصلی
+                        </a>
+                        <a href="@Url.Action("Login", "Account")" class="btn btn-outline-secondary ms-2">
+                            <i class="fas fa-sign-in-alt"></i>
+                            ورود
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

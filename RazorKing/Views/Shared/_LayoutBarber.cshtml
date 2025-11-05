@@ -32,9 +32,9 @@
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href="@Url.Action("Dashboard", "Barber")">
+                                        <a href="@Url.Action("Index", "Barber")">
                                             <i class="fas fa-home"></i>
-                                            داشبورد
+                                            خانه
                                         </a>
                                     </li>
                                     @if (ViewContext.RouteData.Values["Action"]?.ToString() != "Dashboard")
@@ -79,6 +79,15 @@
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="fas fa-exclamation-circle me-2"></i>
                     @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            
+            @if (TempData["InfoMessage"] != null)
+            {
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    @TempData["InfoMessage"]
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             }

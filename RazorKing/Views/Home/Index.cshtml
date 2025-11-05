@@ -60,6 +60,13 @@
                                 <i class="fas fa-sync-alt"></i>
                                 به‌روزرسانی آمار
                             </button>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <button onclick="checkUserAppointments()" class="btn btn-outline-light btn-sm" style="margin-top: 10px; margin-right: 10px;">
+                                    <i class="fas fa-calendar-check"></i>
+                                    بررسی نوبت‌ها
+                                </button>
+                            }
                         </div>
                     </div>
                 </div>
@@ -101,138 +108,65 @@
     </div>
 </section>
 
-<!-- User Profile Section (Only for authenticated users) -->
+<!-- Compact User Profile Section -->
 @if (User.Identity.IsAuthenticated && Model.UserProfile != null)
 {
-    <section class="user-profile-section">
+    <section class="user-profile-compact">
         <div class="container">
-            <div class="profile-welcome">
-                <div class="row align-items-center">
-                    <div class="col-lg-8">
-                        <div class="welcome-content">
-                            <h2 class="welcome-title">
-                                <i class="fas fa-user-circle"></i>
-                                سلام @Model.UserProfile.User.FirstName عزیز!
-                            </h2>
-                            <p class="welcome-subtitle">به پنل کاربری خود خوش آمدید</p>
+            <div class="profile-compact-card">
+                <div class="profile-header">
+                    <div class="user-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-info">
+                        <h4 class="user-name">سلام @Model.UserProfile.User.FirstName عزیز!</h4>
+                        <div class="user-stats">
+                            <span class="stat-item">
+                                <i class="fas fa-calendar-check"></i>
+                                @Model.UserProfile.TotalAppointments نوبت
+                            </span>
+                            <span class="stat-divider">•</span>
+                            <span class="stat-item">
+                                <i class="fas fa-clock"></i>
+                                @Model.UserProfile.UpcomingAppointments.Count آینده
+                            </span>
                         </div>
                     </div>
-                    <div class="col-lg-4 text-lg-end">
-                        <a href="@Url.Action("Index", "Profile")" class="btn btn-gold">
+                    <div class="profile-actions">
+                        <a href="@Url.Action("Index", "Profile")" class="btn-profile">
                             <i class="fas fa-user-cog"></i>
-                            مشاهده پروفایل کامل
+                            پروفایل
+                        </a>
+                        <a href="@Url.Action("Index", "Booking")" class="btn-book">
+                            <i class="fas fa-plus"></i>
+                            رزرو جدید
                         </a>
                     </div>
                 </div>
-            </div>
-
-            <div class="row">
-                <!-- Profile Stats -->
-                <div class="col-lg-4">
-                    <div class="profile-stats-card">
-                        <h3 class="card-title">
-                            <i class="fas fa-chart-bar"></i>
-                            آمار شما
-                        </h3>
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <div class="stat-icon">
-                                    <i class="fas fa-calendar-check"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <div class="stat-number">@Model.UserProfile.TotalAppointments</div>
-                                    <div class="stat-label">کل نوبت‌ها</div>
-                                </div>
+                
+                @if (Model.UserProfile.UpcomingAppointments.Any())
+                {
+                    <div class="next-appointment">
+                        @{
+                            var nextAppointment = Model.UserProfile.UpcomingAppointments.First();
+                        }
+                        <div class="appointment-compact">
+                            <div class="appointment-date-compact">
+                                <span class="date">@nextAppointment.AppointmentDate.Day</span>
+                                <span class="month">@nextAppointment.AppointmentDate.ToString("MMM")</span>
                             </div>
-                            <div class="stat-item">
-                                <div class="stat-icon">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <div class="stat-number">@Model.UserProfile.UpcomingAppointments.Count</div>
-                                    <div class="stat-label">نوبت‌های آینده</div>
-                                </div>
+                            <div class="appointment-info-compact">
+                                <h6>@nextAppointment.Barbershop.Name</h6>
+                                <p>@nextAppointment.Service?.Name • @nextAppointment.AppointmentTime.ToString(@"hh\:mm")</p>
                             </div>
-                            <div class="stat-item">
-                                <div class="stat-icon">
-                                    <i class="fas fa-money-bill-wave"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <div class="stat-number">@Model.UserProfile.TotalSpent.ToString("N0")</div>
-                                    <div class="stat-label">تومان خرج شده</div>
-                                </div>
+                            <div class="appointment-status-compact">
+                                <span class="status-@nextAppointment.Status.ToString().ToLower()">
+                                    @(nextAppointment.Status == AppointmentStatus.Confirmed ? "تایید شده" : "در انتظار")
+                                </span>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Upcoming Appointments -->
-                <div class="col-lg-8">
-                    <div class="appointments-preview-card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-calendar-alt"></i>
-                                نوبت‌های آینده شما
-                            </h3>
-                            @if (Model.UserProfile.UpcomingAppointments.Any())
-                            {
-                                <a href="@Url.Action("Index", "Profile")" class="view-all-link">
-                                    مشاهده همه
-                                    <i class="fas fa-arrow-left"></i>
-                                </a>
-                            }
-                        </div>
-                        
-                        @if (Model.UserProfile.UpcomingAppointments.Any())
-                        {
-                            <div class="appointments-preview-list">
-                                @foreach (var appointment in Model.UserProfile.UpcomingAppointments)
-                                {
-                                    <div class="appointment-preview-item">
-                                        <div class="appointment-date">
-                                            <div class="date-day">@appointment.AppointmentDate.Day</div>
-                                            <div class="date-month">@appointment.AppointmentDate.ToString("MMM")</div>
-                                        </div>
-                                        <div class="appointment-details">
-                                            <h5>@appointment.Barbershop.Name</h5>
-                                            <p class="appointment-service">@appointment.Service?.Name</p>
-                                            <p class="appointment-time">
-                                                <i class="fas fa-clock"></i>
-                                                @appointment.AppointmentTime.ToString(@"hh\:mm")
-                                            </p>
-                                            <p class="appointment-location">
-                                                <i class="fas fa-map-marker-alt"></i>
-                                                @appointment.Barbershop.City?.Name
-                                            </p>
-                                        </div>
-                                        <div class="appointment-status">
-                                            <span class="status-badge status-@appointment.Status.ToString().ToLower()">
-                                                @(appointment.Status == AppointmentStatus.Pending ? "در انتظار تایید" :
-                                                  appointment.Status == AppointmentStatus.Confirmed ? "تایید شده" :
-                                                  appointment.Status == AppointmentStatus.Completed ? "انجام شده" : "لغو شده")
-                                            </span>
-                                            <div class="appointment-price">
-                                                @appointment.TotalPrice.ToString("N0") تومان
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="empty-appointments">
-                                <i class="fas fa-calendar-times"></i>
-                                <h5>نوبت آینده‌ای ندارید</h5>
-                                <p>برای رزرو نوبت جدید کلیک کنید</p>
-                                <a href="@Url.Action("Index", "Booking")" class="btn btn-gold">
-                                    <i class="fas fa-calendar-plus"></i>
-                                    رزرو نوبت جدید
-                                </a>
-                            </div>
-                        }
-                    </div>
-                </div>
+                }
             </div>
         </div>
     </section>
@@ -302,7 +236,7 @@
                                 {
                                     var city = Model.Cities[i];
                                     <div class="city-slide-item">
-                                        <div class="city-card" data-city-id="@city.Id" onclick="window.location.href='@Url.Action("City", "Home", new { id = city.Id })'">
+                                        <div class="city-card" data-city-id="@city.Id" onclick="console.log('Clicked city: @city.Id'); window.location.href='@Url.Action("City", "Home", new { id = city.Id })'" style="cursor: pointer;">
                                             <div class="city-image">
                                                 <img src="@ImageHelper.GetCityImage(i)" alt="@city.Name" onerror="this.src='~/img/background.webp'">
                                                 <div class="city-overlay">
@@ -312,7 +246,7 @@
                                             <div class="city-info">
                                                 <h4>@city.Name</h4>
                                                 <p>@city.Barbershops.Count(b => b.IsActive) آرایشگاه فعال</p>
-                                                <div class="city-btn">
+                                                <div class="city-btn" onclick="event.stopPropagation();">
                                                     مشاهده آرایشگاه‌ها
                                                     <i class="fas fa-arrow-left"></i>
                                                 </div>
@@ -608,23 +542,3 @@
     </script>
 }
 
-<style>
-    /* Force stats to be visible for debugging */
-    .hero-stats {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-    
-    .stat-item {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-    
-    .stat-number {
-        color: #d4af37 !important;
-        font-size: 1.5rem !important;
-        font-weight: 900 !important;
-    }
-</style>

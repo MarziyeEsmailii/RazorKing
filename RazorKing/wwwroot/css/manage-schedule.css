@@ -7,7 +7,7 @@
 .manage-schedule {
     background: var(--gradient-primary);
     min-height: 100vh;
-    padding: 120px 0 40px;
+    padding: 20px 0 40px;
 }
 
 .schedule-header {
@@ -476,7 +476,7 @@
 
 @media (max-width: 768px) {
     .manage-schedule {
-        padding: 100px 0 20px;
+        padding: 20px 0 20px;
     }
     
     .schedule-header {

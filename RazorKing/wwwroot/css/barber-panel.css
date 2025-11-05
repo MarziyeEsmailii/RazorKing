@@ -19,7 +19,7 @@
 .top-bar {
     background: rgba(255, 255, 255, 0.05);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 1rem 0;
+    padding: 0.5rem 0;
     backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
@@ -105,7 +105,7 @@
 
 /* Content Area */
 .content-area {
-    padding: 2rem;
+    padding: 1rem;
 }
 
 /* Alert Styles */
@@ -355,7 +355,7 @@
     }
     
     .content-area {
-        padding: 1rem;
+        padding: 0.75rem;
     }
     
     .top-bar {
@@ -379,7 +379,7 @@
 
 @media (max-width: 576px) {
     .content-area {
-        padding: 0.75rem;
+        padding: 0.5rem;
     }
     
     .top-bar-actions {

@@ -269,6 +269,12 @@ function showCityModal(cityId, cityName) {
     window.location.href = `${baseUrl}/Home/City/${cityId}`;
 }
 
+// City card click handler
+function handleCityCardClick(cityId) {
+    const baseUrl = document.querySelector('meta[name="base-url"]')?.getAttribute('content') || '';
+    window.location.href = `${baseUrl}Home/City/${cityId}`;
+}
+
 async function loadCityBarbershops(cityId) {
     try {
         const response = await fetch(`/Home/GetCityBarbershops?cityId=${cityId}`);
@@ -457,8 +463,39 @@ async function loadRealTimeStats() {
     }
 }
 
+// Check user appointments
+async function checkUserAppointments() {
+    try {
+        console.log('🔍 Checking user appointments...');
+        
+        const response = await fetch('/Home/CheckUserAppointments');
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('📊 User appointments data:', result.data);
+            
+            alert(`
+نتایج بررسی نوبت‌ها:
+- ایمیل کاربر: ${result.data.userEmail}
+- کل نوبت‌ها در سیستم: ${result.data.totalAppointments}
+- نوبت‌های شما: ${result.data.userAppointments}
+
+جزئیات در Console مرورگر موجود است.
+            `);
+        } else {
+            console.error('❌ Error checking appointments:', result.message || result.error);
+            alert('خطا در بررسی نوبت‌ها: ' + (result.message || result.error));
+        }
+    } catch (error) {
+        console.error('❌ Error checking appointments:', error);
+        alert('خطا در ارتباط با سرور');
+    }
+}
+
 // Make functions globally available
 window.quickBooking = quickBooking;
 window.showCityModal = showCityModal;
 window.goToCityRow = goToCityRow;
 window.loadRealTimeStats = loadRealTimeStats;
+window.handleCityCardClick = handleCityCardClick;
+window.checkUserAppointments = checkUserAppointments;

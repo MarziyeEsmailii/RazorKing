@@ -1,0 +1,123 @@
+@using RazorKing.Models.ViewModels
+@model AdminServicesViewModel
+@{
+    ViewData["Title"] = "مدیریت خدمات";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="admin-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5><i class="bi bi-scissors"></i> مدیریت خدمات</h5>
+        <div class="header-actions">
+            <form asp-action="Services" method="get" class="d-flex">
+                <input type="text" name="search" value="@Model.SearchTerm" class="form-control form-control-sm me-2" placeholder="جستجو در خدمات...">
+                <button type="submit" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>نام خدمت</th>
+                        <th>آرایشگاه</th>
+                        <th>شهر</th>
+                        <th>قیمت</th>
+                        <th>مدت زمان</th>
+                        <th>تاریخ ایجاد</th>
+                        <th>وضعیت</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Services?.Any() == true)
+                    {
+                        @foreach (var service in Model.Services)
+                        {
+                            <tr>
+                            <td>
+                                <strong>@service.Name</strong>
+                                @if (!string.IsNullOrEmpty(service.Description))
+                                {
+                                    <small class="text-muted d-block">@service.Description</small>
+                                }
+                            </td>
+                            <td>@service.Barbershop.Name</td>
+                            <td>@service.Barbershop.City.Name</td>
+                            <td>
+                                <strong>@service.Price.ToString("N0") تومان</strong>
+                            </td>
+                            <td>@service.Duration دقیقه</td>
+                            <td>@service.CreatedAt.ToString("yyyy/MM/dd")</td>
+                            <td>
+                                <span class="badge bg-@(service.IsActive ? "success" : "danger")">
+                                    @(service.IsActive ? "فعال" : "غیرفعال")
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <form asp-action="ToggleServiceStatus" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@service.Id" />
+                                        @{
+                                            var serviceButtonClass = service.IsActive ? "warning" : "success";
+                                            var serviceConfirmMessage = service.IsActive ? "آیا می‌خواهید این خدمت را غیرفعال کنید؟" : "آیا می‌خواهید این خدمت را فعال کنید؟";
+                                        }
+                                        <button type="submit" class="btn btn-outline-@serviceButtonClass" 
+                                                onclick="return confirm('@serviceConfirmMessage')">
+                                            <i class="bi bi-@(service.IsActive ? "pause" : "play")"></i>
+                                        </button>
+                                    </form>
+                                    <form asp-action="DeleteService" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@service.Id" />
+                                        <button type="submit" class="btn btn-outline-danger" 
+                                                onclick="return confirm('آیا مطمئن هستید که می‌خواهید این خدمت را حذف کنید؟')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted">خدماتی موجود نیست</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="صفحه‌بندی خدمات">
+                <ul class="pagination justify-content-center">
+                    @if (Model.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Services" asp-route-page="@(Model.CurrentPage - 1)" asp-route-search="@Model.SearchTerm">قبلی</a>
+                        </li>
+                    }
+
+                    @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Services" asp-route-page="@i" asp-route-search="@Model.SearchTerm">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Services" asp-route-page="@(Model.CurrentPage + 1)" asp-route-search="@Model.SearchTerm">بعدی</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    </div>
+</div>

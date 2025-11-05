@@ -240,6 +240,12 @@ namespace RazorKing.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
         private async Task EnsureRolesExist()
         {
             string[] roleNames = { "Customer", "Barber" };

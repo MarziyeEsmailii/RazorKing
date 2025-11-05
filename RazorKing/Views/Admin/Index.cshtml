@@ -1,0 +1,184 @@
+@using RazorKing.Models.ViewModels
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "داشبورد مدیریت";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="dashboard-stats">
+    <div class="row">
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card stat-primary">
+                <div class="stat-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>@Model.TotalUsers</h3>
+                    <p>کل کاربران</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card stat-success">
+                <div class="stat-icon">
+                    <i class="bi bi-shop"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>@Model.TotalBarbershops</h3>
+                    <p>آرایشگاه‌ها</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card stat-warning">
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>@Model.TotalAppointments</h3>
+                    <p>کل نوبت‌ها</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card stat-info">
+                <div class="stat-icon">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>@Model.MonthlyRevenue.ToString("N0") تومان</h3>
+                    <p>درآمد ماهانه</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5><i class="bi bi-clock"></i> آمار امروز</h5>
+            </div>
+            <div class="card-body">
+                <div class="today-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">نوبت‌های امروز:</span>
+                        <span class="stat-value">@Model.TodayAppointments</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">نوبت‌های در انتظار:</span>
+                        <span class="stat-value text-warning">@Model.PendingAppointments</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">آرایشگاه‌های فعال:</span>
+                        <span class="stat-value text-success">@Model.ActiveBarbershops</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5><i class="bi bi-list-ul"></i> آخرین نوبت‌ها</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>مشتری</th>
+                                <th>آرایشگاه</th>
+                                <th>خدمت</th>
+                                <th>تاریخ</th>
+                                <th>وضعیت</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.RecentAppointments?.Any() == true)
+                            {
+                                @foreach (var appointment in Model.RecentAppointments)
+                                {
+                                    <tr>
+                                        <td>@appointment.CustomerName</td>
+                                        <td>@appointment.Barbershop?.Name</td>
+                                        <td>@appointment.Service?.Name</td>
+                                        <td>@appointment.AppointmentDate.ToString("yyyy/MM/dd")</td>
+                                        <td>
+                                        @{
+                                            var statusClass = appointment.Status switch 
+                                            {
+                                                AppointmentStatus.Pending => "warning",
+                                                AppointmentStatus.Confirmed => "info",
+                                                AppointmentStatus.Completed => "success",
+                                                AppointmentStatus.Cancelled => "danger",
+                                                _ => "secondary"
+                                            };
+                                            var statusText = appointment.Status switch 
+                                            {
+                                                AppointmentStatus.Pending => "در انتظار",
+                                                AppointmentStatus.Confirmed => "تایید شده",
+                                                AppointmentStatus.Completed => "تکمیل شده",
+                                                AppointmentStatus.Cancelled => "لغو شده",
+                                                _ => "نامشخص"
+                                            };
+                                        }
+                                        <span class="badge bg-@statusClass">
+                                            @statusText
+                                        </span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">نوبتی موجود نیست</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <a asp-action="Appointments" class="btn btn-outline-primary btn-sm">
+                        مشاهده همه نوبت‌ها <i class="bi bi-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5><i class="bi bi-geo-alt"></i> شهرها</h5>
+            </div>
+            <div class="card-body">
+                <div class="quick-stat">
+                    <h3>@Model.TotalCities</h3>
+                    <p>شهر ثبت شده</p>
+                    <a asp-action="Cities" class="btn btn-outline-primary btn-sm">مدیریت شهرها</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5><i class="bi bi-scissors"></i> خدمات</h5>
+            </div>
+            <div class="card-body">
+                <div class="quick-stat">
+                    <h3>@Model.TotalServices</h3>
+                    <p>خدمت ارائه شده</p>
+                    <a asp-action="Services" class="btn btn-outline-primary btn-sm">مدیریت خدمات</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
