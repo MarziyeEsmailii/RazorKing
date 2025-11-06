@@ -3,6 +3,8 @@
  * ریزر کینگ - اسکریپت صفحه شهر
  */
 
+console.log('🏪 City Page JavaScript loaded');
+
 // Helper function to get barbershop image based on ID
 function getBarbershopImage(barbershopId) {
     const barbershopImages = [
@@ -264,120 +266,187 @@ function animateCards() {
 
 // Barbershop details modal
 async function showBarbershopDetails(barbershopId) {
-    const modal = new bootstrap.Modal(document.getElementById('barbershopModal'));
-    
-    // Show loading
-    document.getElementById('barbershopDetailsLoading').classList.remove('d-none');
-    document.getElementById('barbershopDetailsContent').classList.add('d-none');
-    
-    // Store barbershop ID for booking
-    document.getElementById('bookNowBtn').setAttribute('data-barbershop-id', barbershopId);
-    
-    modal.show();
+    console.log('Loading barbershop details for ID:', barbershopId);
     
     try {
-        const response = await fetch(`/Home/GetBarbershopDetails?barbershopId=${barbershopId}`);
-        const barbershop = await response.json();
+        const modalElement = document.getElementById('barbershopModal');
+        if (!modalElement) {
+            console.error('Modal element not found');
+            return;
+        }
         
-        if (barbershop) {
+        // Check if Bootstrap is available
+        if (typeof bootstrap === 'undefined') {
+            console.error('Bootstrap is not loaded');
+            return;
+        }
+        
+        const modal = new bootstrap.Modal(modalElement);
+        
+        // Show loading
+        const loadingElement = document.getElementById('barbershopDetailsLoading');
+        const contentElement = document.getElementById('barbershopDetailsContent');
+        
+        if (loadingElement) loadingElement.classList.remove('d-none');
+        if (contentElement) contentElement.classList.add('d-none');
+        
+        // Store barbershop ID for booking
+        const bookBtn = document.getElementById('bookNowBtn');
+        if (bookBtn) bookBtn.setAttribute('data-barbershop-id', barbershopId);
+        
+        modal.show();
+        
+        // Fetch barbershop details
+        console.log('Fetching from:', `/Home/GetBarbershopDetails?barbershopId=${barbershopId}`);
+        
+        const response = await fetch(`/Home/GetBarbershopDetails?barbershopId=${barbershopId}`);
+        
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const barbershop = await response.json();
+        console.log('Received barbershop data:', barbershop);
+        
+        if (barbershop && barbershop.id) {
             displayBarbershopDetails(barbershop);
         } else {
-            showBarbershopError();
+            console.warn('No barbershop data received or invalid data');
+            showBarbershopError('آرایشگاه یافت نشد');
         }
     } catch (error) {
         console.error('Error loading barbershop details:', error);
-        showBarbershopError();
+        showBarbershopError('خطا در بارگذاری اطلاعات: ' + error.message);
     }
 }
 
 function displayBarbershopDetails(barbershop) {
     const content = document.getElementById('barbershopDetailsContent');
     
-    // Parse working days
-    const workingDays = barbershop.workingDays ? barbershop.workingDays.split(',') : [];
-    
-    content.innerHTML = `
-        <div class="barbershop-details">
-            <div class="barbershop-header">
-                <img src="${barbershop.imageUrl || getBarbershopImage(barbershop.id)}" 
-                     alt="${barbershop.name}" 
-                     class="barbershop-image-large"
-                     onerror="this.src='/img/background.webp'">
-                <h4 class="barbershop-name-large">${barbershop.name}</h4>
-                ${barbershop.description ? `<p class="barbershop-description">${barbershop.description}</p>` : ''}
-            </div>
-            
-            <div class="barbershop-info-grid">
-                <div class="info-section">
-                    <h6>
-                        <i class="fas fa-info-circle"></i>
-                        اطلاعات تماس
-                    </h6>
-                    <div class="info-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>${barbershop.address}</span>
+    try {
+        console.log('Displaying barbershop details:', barbershop);
+        
+        // Parse working days safely
+        const workingDays = barbershop.workingDays ? 
+            barbershop.workingDays.split(',').filter(day => day.trim()) : 
+            ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه'];
+        
+        // Safe property access
+        const name = barbershop.name || 'نام آرایشگاه';
+        const address = barbershop.address || 'آدرس موجود نیست';
+        const phone = barbershop.phone || 'شماره تماس موجود نیست';
+        const cityName = barbershop.cityName || 'شهر نامشخص';
+        const description = barbershop.description || '';
+        const imageUrl = barbershop.imageUrl || getBarbershopImage(barbershop.id || 1);
+        const openTime = barbershop.openTime || '09:00';
+        const closeTime = barbershop.closeTime || '21:00';
+        const services = barbershop.services || [];
+        
+        content.innerHTML = `
+            <div class="barbershop-details">
+                <div class="barbershop-header">
+                    <img src="${imageUrl}" 
+                         alt="${name}" 
+                         class="barbershop-image-large"
+                         onerror="this.src='/img/background.webp'">
+                    <h4 class="barbershop-name-large">${name}</h4>
+                    ${description ? `<p class="barbershop-description">${description}</p>` : ''}
+                </div>
+                
+                <div class="barbershop-info-grid">
+                    <div class="info-section">
+                        <h6>
+                            <i class="fas fa-info-circle"></i>
+                            اطلاعات تماس
+                        </h6>
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${address}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-phone"></i>
+                            <span>${phone}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-city"></i>
+                            <span>${cityName}</span>
+                        </div>
                     </div>
-                    <div class="info-item">
-                        <i class="fas fa-phone"></i>
-                        <span>${barbershop.phone}</span>
-                    </div>
-                    <div class="info-item">
-                        <i class="fas fa-city"></i>
-                        <span>${barbershop.cityName}</span>
+                    
+                    <div class="info-section">
+                        <h6>
+                            <i class="fas fa-clock"></i>
+                            ساعات کاری
+                        </h6>
+                        <div class="info-item">
+                            <i class="fas fa-sun"></i>
+                            <span>شروع: ${formatTime(openTime)}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-moon"></i>
+                            <span>پایان: ${formatTime(closeTime)}</span>
+                        </div>
+                        <div class="working-days">
+                            ${workingDays.map(day => `<span class="day-badge">${day.trim()}</span>`).join('')}
+                        </div>
                     </div>
                 </div>
                 
-                <div class="info-section">
-                    <h6>
-                        <i class="fas fa-clock"></i>
-                        ساعات کاری
-                    </h6>
-                    <div class="info-item">
-                        <i class="fas fa-sun"></i>
-                        <span>شروع: ${formatTime(barbershop.openTime)}</span>
+                ${services.length > 0 ? `
+                    <div class="info-section">
+                        <h6>
+                            <i class="fas fa-scissors"></i>
+                            خدمات ارائه شده (${services.length})
+                        </h6>
+                        <div class="services-grid">
+                            ${services.map(service => `
+                                <div class="service-item">
+                                    <div class="service-name">${service.name || 'خدمت'}</div>
+                                    <div class="service-price">${formatCurrency(service.price || 0)}</div>
+                                    ${service.duration ? `<div class="service-duration">${service.duration} دقیقه</div>` : ''}
+                                    ${service.description ? `<div class="service-description">${service.description}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
-                    <div class="info-item">
-                        <i class="fas fa-moon"></i>
-                        <span>پایان: ${formatTime(barbershop.closeTime)}</span>
+                ` : `
+                    <div class="info-section">
+                        <h6>
+                            <i class="fas fa-scissors"></i>
+                            خدمات ارائه شده
+                        </h6>
+                        <p class="text-muted">هیچ خدماتی ثبت نشده است</p>
                     </div>
-                    <div class="working-days">
-                        ${workingDays.map(day => `<span class="day-badge">${day.trim()}</span>`).join('')}
-                    </div>
-                </div>
+                `}
             </div>
-            
-            ${barbershop.services && barbershop.services.length > 0 ? `
-                <div class="info-section">
-                    <h6>
-                        <i class="fas fa-scissors"></i>
-                        خدمات ارائه شده
-                    </h6>
-                    <div class="services-grid">
-                        ${barbershop.services.map(service => `
-                            <div class="service-item">
-                                <div class="service-name">${service.name}</div>
-                                <div class="service-price">${formatCurrency(service.price)}</div>
-                                ${service.duration ? `<div class="service-duration">${service.duration} دقیقه</div>` : ''}
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
-        </div>
-    `;
-    
-    // Hide loading and show content
-    document.getElementById('barbershopDetailsLoading').classList.add('d-none');
-    document.getElementById('barbershopDetailsContent').classList.remove('d-none');
+        `;
+        
+        // Hide loading and show content
+        document.getElementById('barbershopDetailsLoading').classList.add('d-none');
+        document.getElementById('barbershopDetailsContent').classList.remove('d-none');
+        
+        console.log('Barbershop details displayed successfully');
+        
+    } catch (error) {
+        console.error('Error displaying barbershop details:', error);
+        showBarbershopError();
+    }
 }
 
-function showBarbershopError() {
+function showBarbershopError(message = 'خطا در بارگذاری اطلاعات') {
     const content = document.getElementById('barbershopDetailsContent');
     content.innerHTML = `
         <div class="text-center py-5">
             <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-            <h5 class="text-muted">خطا در بارگذاری اطلاعات</h5>
-            <p class="text-muted">لطفاً دوباره تلاش کنید</p>
+            <h5 class="text-light">${message}</h5>
+            <p class="text-muted">لطفاً دوباره تلاش کنید یا با پشتیبانی تماس بگیرید</p>
+            <button class="btn btn-outline-gold mt-3" onclick="location.reload()">
+                <i class="fas fa-refresh"></i>
+                تلاش مجدد
+            </button>
         </div>
     `;
     
@@ -395,12 +464,19 @@ function formatTime(timeString) {
     if (!timeString) return '';
     
     try {
+        // Handle different time formats
+        if (timeString.includes(':')) {
+            return timeString;
+        }
+        
         const time = new Date(`2000-01-01T${timeString}`);
         return time.toLocaleTimeString('fa-IR', {
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            hour12: false
         });
-    } catch {
+    } catch (error) {
+        console.log('Time format error:', error, timeString);
         return timeString;
     }
 }
@@ -409,11 +485,11 @@ function formatTime(timeString) {
 function formatCurrency(amount) {
     if (!amount) return '';
     
-    return new Intl.NumberFormat('fa-IR', {
-        style: 'currency',
-        currency: 'IRR',
-        minimumFractionDigits: 0
-    }).format(amount);
+    try {
+        return new Intl.NumberFormat('fa-IR').format(amount) + ' تومان';
+    } catch (error) {
+        return amount.toLocaleString() + ' تومان';
+    }
 }
 
 // Initialize booking button

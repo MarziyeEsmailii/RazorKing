@@ -831,4 +831,46 @@
     opacity: 1 !important;
     visibility: visible !important;
     display: block !important;
+}.se
+rvice-description {
+    color: #888;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    line-height: 1.4;
+}
+
+/* Debug styles */
+.barbershop-modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.barbershop-details {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced error display */
+.text-light {
+    color: #f8f9fa !important;
+}
+
+.btn-outline-gold {
+    border-color: #d4af37;
+    color: #d4af37;
+}
+
+.btn-outline-gold:hover {
+    background-color: #d4af37;
+    color: #1a1a1a;
 }

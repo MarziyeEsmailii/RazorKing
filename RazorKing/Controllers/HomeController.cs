@@ -577,8 +577,8 @@ namespace RazorKing.Controllers
                     address = barbershop.Address,
                     phone = barbershop.Phone,
                     imageUrl = barbershop.ImageUrl,
-                    openTime = barbershop.OpenTime.ToString(@"hh\\:mm"),
-                    closeTime = barbershop.CloseTime.ToString(@"hh\\:mm"),
+                    openTime = barbershop.OpenTime.ToString(@"hh\:mm"),
+                    closeTime = barbershop.CloseTime.ToString(@"hh\:mm"),
                     workingDays = barbershop.WorkingDays,
                     cityName = barbershop.City?.Name,
                     services = barbershop.Services.Select(s => new
