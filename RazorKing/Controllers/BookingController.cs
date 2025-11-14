@@ -13,6 +13,8 @@ namespace RazorKing.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<BookingController> _logger;
 
+       
+
         public BookingController(
             ApplicationDbContext context, 
             UserManager<ApplicationUser> userManager,
@@ -124,7 +126,7 @@ namespace RazorKing.Controllers
                     name = s.Name,
                     description = s.Description,
                     price = s.Price,
-                    duration = s.Duration
+                    duration = s.Duration //چند دقیقه طول میکشه
                 })
                 .ToListAsync();
 

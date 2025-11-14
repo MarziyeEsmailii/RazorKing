@@ -722,11 +722,11 @@ namespace RazorKing.Controllers
                     if (!workingDays.Contains(dayName)) continue;
 
                     // Remove existing time slots for this date
-                    var existingSlots = await _context.TimeSlots
+                    var existingSlots = await _context.Time
                         .Where(ts => ts.BarbershopId == barbershop.Id && ts.Date.Date == date.Date)
                         .ToListAsync();
                     
-                    _context.TimeSlots.RemoveRange(existingSlots);
+                    _context.Time.RemoveRange(existingSlots);
 
                     // Generate new time slots
                     var currentTime = barbershop.OpenTime;
@@ -742,7 +742,7 @@ namespace RazorKing.Controllers
                             SlotType = TimeSlotType.Available
                         };
 
-                        _context.TimeSlots.Add(timeSlot);
+                        _context.Time.Add(timeSlot);
                         currentTime = currentTime.Add(TimeSpan.FromMinutes(slotDuration + breakDuration));
                     }
                 }
@@ -771,7 +771,7 @@ namespace RazorKing.Controllers
                 return Json(new { success = false, message = "آرایشگاه یافت نشد" });
             }
 
-            var timeSlots = await _context.TimeSlots
+            var timeSlots = await _context.Time
                 .Where(ts => ts.BarbershopId == barbershop.Id && ts.Date.Date == date.Date)
                 .OrderBy(ts => ts.StartTime)
                 .Select(ts => new
@@ -813,7 +813,7 @@ namespace RazorKing.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
 
-            var timeSlot = await _context.TimeSlots
+            var timeSlot = await _context.Time
                 .Include(ts => ts.Barbershop)
                 .FirstOrDefaultAsync(ts => ts.Id == model.TimeSlotId && ts.Barbershop.UserId == user.Id);
 
@@ -848,7 +848,7 @@ namespace RazorKing.Controllers
 
             var selectedDate = date ?? DateTime.Today;
 
-            var timeSlots = await _context.TimeSlots
+            var timeSlots = await _context.Time
                 .Where(ts => ts.BarbershopId == barbershop.Id && ts.Date.Date == selectedDate.Date)
                 .OrderBy(ts => ts.StartTime)
                 .Select(ts => new TimeSlotViewModel
@@ -902,7 +902,7 @@ namespace RazorKing.Controllers
                 var endTime = TimeSpan.Parse(model.EndTime);
 
                 // Check for overlapping time slots
-                var overlapping = await _context.TimeSlots
+                var overlapping = await _context.Time
                     .AnyAsync(ts => ts.BarbershopId == barbershop.Id && 
                                    ts.Date.Date == model.Date.Date &&
                                    ((ts.StartTime < endTime && ts.EndTime > startTime)));
@@ -924,7 +924,7 @@ namespace RazorKing.Controllers
                     BlockReason = model.BlockReason
                 };
 
-                _context.TimeSlots.Add(timeSlot);
+                _context.Time.Add(timeSlot);
                 await _context.SaveChangesAsync();
 
                 return Json(new { success = true, message = "بازه زمانی با موفقیت اضافه شد" });
@@ -942,7 +942,7 @@ namespace RazorKing.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
 
-            var timeSlot = await _context.TimeSlots
+            var timeSlot = await _context.Time
                 .Include(ts => ts.Barbershop)
                 .FirstOrDefaultAsync(ts => ts.Id == model.Id && ts.Barbershop.UserId == user.Id);
 
@@ -957,7 +957,7 @@ namespace RazorKing.Controllers
                 var endTime = TimeSpan.Parse(model.EndTime);
 
                 // Check for overlapping time slots (excluding current slot)
-                var overlapping = await _context.TimeSlots
+                var overlapping = await _context.Time
                     .AnyAsync(ts => ts.BarbershopId == timeSlot.BarbershopId && 
                                    ts.Id != model.Id &&
                                    ts.Date.Date == model.Date.Date &&
@@ -992,7 +992,7 @@ namespace RazorKing.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Json(new { success = false, message = "کاربر یافت نشد" });
 
-            var timeSlot = await _context.TimeSlots
+            var timeSlot = await _context.Time
                 .Include(ts => ts.Barbershop)
                 .Include(ts => ts.Appointment)
                 .FirstOrDefaultAsync(ts => ts.Id == id && ts.Barbershop.UserId == user.Id);
@@ -1010,7 +1010,7 @@ namespace RazorKing.Controllers
 
             try
             {
-                _context.TimeSlots.Remove(timeSlot);
+                _context.Time.Remove(timeSlot);        
                 await _context.SaveChangesAsync();
 
                 return Json(new { success = true, message = "بازه زمانی با موفقیت حذف شد" });

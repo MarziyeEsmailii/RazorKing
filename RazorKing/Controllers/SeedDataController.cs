@@ -158,7 +158,7 @@ namespace RazorKing.Controllers
                 // حذف به ترتیب وابستگی
                 _context.AppointmentServices.RemoveRange(_context.AppointmentServices);
                 _context.Appointments.RemoveRange(_context.Appointments);
-                _context.TimeSlots.RemoveRange(_context.TimeSlots);
+                _context.Time.RemoveRange(_context.Time);
                 _context.BlockedTimeSlots.RemoveRange(_context.BlockedTimeSlots);
                 _context.BlockedDates.RemoveRange(_context.BlockedDates);
                 _context.BarberSchedules.RemoveRange(_context.BarberSchedules);
@@ -737,7 +737,7 @@ namespace RazorKing.Controllers
                             CreatedAt = DateTime.Now
                         };
 
-                        _context.TimeSlots.Add(timeSlot);
+                        _context.Time.Add(timeSlot);
                         currentTime = currentTime.Add(TimeSpan.FromMinutes(30));
                     }
                 }

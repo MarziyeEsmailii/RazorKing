@@ -18,7 +18,7 @@ namespace RazorKing.Data
         public DbSet<BarberSchedule> BarberSchedules { get; set; }
         public DbSet<BlockedDate> BlockedDates { get; set; }
         public DbSet<BlockedTimeSlot> BlockedTimeSlots { get; set; }
-        public DbSet<TimeSlot> TimeSlots { get; set; }
+        public DbSet<TimeSlot> Time { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
