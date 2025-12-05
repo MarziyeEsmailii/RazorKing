@@ -10,7 +10,7 @@ builder.Services.AddControllersWithViews();
 
 // Add Entity Framework
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
@@ -62,6 +62,11 @@ app.MapControllerRoute(
     name: "admin",
     pattern: "admin/{action=Index}/{id?}",
     defaults: new { controller = "Admin" });
+
+app.MapControllerRoute(
+    name: "test",
+    pattern: "test/{action=Index}/{id?}",
+    defaults: new { controller = "Test" });
 
 app.MapControllerRoute(
     name: "default",
